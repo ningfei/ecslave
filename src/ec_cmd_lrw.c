@@ -1,5 +1,5 @@
 #include <stdio.h>
-
+#include <string.h>
 #include "ethercattype.h"
 #include "fsm_slave.h"
 #include "ecs_slave.h"
@@ -10,12 +10,12 @@ uint8_t process_data[65536];
 
 void set_data_lrw(uint8_t *data,uint16_t offset,uint16_t datalen)
 {
-	memcpy(process_data[offset], data, datalen);
+	memcpy(&process_data[offset], data, datalen);
 }
 
 void get_data_lrw(uint8_t *data, uint16_t offset, uint16_t datalen)
 {
-	memcpy(data ,process_data[offset],datalen);
+	memcpy(data ,&process_data[offset],datalen);
 }
 
  /** Logical Read Write */

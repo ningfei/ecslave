@@ -66,7 +66,7 @@ static inline uint16_t ec_dgram_data_length(uint8_t *d)
 	return datalen;
 }
 
-static inline uint16_t ec_dgram_address_position(uint8_t *d)
+static inline uint16_t ec_dgram_adp(uint8_t *d)
 {
 	ec_comt *datagram = (ec_comt *)__ecat_header(d);
 	return (datagram->ADP);

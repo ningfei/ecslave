@@ -25,6 +25,14 @@ void ec_init_regs(void)
     								  * 		0b00000100	dc
     								  * 		0b00001000  dc 64 bit
     								  **/
+	ec_registers[ECT_REG_STADR]  = 0xFF;
+	ec_registers[ECT_REG_DLSTAT] = 0b100001000; /* data link state */
+	ec_registers[ECT_REG_DLSTAT +1] = 0x00; /* data link state */
+}
+
+int16_t ec_station_address(void)
+{
+	return ec_registers[ECT_REG_STADR];
 }
 
 void ec_set_ado(int reg,long val)
