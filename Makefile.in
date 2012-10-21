@@ -48,9 +48,10 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_ec_slave_OBJECTS = ec_cmd_apwr.$(OBJEXT) ec_cmd_brd.$(OBJEXT) \
-	ec_cmd_brw.$(OBJEXT) ec_cmd_fprd.$(OBJEXT) \
-	ec_cmd_lrw.$(OBJEXT) ec_regs.$(OBJEXT) ecs_slave.$(OBJEXT)
+am_ec_slave_OBJECTS = ec_cmd_apwr.$(OBJEXT) ec_cmd_fpwr.$(OBJEXT) \
+	ec_cmd_brd.$(OBJEXT) ec_cmd_brw.$(OBJEXT) \
+	ec_cmd_fprd.$(OBJEXT) ec_cmd_lrw.$(OBJEXT) ec_sii.$(OBJEXT) \
+	ec_regs.$(OBJEXT) ecs_slave.$(OBJEXT)
 ec_slave_OBJECTS = $(am_ec_slave_OBJECTS)
 ec_slave_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -162,7 +163,17 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-ec_slave_SOURCES = src/ec_cmd_apwr.c src/ec_cmd_brd.c src/ec_cmd_brw.c src/ec_cmd_fprd.c src/ec_cmd_lrw.c src/ec_regs.c src/ecs_slave.c
+ec_slave_SOURCES = \
+src/ec_cmd_apwr.c \
+src/ec_cmd_fpwr.c \
+src/ec_cmd_brd.c \
+src/ec_cmd_brw.c \
+src/ec_cmd_fprd.c \
+src/ec_cmd_lrw.c \
+src/ec_sii.c \
+src/ec_regs.c \
+src/ecs_slave.c
+
 all: all-am
 
 .SUFFIXES:
@@ -252,8 +263,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ec_cmd_brd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ec_cmd_brw.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ec_cmd_fprd.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ec_cmd_fpwr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ec_cmd_lrw.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ec_regs.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ec_sii.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ecs_slave.Po@am__quote@
 
 .c.o:
@@ -283,6 +296,20 @@ ec_cmd_apwr.obj: src/ec_cmd_apwr.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/ec_cmd_apwr.c' object='ec_cmd_apwr.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ec_cmd_apwr.obj `if test -f 'src/ec_cmd_apwr.c'; then $(CYGPATH_W) 'src/ec_cmd_apwr.c'; else $(CYGPATH_W) '$(srcdir)/src/ec_cmd_apwr.c'; fi`
+
+ec_cmd_fpwr.o: src/ec_cmd_fpwr.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ec_cmd_fpwr.o -MD -MP -MF $(DEPDIR)/ec_cmd_fpwr.Tpo -c -o ec_cmd_fpwr.o `test -f 'src/ec_cmd_fpwr.c' || echo '$(srcdir)/'`src/ec_cmd_fpwr.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/ec_cmd_fpwr.Tpo $(DEPDIR)/ec_cmd_fpwr.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/ec_cmd_fpwr.c' object='ec_cmd_fpwr.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ec_cmd_fpwr.o `test -f 'src/ec_cmd_fpwr.c' || echo '$(srcdir)/'`src/ec_cmd_fpwr.c
+
+ec_cmd_fpwr.obj: src/ec_cmd_fpwr.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ec_cmd_fpwr.obj -MD -MP -MF $(DEPDIR)/ec_cmd_fpwr.Tpo -c -o ec_cmd_fpwr.obj `if test -f 'src/ec_cmd_fpwr.c'; then $(CYGPATH_W) 'src/ec_cmd_fpwr.c'; else $(CYGPATH_W) '$(srcdir)/src/ec_cmd_fpwr.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/ec_cmd_fpwr.Tpo $(DEPDIR)/ec_cmd_fpwr.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/ec_cmd_fpwr.c' object='ec_cmd_fpwr.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ec_cmd_fpwr.obj `if test -f 'src/ec_cmd_fpwr.c'; then $(CYGPATH_W) 'src/ec_cmd_fpwr.c'; else $(CYGPATH_W) '$(srcdir)/src/ec_cmd_fpwr.c'; fi`
 
 ec_cmd_brd.o: src/ec_cmd_brd.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ec_cmd_brd.o -MD -MP -MF $(DEPDIR)/ec_cmd_brd.Tpo -c -o ec_cmd_brd.o `test -f 'src/ec_cmd_brd.c' || echo '$(srcdir)/'`src/ec_cmd_brd.c
@@ -339,6 +366,20 @@ ec_cmd_lrw.obj: src/ec_cmd_lrw.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/ec_cmd_lrw.c' object='ec_cmd_lrw.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ec_cmd_lrw.obj `if test -f 'src/ec_cmd_lrw.c'; then $(CYGPATH_W) 'src/ec_cmd_lrw.c'; else $(CYGPATH_W) '$(srcdir)/src/ec_cmd_lrw.c'; fi`
+
+ec_sii.o: src/ec_sii.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ec_sii.o -MD -MP -MF $(DEPDIR)/ec_sii.Tpo -c -o ec_sii.o `test -f 'src/ec_sii.c' || echo '$(srcdir)/'`src/ec_sii.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/ec_sii.Tpo $(DEPDIR)/ec_sii.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/ec_sii.c' object='ec_sii.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ec_sii.o `test -f 'src/ec_sii.c' || echo '$(srcdir)/'`src/ec_sii.c
+
+ec_sii.obj: src/ec_sii.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ec_sii.obj -MD -MP -MF $(DEPDIR)/ec_sii.Tpo -c -o ec_sii.obj `if test -f 'src/ec_sii.c'; then $(CYGPATH_W) 'src/ec_sii.c'; else $(CYGPATH_W) '$(srcdir)/src/ec_sii.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/ec_sii.Tpo $(DEPDIR)/ec_sii.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/ec_sii.c' object='ec_sii.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ec_sii.obj `if test -f 'src/ec_sii.c'; then $(CYGPATH_W) 'src/ec_sii.c'; else $(CYGPATH_W) '$(srcdir)/src/ec_sii.c'; fi`
 
 ec_regs.o: src/ec_regs.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ec_regs.o -MD -MP -MF $(DEPDIR)/ec_regs.Tpo -c -o ec_regs.o `test -f 'src/ec_regs.c' || echo '$(srcdir)/'`src/ec_regs.c
