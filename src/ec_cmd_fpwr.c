@@ -28,7 +28,7 @@ void ec_cmd_fpwr(e_slave * slave)
 	wkc1++;
 	*wkc = wkc1;
 	ado = ec_dgram_ado(slave->pkt);
-	printf("%s index=%d wkc=%d wkc1=%d ado=0x%xdatalen=%d\n",
+	printf("%s index=%d wkc=%d wkc1=%d ado=0x%x datalen=%d\n",
 	       __FUNCTION__, slave->pkt_index, *wkc, wkc1, ado, datalen);
 
 	if (ec_dgram_data_length(slave->pkt) == 0) {
@@ -41,13 +41,13 @@ void ec_cmd_fpwr(e_slave * slave)
 		goto FPRD_OUT;
 	}
 	adp = ec_dgram_adp(slave->pkt);
-	if (adp == ec_station_address()){
+	if (adp == ec_station_address()) {
 		ec_raw_set_ado(ado, data, datalen);
 	}
 	if (ado == ECT_REG_EEPCTL) {
 		/* sii info  */
 		ec_sii_fetch(slave);
-	} else{
+	} else {
 		ec_raw_get_ado(ado, data, datalen);
 	}
 FPRD_OUT:

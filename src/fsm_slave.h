@@ -10,19 +10,16 @@
 #include "ecs_slave.h"
 
 struct fsm_slave {
-	void (*state)(e_slave *);
+	void (*state) (e_slave *);
 };
 
-
-static inline void __set_fsm_state(e_slave *slave,
-		void (*state)(e_slave *))
+static inline void __set_fsm_state(e_slave * slave, void (*state) (e_slave *))
 {
 	slave->fsm->state = state;
 }
 
-void  ecs_rx_packet(e_slave *);
-void  ecs_tx_packet(e_slave *);
-void  ecs_process_packet(e_slave *);
+void ecs_rx_packet(e_slave *);
+void ecs_tx_packet(e_slave *);
+void ecs_process_packet(e_slave *);
 
 #endif
-
