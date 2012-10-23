@@ -6,10 +6,6 @@
 #include "ethercattype.h"
 
 static uint8_t ec_registers[ECT_REG_DCCYCLE1] = { 0 };
-struct ec_cat_group {
-	uint16_t type;
-	uint16_t size;
-};
 
 void ec_init_regs(void)
 {
@@ -27,7 +23,7 @@ void ec_init_regs(void)
 	 *              0b00000100      dc
 	 *              0b00001000  dc 64 bit
 	 **/
-	ec_registers[ECT_REG_STADR] = 0xFF;
+	ec_registers[ECT_REG_STADR] = 0x00; /* illegal station address */
 	ec_registers[ECT_REG_DLSTAT] = 0b00001000;	/* data link state */
 	ec_registers[ECT_REG_DLSTAT + 1] = 0x00;	/* data link state */
 }

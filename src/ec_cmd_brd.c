@@ -24,11 +24,10 @@ void ec_cmd_brd(e_slave * slave)
 	wkc1 = *wkc;
 	wkc1++;
 	*wkc = wkc1;
-
-	printf("%s index=%d wkc=%d wkc1=%d data len=%d ado=%d\n",
-	       __FUNCTION__,
-	       slave->pkt_index, *wkc, wkc1, datalen, ec_dgram_ado(slave->pkt));
 	ado = ec_dgram_ado(slave->pkt);
+	printf("%s index=%d wkc=%d wkc1=%d data len=%d ado=0x%x adp=0x%x\n",
+	       __FUNCTION__,
+	       slave->pkt_index, *wkc, wkc1, datalen, ado, ec_dgram_adp(slave->pkt));
 	ec_raw_get_ado(ado, data, datalen);
 	ecs_tx_packet(slave);
 	__set_fsm_state(slave, ecs_rx_packet);

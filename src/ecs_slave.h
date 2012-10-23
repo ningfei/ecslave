@@ -47,7 +47,7 @@ static inline uint8_t *__ecat_frameheader(uint8_t * h)
 
 static inline uint8_t *ec_dgram_data(uint8_t * d)
 {
-	return (uint8_t *) & __ecat_frameheader(d)[sizeof(ec_comt)];
+	return (uint8_t *) & (__ecat_frameheader(d)[sizeof(ec_comt)]);
 }
 
 static inline int ec_dgram_command(uint8_t * d)
@@ -71,7 +71,7 @@ static inline uint16_t ec_dgram_data_length(uint8_t * d)
 
 static inline uint16_t ec_dgram_adp(uint8_t * d)
 {
-	ec_comt *datagram = (ec_comt *) ec_dgram_data(d);
+	ec_comt *datagram = (ec_comt *) __ecat_frameheader(d);
 	return (datagram->ADP);
 }
 

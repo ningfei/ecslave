@@ -21,7 +21,7 @@ void ec_cmd_fpwr(e_slave * slave)
 	    (uint8_t *) & slave->pkt[sizeof(struct ether_header)];
 	uint16_t size = ec_dgram_size(slave->pkt);
 	uint16_t datalen = ec_dgram_data_length(slave->pkt);
-	uint8_t *data = (uint8_t *) (((uint8_t *) datagram) + sizeof(ec_comt));
+	uint8_t *data = ec_dgram_data(slave->pkt);
 	uint16_t *wkc = (uint16_t *) & datagram[size];
 
 	wkc1 = *wkc;
@@ -31,8 +31,8 @@ void ec_cmd_fpwr(e_slave * slave)
 	adp = ec_dgram_adp(slave->pkt);
 
 	printf("%s index=%d wkc=%d "
-		"wkc1=%d ado=0x%x adp=0x%x"
-		"station addr=0x%x"
+		"wkc1=%d ado=0x%x adp=0x%x "
+		"station addr=0x%x "
 		"datalen=%d\n",
 	       __FUNCTION__, 
 		slave->pkt_index, 
@@ -41,20 +41,19 @@ void ec_cmd_fpwr(e_slave * slave)
 		ec_station_address(),
 		datalen);
 
-	if (ec_dgram_data_length(slave->pkt) == 0) {
+	if (datalen == 0) {
 		printf("insane no length\n");
 		goto FPRD_OUT;
 	}
 
 	if (adp == ec_station_address()) {
-		
-		int update=1;
-		uint8_t val[datalen];
 
-		ec_raw_set_ado(ado, data, datalen);
-		ec_raw_get_ado(ado, (uint8_t *)&val, datalen);
-		if (update)
-			memcpy(data, &val,datalen);
+		if (ado == ECT_REG_EEPSTAT){
+			if (!ec_sii_fetch(data, datalen))
+					;
+		}else{
+			ec_raw_get_ado(ado, data, datalen);
+		}
 	}
 FPRD_OUT:
 	ecs_tx_packet(slave);

@@ -36,22 +36,25 @@ void ec_cmd_apwr(e_slave * slave)
 	       __FUNCTION__, slave->pkt_index, *wkc, wkc1);
 
 	ado = ec_dgram_ado(slave->pkt);
-	if (adp != ec_station_address() && ec_station_address() != 0xFF ) {
+	if (adp != ec_station_address()) {
 		goto APWR_OUT;
 	}
+
 	((ec_comt *) datagram)->ADP++;	/* each slave ++ in APWR */
-	if (ado == ECT_REG_STADR){
-	   }else{
+	{
 		uint8_t val[datalen];
+
 		ec_raw_get_ado(ado, &val[0], datalen);
 		ec_raw_set_ado(ado, data, datalen);
 		memcpy(data, &val, datalen);
-		
+		printf("%s index=0x%x ADO 0x%x WRITE 0x %x %x\n",
+		       __FUNCTION__,
+		       slave->pkt_index,
+		       ado,
+		       val[0], val[1]);
 	}
-	printf("%s index=%d ADO WRITE 0x%x\n",
-	       __FUNCTION__, slave->pkt_index, data[0]);
-	ec_raw_set_ado(ado, data, datalen);
 APWR_OUT:
+
 	*wkc = wkc1;
 	ecs_tx_packet(slave);
 	__set_fsm_state(slave, ecs_rx_packet);

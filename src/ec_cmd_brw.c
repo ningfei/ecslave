@@ -27,7 +27,7 @@ void ec_cmd_brw(e_slave * slave)
 	ado = ec_dgram_ado(slave->pkt);
 	if (ec_dgram_adp(slave->pkt) == 0) {
 		/*
-		 * if slave is adressed it is the only one who reads
+		 * if slave is addressed it is the only one who reads
 		 * */
 		ec_raw_get_ado(ado, data, datalen);
 		printf("ADO R 0x%x Val=0x%x dlen=%d\n",

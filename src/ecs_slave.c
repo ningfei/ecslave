@@ -140,7 +140,7 @@ void ecs_tx_packet(e_slave * slave)
 	memcpy(eh->ether_shost,
 	       &slave->mac.ether_shost, sizeof(slave->mac.ether_shost));
 	eh->ether_type = htons(ETHERCAT_TYPE);
-	printf("%s Index=%d\n", __FUNCTION__, ec_dgram_pkt_index(slave->pkt));
+	printf("%s Index=0x%x\n", __FUNCTION__, ec_dgram_pkt_index(slave->pkt));
 
 	bytes = sendto(slave->m_sendsock,
 		       slave->pkt,

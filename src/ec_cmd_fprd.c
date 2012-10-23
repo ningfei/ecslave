@@ -26,8 +26,10 @@ void ec_cmd_fprd(e_slave * slave)
 	ado = ec_dgram_ado(slave->pkt);
 	adp = ec_dgram_adp(slave->pkt);
 	if (adp != ec_station_address()) {
-		printf("not me adp=%x,%x \n",
-			adp,ec_station_address());
+		printf("%s not me adp=%x,%x \n",
+			__FUNCTION__,
+			adp,
+			ec_station_address());
 		goto FPRD_OUT;
 	}
 	wkc1 = *wkc;
@@ -36,7 +38,7 @@ void ec_cmd_fprd(e_slave * slave)
 	printf("%s index=%d wkc=%d wkc1=%d ADO=0x%x data len=%d\n",
 	       __FUNCTION__, slave->pkt_index, *wkc, wkc1, ado, datalen);
 
-	if (ec_dgram_data_length(slave->pkt) == 0) {
+	if (datalen == 0) {
 		printf("insane no length\n");
 		goto FPRD_OUT;
 	}
