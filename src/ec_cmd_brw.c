@@ -29,21 +29,14 @@ void ec_cmd_brw(e_slave * slave)
 		/*
 		 * if slave is adressed it is the only one who reads
 		 * */
-		ec_get_ado(ado, (uint8_t *) & val);
-		memcpy(data, &val, datalen);
-		printf("ADO R 0x%x Val=0x%x\n", ado, val);
+		ec_raw_get_ado(ado, data, datalen);
+		printf("ADO R 0x%x Val=0x%x dlen=%d\n",
+				ado, data[0], datalen);
 		goto BRW_EXIT;
 	}
-
-	if (ado > ECT_REG_DCCYCLE1 || ado < ECT_REG_TYPE) {
-		printf("insane offset\n");
-		goto BRW_EXIT;
-	}
-
 	wkc1++;
-	memcpy(&val, data, datalen);
 	printf("ADO 0x%x Val=0x%x\n", ado, val);
-	ec_set_ado(ado, val);
+	ec_raw_set_ado(ado, data, datalen);
 BRW_EXIT:
 	*wkc = wkc1;
 	ecs_tx_packet(slave);

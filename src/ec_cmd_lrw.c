@@ -24,9 +24,9 @@ void ec_cmd_lrw(e_slave * slave)
 	int val = 0;
 	uint16_t wkc1;
 	uint16_t datalen = ec_dgram_data_length(slave->pkt);
-	uint8_t *datagram = (uint8_t *) __ecat_header(slave->pkt);
+	uint8_t *datagram = (uint8_t *) __ecat_frameheader(slave->pkt);
 	uint16_t size = ec_dgram_size(slave->pkt);
-	uint8_t *data = (uint8_t *) (((uint8_t *) datagram) + sizeof(ec_comt));
+	uint8_t *data = ec_dgram_data(slave->pkt);
 	uint16_t *wkc = (uint16_t *) & datagram[size];
 	uint32_t offset = 0;
 

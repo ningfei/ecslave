@@ -416,7 +416,12 @@ enum
 /** Ethercat registers */
 enum 
 {
-    ECT_REG_TYPE        = 0x0000,
+    ECT_REG_TYPE        = 0x0000,  /* base type 1byte fsm_slave_scan.c line 296 */
+    ECT_BASE_REVISION   = 0x0001,  /* base revision. 1byte */
+    ECT_BASE_BUILD1		= 0x0002,  /* base build .2bytes   */
+    ECT_BASE_BUILD2		= 0x0003,  /* base fmmu count 1byte         */
+    ECT_BASE_FMMUS		= 0x0004,  /* base sync count 1byte */
+    ECT_BASE_SYNCM		= 0x0005,  /* octet 1      0x000F one port. mii */
     ECT_REG_PORTDES		= 0x0007,
     ECT_REG_ESCSUP      = 0x0008,
     ECT_REG_STADR       = 0x0010,

@@ -13,7 +13,7 @@
 void ec_cmd_brd(e_slave * slave)
 {
 	uint16_t wkc1;
-	uint32_t val = 0;
+	uint16_t ado;
 	uint8_t *datagram =
 	    (uint8_t *) & slave->pkt[sizeof(struct ether_header)];
 	uint16_t size = ec_dgram_size(slave->pkt);
@@ -28,15 +28,8 @@ void ec_cmd_brd(e_slave * slave)
 	printf("%s index=%d wkc=%d wkc1=%d data len=%d ado=%d\n",
 	       __FUNCTION__,
 	       slave->pkt_index, *wkc, wkc1, datalen, ec_dgram_ado(slave->pkt));
-
-	if (ec_dgram_data_length(slave->pkt)) {
-		if (ec_dgram_ado(slave->pkt) <= ECT_REG_DCCYCLE1
-		    && ec_dgram_ado(slave->pkt) >= ECT_REG_TYPE) {
-
-			ec_get_ado(ec_dgram_ado(slave->pkt), &val);
-			memcpy(data, &val, datalen);
-		}
-	}
+	ado = ec_dgram_ado(slave->pkt);
+	ec_raw_get_ado(ado, data, datalen);
 	ecs_tx_packet(slave);
 	__set_fsm_state(slave, ecs_rx_packet);
 }

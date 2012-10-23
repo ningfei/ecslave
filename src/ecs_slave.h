@@ -40,57 +40,57 @@ void ec_cmd_brw(e_slave * slave);
 void ec_cmd_brd(e_slave * slave);
 void ec_cmd_nop(e_slave * slave);
 
-static inline uint8_t *__ecat_header(uint8_t * h)
+static inline uint8_t *__ecat_frameheader(uint8_t * h)
 {
 	return (uint8_t *) & h[sizeof(struct ether_header)];
 }
 
+static inline uint8_t *ec_dgram_data(uint8_t * d)
+{
+	return (uint8_t *) & __ecat_frameheader(d)[sizeof(ec_comt)];
+}
+
 static inline int ec_dgram_command(uint8_t * d)
 {
-	ec_comt *datagram = (ec_comt *) __ecat_header(d);
+	ec_comt *datagram = (ec_comt *) __ecat_frameheader(d);
 	return datagram->command;
 }
 
 static inline uint16_t ec_dgram_size(uint8_t * d)
 {
-	ec_comt *datagram = (ec_comt *) __ecat_header(d);
+	ec_comt *datagram = (ec_comt *) __ecat_frameheader(d);
 	return (datagram->elength & 0b011111111111);
 }
 
 static inline uint16_t ec_dgram_data_length(uint8_t * d)
 {
-	ec_comt *datagram = (ec_comt *) __ecat_header(d);
+	ec_comt *datagram = (ec_comt *) __ecat_frameheader(d);
 	uint16_t datalen = (datagram->dlength & 0b011111111111);
 	return datalen;
 }
 
 static inline uint16_t ec_dgram_adp(uint8_t * d)
 {
-	ec_comt *datagram = (ec_comt *) __ecat_header(d);
+	ec_comt *datagram = (ec_comt *) ec_dgram_data(d);
 	return (datagram->ADP);
-}
-
-static inline uint8_t *ec_dgram_data(uint8_t * d)
-{
-	return (uint8_t *) (((uint8_t *) d) + sizeof(ec_comt));
 }
 
 static inline uint32_t ec_dgram_laddr(uint8_t * d)
 {
-	ec_comt *datagram = (ec_comt *) __ecat_header(d);
+	ec_comt *datagram = (ec_comt *) __ecat_frameheader(d);
 	return ((uint32_t) datagram->ADP | (uint32_t) (datagram->ADO << 16));
 }
 
 /* address offset */
 static inline uint16_t ec_dgram_ado(uint8_t * d)
 {
-	ec_comt *datagram = (ec_comt *) __ecat_header(d);
+	ec_comt *datagram = (ec_comt *) __ecat_frameheader(d);
 	return datagram->ADO;
 }
 
 static inline uint8_t ec_dgram_pkt_index(uint8_t * d)
 {
-	ec_comt *datagram = (ec_comt *) __ecat_header(d);
+	ec_comt *datagram = (ec_comt *) __ecat_frameheader(d);
 	return datagram->index;
 }
 

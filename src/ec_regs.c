@@ -1,4 +1,4 @@
-
+#include <stdio.h>
 #include <arpa/inet.h>
 #include <string.h>
 #include <net/ethernet.h>
@@ -6,6 +6,10 @@
 #include "ethercattype.h"
 
 static uint8_t ec_registers[ECT_REG_DCCYCLE1] = { 0 };
+struct ec_cat_group {
+	uint16_t type;
+	uint16_t size;
+};
 
 void ec_init_regs(void)
 {
@@ -24,7 +28,7 @@ void ec_init_regs(void)
 	 *              0b00001000  dc 64 bit
 	 **/
 	ec_registers[ECT_REG_STADR] = 0xFF;
-	ec_registers[ECT_REG_DLSTAT] = 0b100001000;	/* data link state */
+	ec_registers[ECT_REG_DLSTAT] = 0b00001000;	/* data link state */
 	ec_registers[ECT_REG_DLSTAT + 1] = 0x00;	/* data link state */
 }
 
@@ -33,22 +37,23 @@ int16_t ec_station_address(void)
 	return ec_registers[ECT_REG_STADR];
 }
 
-void ec_set_ado(int reg, long val)
+int ec_raw_set_ado(int reg, uint8_t * data, int datalen)
 {
-	ec_registers[reg] = val;
-}
+	int ret = 1;
 
-void ec_get_ado(int reg, uint8_t * val)
-{
-	*val = ec_registers[reg];
-}
-
-void ec_raw_set_ado(int reg, uint8_t * data, int datalen)
-{
+	if (reg > ECT_REG_DCCYCLE1 || reg < ECT_REG_TYPE) {
+		printf("%s insane ado\n",__FUNCTION__);
+		return 0;
+	}
 	memcpy(&ec_registers[reg], data, datalen);
+	return ret;
 }
 
 void ec_raw_get_ado(int reg, uint8_t * data, int datalen)
 {
+	if (reg > ECT_REG_DCCYCLE1 || reg < ECT_REG_TYPE) {
+		printf("%s insane ado\n",__FUNCTION__);
+		return;
+	}
 	memcpy(data, &ec_registers[reg], datalen);
 }
