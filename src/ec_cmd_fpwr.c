@@ -17,8 +17,7 @@ void ec_cmd_fpwr(e_slave * slave)
 	long val = 0;
 	uint16_t ado = 0;
 	uint16_t adp = 0;
-	uint8_t *datagram =
-	    (uint8_t *) & slave->pkt[sizeof(struct ether_header)];
+	uint8_t *datagram = __ecat_frameheader(slave->pkt);
 	uint16_t size = ec_dgram_size(slave->pkt);
 	uint16_t datalen = ec_dgram_data_length(slave->pkt);
 	uint8_t *data = ec_dgram_data(slave->pkt);
@@ -47,11 +46,10 @@ void ec_cmd_fpwr(e_slave * slave)
 	}
 
 	if (adp == ec_station_address()) {
-
 		if (ado == ECT_REG_EEPSTAT){
-			if (!ec_sii_fetch(data, datalen))
-					;
-		}else{
+			//ec_fsm_sii_state_start_reading
+			ec_sii_fetch(data, datalen);
+		} else{
 			ec_raw_get_ado(ado, data, datalen);
 		}
 	}

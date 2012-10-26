@@ -8,8 +8,12 @@
 #include <arpa/inet.h>
 
 #define CAT_TYPE_NOP	0x00
+
 #define CAT_TYPE_STRINGS 0x10
+#define CAT_TYPE_STRINGS_OFFSET 0x40
+
 #define CAT_TYPE_DATA_TYPE 0x20
+
 #define CAT_TYPE_GENERAL  0x30
 #define CAT_TYPE_FMMU	 0x40
 #define CAT_TYPE_SYNCM	 0x41
@@ -206,6 +210,45 @@ typedef struct {
 
 sii_categories categories;
 
+void read_category_hdr(uint8_t off,uint8_t *data)
+{
+	int offset = (off - 0x040)*2;
+	uint8_t cat_off =
+			(uint8_t *)&(categories.syncm_hdr) - (uint8_t *)&(categories.strings_hdr);
+
+	printf("%s off %d offset %d max category off=%d\n",
+			__FUNCTION__,off, offset, cat_off);
+	if (offset == 0){
+			return (void)memcpy(data, &categories.strings_hdr,
+					sizeof(categories.strings_hdr));
+
+	}
+	cat_off = (uint8_t *)&categories.general_hdr - (uint8_t *) &categories.strings_hdr;
+	if (offset == cat_off){
+		return (void)memcpy(data, &categories.general_hdr,
+				sizeof(categories.general_hdr));
+	}
+
+	cat_off = (uint8_t *)&categories.rxpdo_hdr - (uint8_t *) &categories.strings_hdr;
+	if (offset == cat_off){
+		return (void)memcpy(data, &categories.rxpdo_hdr,
+				sizeof(categories.rxpdo_hdr));
+	}
+
+	cat_off = (uint8_t *)&categories.fmmu_hdr - (uint8_t *) &categories.strings_hdr;
+	if (offset == cat_off){
+		return (void)memcpy(data, &categories.fmmu_hdr,
+				sizeof(categories.fmmu_hdr));
+	}
+
+	cat_off = (uint8_t *)&categories.syncm_hdr - (uint8_t *) &categories.strings_hdr;
+	if (offset == cat_off){
+		return (void)memcpy(data, &categories.syncm_hdr,
+				sizeof(categories.syncm_hdr));
+	}
+	printf("%s insane offset\n",__FUNCTION__);
+}
+
 void init_general(category_general * general,category_header * hdr)
 {
 	hdr->size = sizeof(*general);
@@ -338,19 +381,31 @@ int ec_sii_fetch(uint8_t * data, int datalen)
 {
 	int word_offset;
 
-	printf("%s received datalen %d\n", __FUNCTION__, datalen);
+	printf("%s received data len %d\n",
+			__FUNCTION__, datalen);
 
-	if (data[0] != 0x80) {
+	if (data[0] != 0x80 && data[0] != 0x81) {
 		printf("%s no two addressed octets %x %x\n",
 		       __FUNCTION__, data[0], data[1]);
 		return 1;
 	}
-	if (data[1] != 0x01) {
-		printf("request read operation\n", __FUNCTION__);
-		return 1;
-	}
 	word_offset = *(uint16_t *) & data[2];
-	printf("%s received word offset %d\n", __FUNCTION__, word_offset);
-	memset(data, 0, datalen);
+	printf("%s request %d operation on offset %d\n",
+			__FUNCTION__, data[1], word_offset);
+
+	switch(data[1])
+	{
+	case 0x01: // read
+		read_category_hdr(word_offset, data);
+		break;
+
+	case 0x02: // write
+		break;
+
+	default: // unknown
+		printf("%s default\n",__FUNCTION__);
+		break;
+	}
+
 	return 0;
 }

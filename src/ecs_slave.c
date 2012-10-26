@@ -280,6 +280,7 @@ int main(int argc, char *argv[])
 	}
 	strncpy(eth_interface, argv[1], sizeof(eth_interface));
 	ec_init_regs();
+	init_sii();
 
 	slave.fsm = &fsm_slave;
 

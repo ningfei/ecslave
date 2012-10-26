@@ -14,7 +14,7 @@
 #include "ec_regs.h"
 #include <arpa/inet.h>
 
- /** Auto Increment Write */
+ /** Auto Increment Write. by ring position */
 void ec_cmd_apwr(e_slave * slave)
 {
 	uint16_t wkc1;
@@ -36,9 +36,6 @@ void ec_cmd_apwr(e_slave * slave)
 	       __FUNCTION__, slave->pkt_index, *wkc, wkc1);
 
 	ado = ec_dgram_ado(slave->pkt);
-	if (adp != ec_station_address()) {
-		goto APWR_OUT;
-	}
 
 	((ec_comt *) datagram)->ADP++;	/* each slave ++ in APWR */
 	{
