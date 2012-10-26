@@ -42,11 +42,10 @@ void ec_cmd_fprd(e_slave * slave)
 		printf("insane no length\n");
 		goto FPRD_OUT;
 	}
+	ec_raw_get_ado(ado, data, datalen);
 	if (adp == ec_station_address()) {
 		if (ado == ECT_REG_EEPSTAT){
 			ec_sii_fetch(data, datalen);
-		} else{
-			ec_raw_get_ado(ado, data, datalen);
 		}
 	}
 FPRD_OUT:
