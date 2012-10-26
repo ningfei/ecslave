@@ -12,7 +12,7 @@
 #define CAT_TYPE_DATA_TYPE 0x20
 #define CAT_TYPE_GENERAL  0x30
 #define CAT_TYPE_FMMU	 0x40
-#define CAT_TYPE_syncm	 0x41
+#define CAT_TYPE_SYNCM	 0x41
 #define CAT_TYPE_TXPDO	 0x50
 #define CAT_TYPE_RXPDO	 0x51
 #define CAT_TYPE_DC	0x60
@@ -161,6 +161,18 @@ typedef struct {
 	char str2[sizeof(STRING2)];
 	uint8_t str3_len;
 	char str3[sizeof(STRING3)];
+	uint8_t str4_len;
+	char str4[sizeof(STRING4)];
+	uint8_t str5_len;
+	char str5[sizeof(STRING5)];
+	uint8_t str6_len;
+	char str6[sizeof(STRING6)];
+	uint8_t str7_len;
+	char str7[sizeof(STRING7)];
+	uint8_t str8_len;
+	char str8[sizeof(STRING8)];
+	uint8_t str9_len;
+	char str9[sizeof(STRING9)];
 }
 category_strings;
 
@@ -222,7 +234,7 @@ void init_general(category_general * general,category_header * hdr)
 void init_syncm(category_syncm * syncm,category_header * hdr)
 {
 	hdr->size = sizeof(*syncm) / 2;
-	hdr->type = CAT_TYPE_syncm;
+	hdr->type = CAT_TYPE_SYNCM;
 
 	syncm->ctrl_reg = 0;
 	syncm->enable_syncm = 0;
@@ -253,6 +265,24 @@ void init_strings(category_strings * str, category_header * hdr)
 
 	str->str3_len = sizeof(STRING3);
 	strncpy(str->str3, STRING2, str->str3_len);
+
+	str->str4_len = sizeof(STRING3);
+	strncpy(str->str3, STRING2, str->str3_len);
+
+	str->str5_len = sizeof(STRING3);
+	strncpy(str->str3, STRING2, str->str3_len);
+
+	str->str6_len = sizeof(STRING3);
+	strncpy(str->str3, STRING2, str->str3_len);
+
+	str->str7_len = sizeof(STRING3);
+	strncpy(str->str3, STRING2, str->str3_len);
+
+	str->str8_len = sizeof(STRING8);
+	strncpy(str->str8, STRING8, str->str8_len);
+
+	str->str9_len = sizeof(STRING9);
+	strncpy(str->str9, STRING9, str->str9_len);
 }
 
 void init_pdo(pdo_entry * pdo,
