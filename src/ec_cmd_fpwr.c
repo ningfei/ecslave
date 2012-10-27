@@ -48,7 +48,7 @@ void ec_cmd_fpwr(e_slave * slave)
 	if (adp == ec_station_address()) {
 		if (ado == ECT_REG_EEPSTAT){
 			//ec_fsm_sii_state_start_reading
-			ec_sii_fetch(data, datalen);
+			ec_sii_start_read(data, datalen);
 		} else{
 			ec_raw_get_ado(ado, data, datalen);
 		}

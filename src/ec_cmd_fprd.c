@@ -45,7 +45,7 @@ void ec_cmd_fprd(e_slave * slave)
 	ec_raw_get_ado(ado, data, datalen);
 	if (adp == ec_station_address()) {
 		if (ado == ECT_REG_EEPSTAT){
-			ec_sii_fetch(data, datalen);
+			ec_sii_rw(data, datalen);
 		}
 	}
 FPRD_OUT:
