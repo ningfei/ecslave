@@ -1,6 +1,8 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+
 #include "ethercattype.h"
 #include "fsm_slave.h"
 #include "ecs_slave.h"
@@ -72,7 +74,7 @@ typedef struct {
 #define RXPDO_CAT_STRING	"LIBIX RX_PDO"
 #define TXPDO_CAT_STRING	"LIBIX TX_PDO"
 #define TX_PDO1_NAME		"TXPDO1	LIBIX"
-#define TX_PDO2_NAME		"TXPD2 LIBIX"
+#define TX_PDO2_NAME		"TXPDO2 LIBIX"
 #define RX_PDO1_NAME		"RXPDO1 LIBIX"
 #define RX_PDO2_NAME		"RXPDO2 LIBIX"
 
@@ -94,13 +96,17 @@ typedef struct {
 #define STRING8 RX_PDO1_NAME
 #define STRING9 RX_PDO1_NAME
 
+#define NR_STRINGS  10
 #define PORT_MII	0b01
 #define PORT0_SHIFT	0
+#define NR_PDOS		2
 
+#define STRINGS_SIZE ( sizeof(STRING9) + \
+		sizeof(STRING8) + sizeof(STRING7) + sizeof(STRING6) \
+		+ sizeof(STRING5) + sizeof(STRING4) + sizeof(STRING3) \
+		+ sizeof(STRING2) + sizeof(STRING1) + sizeof(STRING0) \
+		+ (NR_STRINGS * sizeof(uint8_t)))
 
-#define NR_PDOS	2
-
-#define NR_STRINGS  10
 
 // table 25
 typedef struct {
@@ -157,7 +163,7 @@ typedef struct {
 	uint8_t pad_byte2[14];
 } category_general;
 
-typedef struct {
+typedef struct __category_strings__{
 	uint8_t nr_strings;
 	uint8_t str1_len;
 	char str1[sizeof(STRING1)];
@@ -177,8 +183,8 @@ typedef struct {
 	char str8[sizeof(STRING8)];
 	uint8_t str9_len;
 	char str9[sizeof(STRING9)];
-}
-category_strings;
+	uint8_t pad[(((STRINGS_SIZE)/2)*2 + 2) - STRINGS_SIZE];
+} category_strings;
 
 typedef struct {
 	uint16_t type:15;
@@ -206,16 +212,28 @@ typedef struct {
 	category_header syncm_hdr __attribute__ ((packed));
 	category_syncm syncm __attribute__ ((packed));
 
+	category_header endhdr;
+
 } sii_categories;
 
 sii_categories categories;
+int last_word_offset = -1;
 
-void read_category_hdr(uint8_t off,uint8_t *data)
+void write_category_hdr(int off,uint8_t *data)
+{
+	printf("%s off%d \n",__FUNCTION__,off);
+}
+
+void read_category_hdr(int off,uint8_t *data)
 {
 	int offset = (off - 0x040)*2;
-	uint8_t cat_off =
+	int cat_off =
 			(uint8_t *)&(categories.syncm_hdr) - (uint8_t *)&(categories.strings_hdr);
 
+	if (off == -1){
+		printf("%s state error\n",__FUNCTION__);
+		return;
+	}
 	printf("%s off %d offset %d max category off=%d\n",
 			__FUNCTION__,off, offset, cat_off);
 	if (offset == 0){
@@ -243,7 +261,7 @@ void read_category_hdr(uint8_t off,uint8_t *data)
 
 	cat_off = (uint8_t *)&categories.syncm_hdr - (uint8_t *) &categories.strings_hdr;
 	if (offset == cat_off){
-		return (void)memcpy(data, &categories.syncm_hdr,
+		return (void)memcpy(data, &categories.syncm,
 				sizeof(categories.syncm_hdr));
 	}
 	printf("%s insane offset\n",__FUNCTION__);
@@ -252,6 +270,12 @@ void read_category_hdr(uint8_t off,uint8_t *data)
 void init_general(category_general * general,category_header * hdr)
 {
 	hdr->size = sizeof(*general);
+
+	if (sizeof(*general) %2){
+		printf("ilegal size\n");
+		exit(0);
+	}
+
 	hdr->type = CAT_TYPE_GENERAL;
 
 	memset(general, 0x00, sizeof(*general));
@@ -277,6 +301,11 @@ void init_general(category_general * general,category_header * hdr)
 void init_syncm(category_syncm * syncm,category_header * hdr)
 {
 	hdr->size = sizeof(*syncm) / 2;
+	if (sizeof(*syncm) %2){
+		printf("ilegal size\n");
+		exit(0);
+	}
+
 	hdr->type = CAT_TYPE_SYNCM;
 
 	syncm->ctrl_reg = 0;
@@ -290,14 +319,32 @@ void init_syncm(category_syncm * syncm,category_header * hdr)
 void init_fmmu(category_fmmu * fmmu,category_header * hdr)
 {
 	hdr->size = sizeof(*fmmu) / 2;
+	if (sizeof(*fmmu) %2){
+		printf("ilegal size\n");
+		exit(0);
+	}
+
 	hdr->type = CAT_TYPE_FMMU;
 	fmmu->fmmu0 = 0;	// fmmmu not used
 	fmmu->fmmu1 = 0;	// fmmmu not used
 }
 
+void init_end_hdr(category_header * hdr)
+{
+	hdr->size = 0;
+	hdr->type = 0b111111111111111;
+	hdr->vendor_specific = 0b0;
+}
+
 void init_strings(category_strings * str, category_header * hdr)
 {
 	hdr->size = sizeof(*str) / 2;
+
+	if (sizeof(*str) %2){
+		printf("ilegal size\n");
+		exit(0);
+	}
+
 	hdr->type = CAT_TYPE_STRINGS;
 
 	str->str1_len = sizeof(STRING1);
@@ -309,17 +356,17 @@ void init_strings(category_strings * str, category_header * hdr)
 	str->str3_len = sizeof(STRING3);
 	strncpy(str->str3, STRING2, str->str3_len);
 
-	str->str4_len = sizeof(STRING3);
-	strncpy(str->str3, STRING2, str->str3_len);
+	str->str4_len = sizeof(STRING4);
+	strncpy(str->str4, STRING2, str->str4_len);
 
-	str->str5_len = sizeof(STRING3);
-	strncpy(str->str3, STRING2, str->str3_len);
+	str->str5_len = sizeof(STRING5);
+	strncpy(str->str5, STRING2, str->str5_len);
 
-	str->str6_len = sizeof(STRING3);
-	strncpy(str->str3, STRING2, str->str3_len);
+	str->str6_len = sizeof(STRING6);
+	strncpy(str->str6, STRING2, str->str6_len);
 
-	str->str7_len = sizeof(STRING3);
-	strncpy(str->str3, STRING2, str->str3_len);
+	str->str7_len = sizeof(STRING7);
+	strncpy(str->str7, STRING2, str->str7_len);
 
 	str->str8_len = sizeof(STRING8);
 	strncpy(str->str8, STRING8, str->str8_len);
@@ -348,6 +395,7 @@ void init_sii(void)
 	init_fmmu(&categories.fmmu, &categories.fmmu_hdr);
 	init_syncm(&categories.syncm, &categories.syncm_hdr);
 	init_general(&categories.general, &categories.general_hdr);
+	init_end_hdr(&categories.endhdr);
 
 	// pdos.
 	categories.rxpdo.entries = 2;
@@ -377,7 +425,20 @@ void init_sii(void)
 		 16, 0);
 }
 
-int ec_sii_fetch(uint8_t * data, int datalen)
+void (*sii_command)(int offset,uint8_t * data) = 0;
+
+int ec_sii_rw(uint8_t * data, int datalen)
+{
+	if (sii_command){
+			sii_command(last_word_offset, data + 6);
+	} else{
+		printf("%s no command\n",__FUNCTION__);
+	}
+	sii_command = 0;
+	last_word_offset = -1;
+}
+
+int ec_sii_start_read(uint8_t * data, int datalen)
 {
 	int word_offset;
 
@@ -386,7 +447,7 @@ int ec_sii_fetch(uint8_t * data, int datalen)
 
 	if (data[0] != 0x80 && data[0] != 0x81) {
 		printf("%s no two addressed octets %x %x\n",
-		       __FUNCTION__, data[0], data[1]);
+		       __FUNCTION__	, data[0], data[1]);
 		return 1;
 	}
 	word_offset = *(uint16_t *) & data[2];
@@ -396,10 +457,13 @@ int ec_sii_fetch(uint8_t * data, int datalen)
 	switch(data[1])
 	{
 	case 0x01: // read
-		read_category_hdr(word_offset, data);
+		last_word_offset = word_offset;
+		sii_command = read_category_hdr;
 		break;
 
 	case 0x02: // write
+		last_word_offset = word_offset;
+		sii_command = write_category_hdr;
 		break;
 
 	default: // unknown
