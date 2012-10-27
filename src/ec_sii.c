@@ -9,10 +9,11 @@
 #include "ec_regs.h"
 #include <arpa/inet.h>
 
+#define EC_FIRST_SII_CATEGORY_OFFSET 0x040
+
 #define CAT_TYPE_NOP	0x00
 
 #define CAT_TYPE_STRINGS 0x10
-#define CAT_TYPE_STRINGS_OFFSET 0x40
 
 #define CAT_TYPE_DATA_TYPE 0x20
 
@@ -194,19 +195,19 @@ typedef struct {
 
 typedef struct {
 
-	category_header strings_hdr __attribute__ ((packed));
+	category_header strings_hdr __attribute__ ((packed)); // 0
 	category_strings strings;
 
-	category_header general_hdr __attribute__ ((packed));
+	category_header general_hdr __attribute__ ((packed)); // 128
 	category_general general;
 
-	category_header txpdo_hdr __attribute__ ((packed));
+	category_header txpdo_hdr __attribute__ ((packed)); // 192
 	category_pdo txpdo;
 
-	category_header rxpdo_hdr __attribute__ ((packed));
+	category_header rxpdo_hdr __attribute__ ((packed)); // 220
 	category_pdo rxpdo;
 
-	category_header fmmu_hdr __attribute__ ((packed));
+	category_header fmmu_hdr __attribute__ ((packed));  //226
 	category_fmmu fmmu;
 
 	category_header syncm_hdr __attribute__ ((packed));
@@ -226,11 +227,11 @@ void write_category_hdr(int off,uint8_t *data)
 
 void read_category_hdr(int off,uint8_t *data)
 {
-	int offset = (off - 0x040)*2;
+	int offset = (off - EC_FIRST_SII_CATEGORY_OFFSET)*2;
 	int cat_off =
 			(uint8_t *)&(categories.syncm_hdr) - (uint8_t *)&(categories.strings_hdr);
 
-	if (off == -1){
+	if (off < 0){
 		printf("%s state error\n",__FUNCTION__);
 		return;
 	}
@@ -241,10 +242,17 @@ void read_category_hdr(int off,uint8_t *data)
 					sizeof(categories.strings_hdr));
 
 	}
+	//offset -= 4; // etherlab does this : 2UL + fsm->sii_offset + cat_size
 	cat_off = (uint8_t *)&categories.general_hdr - (uint8_t *) &categories.strings_hdr;
 	if (offset == cat_off){
 		return (void)memcpy(data, &categories.general_hdr,
 				sizeof(categories.general_hdr));
+	}
+
+	cat_off = (uint8_t *)&categories.txpdo_hdr - (uint8_t *) &categories.strings_hdr;
+	if (offset == cat_off){
+		return (void)memcpy(data, &categories.txpdo_hdr,
+				sizeof(categories.txpdo_hdr));
 	}
 
 	cat_off = (uint8_t *)&categories.rxpdo_hdr - (uint8_t *) &categories.strings_hdr;
@@ -389,6 +397,20 @@ void init_pdo(pdo_entry * pdo,
 	pdo->subindex = subindex;
 }
 
+void init_hdr_dbg()
+{
+	int cat_off =0;
+
+	cat_off = (uint8_t *)&categories.general_hdr - (uint8_t *) &categories.strings_hdr;
+	printf("%s offset =%d\n",__FUNCTION__,cat_off);
+	cat_off = (uint8_t *)&categories.rxpdo_hdr - (uint8_t *) &categories.strings_hdr;
+	printf("%s offset =%d\n",__FUNCTION__,cat_off);
+	cat_off = (uint8_t *)&categories.fmmu_hdr - (uint8_t *) &categories.strings_hdr;
+	printf("%s offset =%d\n",__FUNCTION__,cat_off);
+	cat_off = (uint8_t *)&categories.syncm_hdr - (uint8_t *) &categories.strings_hdr;
+	printf("%s offset =%d\n",__FUNCTION__,cat_off);
+}
+
 void init_sii(void)
 {
 	init_strings(&categories.strings, &categories.strings_hdr);
@@ -396,6 +418,7 @@ void init_sii(void)
 	init_syncm(&categories.syncm, &categories.syncm_hdr);
 	init_general(&categories.general, &categories.general_hdr);
 	init_end_hdr(&categories.endhdr);
+	init_hdr_dbg();
 
 	// pdos.
 	categories.rxpdo.entries = 2;
@@ -430,7 +453,7 @@ void (*sii_command)(int offset,uint8_t * data) = 0;
 int ec_sii_rw(uint8_t * data, int datalen)
 {
 	if (sii_command){
-			sii_command(last_word_offset, data + 6);
+			sii_command(last_word_offset, (uint8_t *)&data[6]);
 	} else{
 		printf("%s no command\n",__FUNCTION__);
 	}
