@@ -391,8 +391,19 @@ void init_hdr_dbg()
 	printf("%s offset =%d\n",__FUNCTION__,cat_off);
 }
 
+void init_si_info(ec_sii_t *sii)
+{
+	memset(sii,0x00,sizeof(*sii));
+	sii->alias = 0x04;
+	sii->vendor_id = 0x1ee;
+	sii->product_code = 0x0e;
+	sii->revision_number = 0x12;
+	sii->serial_number = 0x45;
+}
+
 void init_sii(void)
 {
+	init_si_info(&categories.sii);
 	init_strings(&categories.strings, &categories.strings_hdr);
 	init_fmmu(&categories.fmmu, &categories.fmmu_hdr);
 	init_syncm(&categories.syncm, &categories.syncm_hdr);
