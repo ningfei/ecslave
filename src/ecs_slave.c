@@ -174,7 +174,9 @@ void ecs_rx_packet(e_slave * slave)
 		if (!ec_is_ethercat(slave->pkt)) {
 			continue;
 		}
-		if (slave->pkt_index == ec_dgram_pkt_index(slave->pkt)) {
+		if (!memcmp(ec_get_shost(slave->pkt),
+					slave->mac.ether_shost,
+					sizeof(slave->mac.ether_shost)) ){
 			continue;
 		}
 		slave->pkt_index = ec_dgram_pkt_index(slave->pkt);

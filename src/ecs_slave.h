@@ -94,6 +94,13 @@ static inline uint8_t ec_dgram_pkt_index(uint8_t * d)
 	return datagram->index;
 }
 
+static inline uint8_t *ec_get_shost(uint8_t* h)
+{
+	struct ether_header *eh = (struct ether_header *)h;
+
+	return (uint8_t *)&(eh->ether_shost[0]);
+}
+
 static inline int ec_is_ethercat(uint8_t * h)
 {
 	struct ether_header *eh = (struct ether_header *)h;
