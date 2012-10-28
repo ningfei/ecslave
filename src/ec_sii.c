@@ -50,7 +50,7 @@ typedef struct {
 	uint8_t  reserved3[66]; // 0x2b
 	uint16_t eprom_size_kbits; // 0x03e
 	uint16_t version; //0x03f
-} ec_sii_t  __attribute__ ((packed));
+} ec_sii_t;
 
 #define GROUP_IDX			0
 #define IMAGE_IDX			1
@@ -190,27 +190,27 @@ typedef struct {
 
 typedef struct {
 	ec_sii_t sii;  __attribute__ ((packed))
-	category_header strings_hdr __attribute__ ((packed)); // 0x40
-	category_strings strings __attribute__ ((packed));
+	category_header strings_hdr __attribute__ ((packed));
+	category_strings strings;
 
-	category_header general_hdr __attribute__ ((packed)); // 128
+	category_header general_hdr __attribute__ ((packed));
 	category_general general __attribute__ ((packed));
 
-	category_header txpdo_hdr __attribute__ ((packed)); // 192
+	category_header txpdo_hdr __attribute__ ((packed));
 	category_pdo txpdo  __attribute__ ((packed));
 
-	category_header rxpdo_hdr __attribute__ ((packed)); // 220
+	category_header rxpdo_hdr __attribute__ ((packed));
 	category_pdo rxpdo  __attribute__ ((packed));
 
-	category_header fmmu_hdr __attribute__ ((packed));  //226
-	category_fmmu fmmu  __attribute__ ((packed));
+	category_header fmmu_hdr __attribute__ ((packed));
+	category_fmmu fmmu;
 
 	category_header syncm_hdr __attribute__ ((packed));
 	category_syncm syncm __attribute__ ((packed));
 
 	category_header endhdr __attribute__ ((packed));
 
-} sii_categories  __attribute__ ((packed));
+} sii_categories;
 
 sii_categories categories;
 int last_word_offset = -1;
