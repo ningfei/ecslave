@@ -215,70 +215,24 @@ typedef struct {
 sii_categories categories;
 int last_word_offset = -1;
 
-void write_category_hdr(int off,uint8_t *data)
+void write_category_hdr(int off,int datalen, uint8_t *data)
 {
 	printf("%s off%d \n",__FUNCTION__,off);
 }
 
-void read_category_hdr(int off,uint8_t *data)
+void read_category_hdr(int off,int datalen, uint8_t *data)
 {
-	int offset = (off - EC_FIRST_SII_CATEGORY_OFFSET)*2;
-	int cat_off =
-			(uint8_t *)&(categories.syncm_hdr) - (uint8_t *)&(categories.strings_hdr);
+	int offset = off*2;
+	uint8_t* cat_off = (uint8_t *)&categories;
 
-	printf("%s off %d offset %d max category off=%d\n",
-			__FUNCTION__,off, offset, cat_off);
-	if (offset == 0){
-		puts("strings gen");
-		return (void)memcpy(data, &categories.strings_hdr,
-					sizeof(categories.strings_hdr));
-	}
+	printf("%s off %d offset %d datalen=%d\n",
+			__FUNCTION__,off, offset ,datalen);
 
-	cat_off = (uint8_t *)&categories.general_hdr - (uint8_t *) &categories.strings_hdr;
-	if (offset == cat_off){
-		puts("hdr gen");
-		return (void)memcpy(data, &categories.general_hdr,
-				sizeof(categories.general_hdr));
+	if (offset + datalen > sizeof(categories)){
+		printf("%s insane offset\n",__FUNCTION__);
+		return;
 	}
-
-	cat_off = (uint8_t *)&categories.txpdo_hdr - (uint8_t *) &categories.strings_hdr;
-	if (offset == cat_off){
-		puts("hdr txpdo");
-		return (void)memcpy(data, &categories.txpdo_hdr,
-				sizeof(categories.txpdo_hdr));
-	}
-
-	cat_off = (uint8_t *)&categories.rxpdo_hdr - (uint8_t *) &categories.strings_hdr;
-	if (offset == cat_off){
-		puts("hdr rxpdo");
-		return (void)memcpy(data, &categories.rxpdo_hdr,
-				sizeof(categories.rxpdo_hdr));
-	}
-
-	cat_off = (uint8_t *)&categories.fmmu_hdr - (uint8_t *) &categories.strings_hdr;
-	if (offset == cat_off){
-		puts("fmmu hdr");
-		return (void)memcpy(data, &categories.fmmu_hdr,
-				sizeof(categories.fmmu_hdr));
-	}
-
-	cat_off = (uint8_t *)&categories.syncm_hdr - (uint8_t *) &categories.strings_hdr;
-	if (offset == cat_off){
-		puts("syncm hdr");
-		return (void)memcpy(data, &categories.syncm_hdr,
-				sizeof(categories.syncm_hdr));
-	}
-
-	cat_off = (uint8_t *)&categories.endhdr - (uint8_t *) &categories.strings_hdr;
-	if (offset == cat_off){
-		puts("endh hdr");
-		return (void)memcpy(data, &categories.endhdr,
-				sizeof(categories.endhdr));
-	}
-	if (offset > sizeof() > )
-	printf("%s insane offset ending\n",__FUNCTION__);
-	return (void)memcpy(data, &categories.endhdr,
-			sizeof(categories.endhdr));
+	memcpy(data, cat_off + offset, datalen);
 }
 
 void init_general(category_general * general,category_header * hdr)
@@ -479,12 +433,12 @@ void init_sii(void)
 	init_hdr_dbg();
 }
 
-void (*sii_command)(int offset,uint8_t * data) = 0;
+void (*sii_command)(int offset, int datalen, uint8_t * data) = 0;
 
 int ec_sii_rw(uint8_t * data, int datalen)
 {
 	if (sii_command){
-			sii_command(last_word_offset, (uint8_t *)&data[6]);
+			sii_command(last_word_offset, datalen - 6, (uint8_t *)&data[6]);
 	} else{
 		printf("%s no command\n",__FUNCTION__);
 	}
