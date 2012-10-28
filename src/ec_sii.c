@@ -26,36 +26,31 @@
 #define CAT_TYPE_END	0xFFFF
 
 typedef struct {
-	uint16_t pdi_control;
-	uint16_t pdi_configuration;
-	uint16_t sync_impulse_len;
-	uint16_t pdi_configuration2;
-	uint16_t alias;
-		    /**< The slaves alias if not equal to 0. */
-	uint8_t reverved[4];
-	uint16_t checksum;
-	uint32_t vendor_id;
-			/**< Vendor-ID stored on the slave. */
-	uint32_t product_code;
-			   /**< Product-Code stored on the slave. */
-	uint32_t revision_number;
-			      /**< Revision-Number stored on the slave. */
-	uint32_t serial_number;
-			    /**< Serial-Number stored on the slave. */
-	uint8_t reserved[8];
-	uint16_t boot_rx_mailbox_offset;
-	uint16_t boot_rx_mailbox_size;
-	uint16_t boot_tx_mailbox_offset;
-	uint16_t boot_tx_mailbox_size;
-	uint16_t std_rx_mailbox_offset;
-	uint16_t std_rx_mailbox_size;
-	uint16_t std_tx_mailbox_offset;
-	uint16_t std_tx_mailbox_size;
-	uint16_t mailbox_protocols;
-	uint8_t reserved2[66];
-	uint16_t eprom_size_kbits;
-	uint16_t version;
-} ec_sii_t;
+	uint16_t pdi_control; // 0x000
+	uint16_t pdi_configuration; // 0x001
+	uint16_t sync_impulse_len; // 0x002
+	uint16_t pdi_configuration2;  // 0x003
+	uint16_t alias; // 0x004  /**< The slaves alias if not equal to 0. */
+	uint8_t  reverved1[4]; // 0x005
+	uint16_t checksum; //0x007
+	uint32_t vendor_id; //0x008 	/**< Vendor-ID stored on the slave. */
+	uint32_t product_code; // 0x00a	   /**< Product-Code stored on the slave. */
+	uint32_t revision_number; // 0x00c /**< Revision-Number stored on the slave. */
+	uint32_t serial_number; // 0x00e  /**< Serial-Number stored on the slave. */
+	uint8_t  reserved2[8]; ///0x013
+	uint16_t boot_rx_mailbox_offset; // 0x0014
+	uint16_t boot_rx_mailbox_size; // 0x0015
+	uint16_t boot_tx_mailbox_offset; // 0x0016
+	uint16_t boot_tx_mailbox_size; // 0x0017
+	uint16_t std_rx_mailbox_offset; //0x0018
+	uint16_t std_rx_mailbox_size; // 0x0019
+	uint16_t std_tx_mailbox_offset; // 0x01a
+	uint16_t std_tx_mailbox_size; // 0x01b
+	uint16_t mailbox_protocols; // 0x01c
+	uint8_t  reserved3[66]; // 0x2b
+	uint16_t eprom_size_kbits; // 0x03e
+	uint16_t version; //0x03f
+} ec_sii_t  __attribute__ ((packed));
 
 #define GROUP_IDX			0
 #define IMAGE_IDX			1
@@ -194,8 +189,8 @@ typedef struct {
 } category_header;
 
 typedef struct {
-
-	category_header strings_hdr __attribute__ ((packed)); // 0
+	ec_sii_t sii;  __attribute__ ((packed))
+	category_header strings_hdr __attribute__ ((packed)); // 0x40
 	category_strings strings __attribute__ ((packed));
 
 	category_header general_hdr __attribute__ ((packed)); // 128
@@ -231,10 +226,6 @@ void read_category_hdr(int off,uint8_t *data)
 	int cat_off =
 			(uint8_t *)&(categories.syncm_hdr) - (uint8_t *)&(categories.strings_hdr);
 
-	if (off < 0){
-		printf("%s state error\n",__FUNCTION__);
-		return;
-	}
 	printf("%s off %d offset %d max category off=%d\n",
 			__FUNCTION__,off, offset, cat_off);
 	if (offset == 0){
@@ -284,6 +275,7 @@ void read_category_hdr(int off,uint8_t *data)
 		return (void)memcpy(data, &categories.endhdr,
 				sizeof(categories.endhdr));
 	}
+	if (offset > sizeof() > )
 	printf("%s insane offset ending\n",__FUNCTION__);
 	return (void)memcpy(data, &categories.endhdr,
 			sizeof(categories.endhdr));
@@ -415,8 +407,9 @@ void init_hdr_dbg()
 {
 	int cat_off =0;
 
-	printf("%s sizes str=%d gen=%d"
+	printf("%s sizes sii %d str=%d gen=%d"
 			"tx=%d rx=%d fm=%d sync=%d end=%d\n",	__FUNCTION__,
+			sizeof(categories.sii),
 			categories.strings_hdr.size,
 			categories.general_hdr.size,
 			categories.txpdo_hdr.size,
