@@ -240,7 +240,7 @@ void init_general(category_general * general,category_header * hdr)
 	hdr->size = sizeof(*general)/2;
 
 	if (sizeof(*general) %2){
-		printf("ilegal size\n");
+		printf("%s illegal size\n",__FUNCTION__);
 		exit(0);
 	}
 
@@ -438,6 +438,7 @@ void (*sii_command)(int offset, int datalen, uint8_t * data) = 0;
 int ec_sii_rw(uint8_t * data, int datalen)
 {
 	if (sii_command){
+			printf("%s datalen =%d\n",__FUNCTION__,datalen);
 			sii_command(last_word_offset, datalen - 6, (uint8_t *)&data[6]);
 	} else{
 		printf("%s no command\n",__FUNCTION__);
