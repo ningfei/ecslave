@@ -22,7 +22,7 @@
 #define CAT_TYPE_SYNCM	 0x41
 #define CAT_TYPE_TXPDO	 0x50
 #define CAT_TYPE_RXPDO	 0x51
-#define CAT_TYPE_DC	0x60
+#define CAT_TYPE_DC		0x60
 #define CAT_TYPE_END	0xFFFF
 
 typedef struct {
@@ -274,7 +274,7 @@ void read_category_hdr(int off,uint8_t *data)
 	cat_off = (uint8_t *)&categories.syncm_hdr - (uint8_t *) &categories.strings_hdr;
 	if (offset == cat_off){
 		puts("syncm hdr");
-		return (void)memcpy(data, &categories.syncm,
+		return (void)memcpy(data, &categories.syncm_hdr,
 				sizeof(categories.syncm_hdr));
 	}
 
