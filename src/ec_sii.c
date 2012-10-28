@@ -196,26 +196,26 @@ typedef struct {
 typedef struct {
 
 	category_header strings_hdr __attribute__ ((packed)); // 0
-	category_strings strings;
+	category_strings strings __attribute__ ((packed));
 
 	category_header general_hdr __attribute__ ((packed)); // 128
-	category_general general;
+	category_general general __attribute__ ((packed));
 
 	category_header txpdo_hdr __attribute__ ((packed)); // 192
-	category_pdo txpdo;
+	category_pdo txpdo  __attribute__ ((packed));
 
 	category_header rxpdo_hdr __attribute__ ((packed)); // 220
-	category_pdo rxpdo;
+	category_pdo rxpdo  __attribute__ ((packed));
 
 	category_header fmmu_hdr __attribute__ ((packed));  //226
-	category_fmmu fmmu;
+	category_fmmu fmmu  __attribute__ ((packed));
 
 	category_header syncm_hdr __attribute__ ((packed));
 	category_syncm syncm __attribute__ ((packed));
 
-	category_header endhdr;
+	category_header endhdr __attribute__ ((packed));
 
-} sii_categories;
+} sii_categories  __attribute__ ((packed));
 
 sii_categories categories;
 int last_word_offset = -1;
@@ -238,46 +238,60 @@ void read_category_hdr(int off,uint8_t *data)
 	printf("%s off %d offset %d max category off=%d\n",
 			__FUNCTION__,off, offset, cat_off);
 	if (offset == 0){
-			return (void)memcpy(data, &categories.strings_hdr,
+		puts("strings gen");
+		return (void)memcpy(data, &categories.strings_hdr,
 					sizeof(categories.strings_hdr));
-
 	}
-	//offset -= 4; // etherlab does this : 2UL + fsm->sii_offset + cat_size
+
 	cat_off = (uint8_t *)&categories.general_hdr - (uint8_t *) &categories.strings_hdr;
 	if (offset == cat_off){
+		puts("hdr gen");
 		return (void)memcpy(data, &categories.general_hdr,
 				sizeof(categories.general_hdr));
 	}
 
 	cat_off = (uint8_t *)&categories.txpdo_hdr - (uint8_t *) &categories.strings_hdr;
 	if (offset == cat_off){
+		puts("hdr txpdo");
 		return (void)memcpy(data, &categories.txpdo_hdr,
 				sizeof(categories.txpdo_hdr));
 	}
 
 	cat_off = (uint8_t *)&categories.rxpdo_hdr - (uint8_t *) &categories.strings_hdr;
 	if (offset == cat_off){
+		puts("hdr rxpdo");
 		return (void)memcpy(data, &categories.rxpdo_hdr,
 				sizeof(categories.rxpdo_hdr));
 	}
 
 	cat_off = (uint8_t *)&categories.fmmu_hdr - (uint8_t *) &categories.strings_hdr;
 	if (offset == cat_off){
+		puts("fmmu hdr");
 		return (void)memcpy(data, &categories.fmmu_hdr,
 				sizeof(categories.fmmu_hdr));
 	}
 
 	cat_off = (uint8_t *)&categories.syncm_hdr - (uint8_t *) &categories.strings_hdr;
 	if (offset == cat_off){
+		puts("syncm hdr");
 		return (void)memcpy(data, &categories.syncm,
 				sizeof(categories.syncm_hdr));
 	}
-	printf("%s insane offset\n",__FUNCTION__);
+
+	cat_off = (uint8_t *)&categories.endhdr - (uint8_t *) &categories.strings_hdr;
+	if (offset == cat_off){
+		puts("endh hdr");
+		return (void)memcpy(data, &categories.endhdr,
+				sizeof(categories.endhdr));
+	}
+	printf("%s insane offset ending\n",__FUNCTION__);
+	return (void)memcpy(data, &categories.endhdr,
+			sizeof(categories.endhdr));
 }
 
 void init_general(category_general * general,category_header * hdr)
 {
-	hdr->size = sizeof(*general);
+	hdr->size = sizeof(*general)/2;
 
 	if (sizeof(*general) %2){
 		printf("ilegal size\n");
@@ -341,7 +355,7 @@ void init_end_hdr(category_header * hdr)
 {
 	hdr->size = 0;
 	hdr->type = 0b111111111111111;
-	hdr->vendor_specific = 0b0;
+	hdr->vendor_specific = 0b1; // etherlab does not care for vendor
 }
 
 void init_strings(category_strings * str, category_header * hdr)
@@ -401,13 +415,32 @@ void init_hdr_dbg()
 {
 	int cat_off =0;
 
+	printf("%s sizes str=%d gen=%d"
+			"tx=%d rx=%d fm=%d sync=%d end=%d\n",	__FUNCTION__,
+			categories.strings_hdr.size,
+			categories.general_hdr.size,
+			categories.txpdo_hdr.size,
+			categories.rxpdo_hdr.size,
+			categories.fmmu_hdr.size,
+			categories.syncm_hdr.size,
+			categories.endhdr.size);
+
 	cat_off = (uint8_t *)&categories.general_hdr - (uint8_t *) &categories.strings_hdr;
 	printf("%s offset =%d\n",__FUNCTION__,cat_off);
+
+	cat_off = (uint8_t *)&categories.txpdo_hdr - (uint8_t *) &categories.strings_hdr;
+	printf("%s offset =%d\n",__FUNCTION__,cat_off);
+
 	cat_off = (uint8_t *)&categories.rxpdo_hdr - (uint8_t *) &categories.strings_hdr;
 	printf("%s offset =%d\n",__FUNCTION__,cat_off);
+
 	cat_off = (uint8_t *)&categories.fmmu_hdr - (uint8_t *) &categories.strings_hdr;
 	printf("%s offset =%d\n",__FUNCTION__,cat_off);
+
 	cat_off = (uint8_t *)&categories.syncm_hdr - (uint8_t *) &categories.strings_hdr;
+	printf("%s offset =%d\n",__FUNCTION__,cat_off);
+
+	cat_off = (uint8_t *)&categories.endhdr - (uint8_t *) &categories.strings_hdr;
 	printf("%s offset =%d\n",__FUNCTION__,cat_off);
 }
 
@@ -418,9 +451,10 @@ void init_sii(void)
 	init_syncm(&categories.syncm, &categories.syncm_hdr);
 	init_general(&categories.general, &categories.general_hdr);
 	init_end_hdr(&categories.endhdr);
-	init_hdr_dbg();
 
-	// pdos.
+	// pdos
+	categories.rxpdo_hdr.type = CAT_TYPE_RXPDO;
+	categories.rxpdo_hdr.size = sizeof(categories.rxpdo)/2;
 	categories.rxpdo.entries = 2;
 	categories.rxpdo.flags = 0;
 	categories.rxpdo.name_idx = RXPDO_CAT_NAME_IDX;
@@ -440,12 +474,16 @@ void init_sii(void)
 	categories.txpdo.synchronization = 0;
 	categories.txpdo.syncm = 0;
 	categories.txpdo.pdo_index = 0x1a00;
+	categories.txpdo_hdr.size = sizeof(categories.txpdo)/2;
+	categories.txpdo_hdr.type = CAT_TYPE_TXPDO;
 
 	init_pdo(&categories.txpdo.pdo[0], 0x1a01, 0X02, TX_PDO1_NAME_IDX, 0,	// index in the object dictionary
 		 32, 0);
 
 	init_pdo(&categories.txpdo.pdo[1], 0x1a03, 0X01, TX_PDO2_NAME_IDX, 0,	// index in the object dictionary
 		 16, 0);
+
+	init_hdr_dbg();
 }
 
 void (*sii_command)(int offset,uint8_t * data) = 0;
