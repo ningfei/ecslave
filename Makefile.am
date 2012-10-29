@@ -9,3 +9,5 @@ src/ec_cmd_lrw.c \
 src/ec_sii.c \
 src/ec_regs.c \
 src/ecs_slave.c
+
+ec_slave_CFLAGS = -lrt

@@ -359,6 +359,12 @@ m4trace:configure.ac:25: -1- AH_OUTPUT([inline], [/* Define to `__inline__\' or 
 #ifndef __cplusplus
 #undef inline
 #endif])
+m4trace:configure.ac:26: -1- AM_PROG_CC_C_O
+m4trace:configure.ac:26: -1- AC_DEFINE_TRACE_LITERAL([NO_MINUS_C_MINUS_O])
+m4trace:configure.ac:26: -1- m4_pattern_allow([^NO_MINUS_C_MINUS_O$])
+m4trace:configure.ac:26: -1- AH_OUTPUT([NO_MINUS_C_MINUS_O], [/* Define to 1 if your C compiler doesn\'t accept -c and -o together. */
+@%:@undef NO_MINUS_C_MINUS_O])
+m4trace:configure.ac:26: -1- AC_REQUIRE_AUX_FILE([compile])
 m4trace:configure.ac:27: -1- AH_OUTPUT([HAVE_SOCKET], [/* Define to 1 if you have the `socket\' function. */
 @%:@undef HAVE_SOCKET])
 m4trace:configure.ac:27: -1- AC_DEFINE_TRACE_LITERAL([HAVE_SOCKET])

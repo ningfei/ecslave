@@ -23,7 +23,7 @@ AC_CHECK_HEADERS([stdlib.h])
 AC_CHECK_HEADERS([arpa/inet.h])
 
 AC_C_INLINE
-
+AM_PROG_CC_C_O
 AC_CHECK_FUNCS([socket])
 
 AC_OUTPUT
