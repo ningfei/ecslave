@@ -449,10 +449,10 @@ void (*sii_command)(int offset, int datalen, uint8_t * data) = 0;
 int ec_sii_rw(uint8_t * data, int datalen)
 {
 	if (sii_command){
-			printf("%s datalen =%d\n",__FUNCTION__,datalen);
+			dprintf("%s datalen =%d\n",__FUNCTION__,datalen);
 			sii_command(last_word_offset, datalen - 6, (uint8_t *)&data[6]);
 	} else{
-		printf("%s no command\n",__FUNCTION__);
+		dprintf("%s no command\n",__FUNCTION__);
 	}
 	sii_command = 0;
 	last_word_offset = -1;
@@ -462,16 +462,16 @@ int ec_sii_start_read(uint8_t * data, int datalen)
 {
 	int word_offset;
 
-	printf("%s received data len %d\n",
+	dprintf("%s received data len %d\n",
 			__FUNCTION__, datalen);
 
 	if (data[0] != 0x80 && data[0] != 0x81) {
-		printf("%s no two addressed octets %x %x\n",
+		dprintf("%s no two addressed octets %x %x\n",
 		       __FUNCTION__	, data[0], data[1]);
 		return 1;
 	}
 	word_offset = *(uint16_t *) & data[2];
-	printf("%s request %d operation on offset %d\n",
+	dprintf("%s request %d operation on offset %d\n",
 			__FUNCTION__, data[1], word_offset);
 
 	switch(data[1])
@@ -487,7 +487,7 @@ int ec_sii_start_read(uint8_t * data, int datalen)
 		break;
 
 	default: // unknown
-		printf("%s default\n",__FUNCTION__);
+		dprintf("%s default\n",__FUNCTION__);
 		break;
 	}
 

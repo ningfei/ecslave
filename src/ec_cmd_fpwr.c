@@ -29,7 +29,7 @@ void ec_cmd_fpwr(e_slave * slave)
 	ado = ec_dgram_ado(slave->pkt);
 	adp = ec_dgram_adp(slave->pkt);
 
-	printf("%s index=%d wkc=%d "
+	dprintf("%s index=%d wkc=%d "
 		"wkc1=%d ado=0x%x adp=0x%x "
 		"station addr=0x%x "
 		"datalen=%d\n",

@@ -25,7 +25,7 @@ void ec_cmd_brd(e_slave * slave)
 	wkc1++;
 	*wkc = wkc1;
 	ado = ec_dgram_ado(slave->pkt);
-	printf("%s index=%d wkc=%d wkc1=%d data len=%d ado=0x%x adp=0x%x\n",
+	dprintf("%s index=%d wkc=%d wkc1=%d data len=%d ado=0x%x adp=0x%x\n",
 	       __FUNCTION__,
 	       slave->pkt_index, *wkc, wkc1, datalen, ado, ec_dgram_adp(slave->pkt));
 	ec_raw_get_ado(ado, data, datalen);

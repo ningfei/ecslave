@@ -35,7 +35,7 @@ void ec_cmd_fprd(e_slave * slave)
 	wkc1 = *wkc;
 	wkc1++;
 	*wkc = wkc1;
-	printf("%s index=%d wkc=%d wkc1=%d ADO=0x%x data len=%d\n",
+	dprintf("%s index=%d wkc=%d wkc1=%d ADO=0x%x data len=%d\n",
 	       __FUNCTION__, slave->pkt_index, *wkc, wkc1, ado, datalen);
 
 	if (datalen == 0) {

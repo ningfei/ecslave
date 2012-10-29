@@ -588,4 +588,6 @@ typedef struct
 
 #endif
 
+#define dprintf
+
 #endif /* _EC_TYPE_H */
