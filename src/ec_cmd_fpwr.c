@@ -50,7 +50,7 @@ void ec_cmd_fpwr(e_slave * slave)
 			//ec_fsm_sii_state_start_reading
 			ec_sii_start_read(data, datalen);
 		} else{
-			ec_raw_get_ado(ado, data, datalen);
+			ec_raw_set_ado(ado, data, datalen);
 		}
 	}
 FPRD_OUT:
