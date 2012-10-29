@@ -113,4 +113,16 @@ static inline char *__eth_interface(void)
 	return eth_interface;
 }
 
+static inline void __ec_inc_wkc(e_slave *slave)
+{
+	uint16_t wkc1;
+	uint8_t *datagram = __ecat_frameheader(slave->pkt);
+	uint16_t size = ec_dgram_size(slave->pkt);
+	uint16_t *wkc = (uint16_t *) & datagram[size];
+
+	wkc1 = *wkc;
+	wkc1++;
+	*wkc = wkc1;
+}
+
 #endif

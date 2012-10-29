@@ -12,22 +12,15 @@
 
 void ec_cmd_brd(e_slave * slave)
 {
-	uint16_t wkc1;
 	uint16_t ado;
-	uint8_t *datagram =
-	    (uint8_t *) & slave->pkt[sizeof(struct ether_header)];
-	uint16_t size = ec_dgram_size(slave->pkt);
 	uint16_t datalen = ec_dgram_data_length(slave->pkt);
-	uint8_t *data = (uint8_t *) (((uint8_t *) datagram) + sizeof(ec_comt));
-	uint16_t *wkc = (uint16_t *) & datagram[size];
+	uint8_t *data = ec_dgram_data(slave->pkt);
 
-	wkc1 = *wkc;
-	wkc1++;
-	*wkc = wkc1;
+	__ec_inc_wkc(slave);
 	ado = ec_dgram_ado(slave->pkt);
-	dprintf("%s index=%d wkc=%d wkc1=%d data len=%d ado=0x%x adp=0x%x\n",
+	dprintf("%s index=%d data len=%d ado=0x%x adp=0x%x\n",
 	       __FUNCTION__,
-	       slave->pkt_index, *wkc, wkc1, datalen, ado, ec_dgram_adp(slave->pkt));
+	       slave->pkt_index, datalen, ado, ec_dgram_adp(slave->pkt));
 	ec_raw_get_ado(ado, data, datalen);
 	ecs_tx_packet(slave);
 	__set_fsm_state(slave, ecs_rx_packet);

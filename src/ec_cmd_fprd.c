@@ -13,15 +13,9 @@
 /** Configured Address Read */
 void ec_cmd_fprd(e_slave * slave)
 {
-	uint16_t wkc1;
-	uint32_t val = 0;
-	uint16_t ado;
-	uint16_t adp;
-	uint8_t *datagram = __ecat_frameheader(slave->pkt);
-	uint16_t size = ec_dgram_size(slave->pkt);
+	uint16_t ado, adp;
 	uint16_t datalen = ec_dgram_data_length(slave->pkt);
 	uint8_t *data = ec_dgram_data(slave->pkt);
-	uint16_t *wkc = (uint16_t *) & datagram[size];
 
 	ado = ec_dgram_ado(slave->pkt);
 	adp = ec_dgram_adp(slave->pkt);
@@ -32,11 +26,9 @@ void ec_cmd_fprd(e_slave * slave)
 			ec_station_address());
 		goto FPRD_OUT;
 	}
-	wkc1 = *wkc;
-	wkc1++;
-	*wkc = wkc1;
-	dprintf("%s index=%d wkc=%d wkc1=%d ADO=0x%x data len=%d\n",
-	       __FUNCTION__, slave->pkt_index, *wkc, wkc1, ado, datalen);
+	__ec_inc_wkc(slave);
+	dprintf("%s index=%d ADO=0x%x data len=%d\n",
+	       __FUNCTION__, slave->pkt_index,  ado, datalen);
 
 	if (datalen == 0) {
 		printf("insane no length\n");

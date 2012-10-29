@@ -22,22 +22,17 @@ void get_data_lrw(uint8_t * data, uint16_t offset, uint16_t datalen)
 void ec_cmd_lrw(e_slave * slave)
 {
 	int val = 0;
-	uint16_t wkc1;
 	uint16_t datalen = ec_dgram_data_length(slave->pkt);
 	uint8_t *datagram = (uint8_t *) __ecat_frameheader(slave->pkt);
 	uint16_t size = ec_dgram_size(slave->pkt);
 	uint8_t *data = ec_dgram_data(slave->pkt);
-	uint16_t *wkc = (uint16_t *) & datagram[size];
 	uint32_t offset = 0;
 
-	wkc1 = *wkc;
-	wkc1++;
-
-	printf("%s index=%d wkc=%d wkc1=%d\n",
-	       __FUNCTION__, slave->pkt_index, *wkc, wkc1);
+	__ec_inc_wkc(slave);
+	printf("%s index=%d\n",
+	       __FUNCTION__, slave->pkt_index);
 
 LWR_OUT:
-	*wkc = wkc1;
 	ecs_tx_packet(slave);
 	__set_fsm_state(slave, ecs_rx_packet);
 }

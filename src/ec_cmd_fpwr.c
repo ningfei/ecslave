@@ -13,32 +13,23 @@
 /** Configured Address Write */
 void ec_cmd_fpwr(e_slave * slave)
 {
-	uint16_t wkc1;
 	long val = 0;
 	uint16_t ado = 0;
 	uint16_t adp = 0;
-	uint8_t *datagram = __ecat_frameheader(slave->pkt);
-	uint16_t size = ec_dgram_size(slave->pkt);
 	uint16_t datalen = ec_dgram_data_length(slave->pkt);
 	uint8_t *data = ec_dgram_data(slave->pkt);
-	uint16_t *wkc = (uint16_t *) & datagram[size];
 
-	wkc1 = *wkc;
-	wkc1++;
-	*wkc = wkc1;
 	ado = ec_dgram_ado(slave->pkt);
 	adp = ec_dgram_adp(slave->pkt);
+	__ec_inc_wkc(slave);
 
-	dprintf("%s index=%d wkc=%d "
-		"wkc1=%d ado=0x%x adp=0x%x "
-		"station addr=0x%x "
-		"datalen=%d\n",
+	dprintf("%s index=%d ado=0x%x adp=0x%x "
+			"station addr=0x%x datalen=%d\n",
 	       __FUNCTION__, 
-		slave->pkt_index, 
-		*wkc, wkc1, 
-		ado,adp,
-		ec_station_address(),
-		datalen);
+	       slave->pkt_index,
+	       ado,adp,
+	       ec_station_address(),
+	       datalen);
 
 	if (datalen == 0) {
 		printf("insane no length\n");
