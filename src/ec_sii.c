@@ -135,10 +135,12 @@ typedef struct {
 	uint8_t syncm_type;
 } category_syncm;
 
-typedef struct {
-	uint8_t fmmu0;
-	uint8_t fmmu1;
-} category_fmmu;
+typedef unsigned short category_fmmu;
+category_fmmu fmmu;
+//typedef struct {
+//	unsigned short fmmu0:8,
+//		 	 fmmu1:8  __attribute__ (( packed ));
+//} category_fmmu;
 
 typedef struct {
 	uint8_t groupd_idx;	/*index to strings  */
@@ -230,7 +232,7 @@ void read_category_hdr(int off,int datalen, uint8_t *data)
 
 	if (offset + datalen > sizeof(categories)){
 		printf("%s insane offset offset=%d "
-					"datalen=%d sizeofcat%d\n",
+					"datalen=%d sizeof cat%d\n",
 				__FUNCTION__,
 				offset ,datalen,
 				sizeof(categories));
@@ -288,17 +290,16 @@ void init_syncm(category_syncm * syncm,category_header * hdr)
 	syncm->syncm_type = 0;	// not used
 }
 
-void init_fmmu(category_fmmu * fmmu,category_header * hdr)
+void init_fmmu(category_fmmu *fmmu,category_header *hdr)
 {
-	hdr->size = sizeof(*fmmu) / 2;
+	hdr->size = sizeof(category_fmmu) / 2;
 	if (sizeof(*fmmu) %2){
 		printf("ilegal size\n");
 		exit(0);
 	}
 
 	hdr->type = CAT_TYPE_FMMU;
-	fmmu->fmmu0 = 0;	// fmmmu not used
-	fmmu->fmmu1 = 0;	// fmmmu not used
+	fmmu = 0;	// fmmmu not used
 }
 
 void init_end_hdr(category_header * hdr)
@@ -364,8 +365,9 @@ void init_pdo(pdo_entry * pdo,
 void init_hdr_dbg()
 {
 	int cat_off =0;
+	printf("sz = category_fmmu = %d\n",sizeof(category_fmmu));
 
-	printf("%s sizes sii %lu str=%d gen=%d"
+	printf("%s sizes sii %lu str=%d gen=%d "
 			"tx=%d rx=%d fm=%d sync=%d end=%u\n",	__FUNCTION__,
 			sizeof(categories.sii),
 			categories.strings_hdr.size,
