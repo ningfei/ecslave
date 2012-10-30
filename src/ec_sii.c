@@ -225,11 +225,15 @@ void read_category_hdr(int off,int datalen, uint8_t *data)
 	int offset = off*2;
 	uint8_t* cat_off = (uint8_t *)&categories;
 
-	printf("%s off %d offset %d datalen=%d\n",
+	printf("%s off %d offset %d data len=%d\n",
 			__FUNCTION__,off, offset ,datalen);
 
 	if (offset + datalen > sizeof(categories)){
-		printf("%s insane offset\n",__FUNCTION__);
+		printf("%s insane offset offset=%d "
+					"datalen=%d sizeofcat%d\n",
+				__FUNCTION__,
+				offset ,datalen,
+				sizeof(categories));
 		return;
 	}
 	memcpy(data, cat_off + offset, datalen);
