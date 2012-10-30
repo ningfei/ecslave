@@ -25,13 +25,13 @@ void ec_init_regs(void)
 	ec_registers[ECT_BASE_FMMUS] = 0x0;	/* base fmmu count 1byte */
 	ec_registers[ECT_BASE_SYNCM] = 0x0;	/* base sync count 1byte */
 	ec_registers[ECT_REG_PORTDES] = 0x000F;	/* octet 1      0x000F one port. mii */
-	ec_registers[ECT_REG_ESCSUP] = 0b00000001 | 0b00000100;
+	ec_registers[ECT_REG_ESCSUP] = 0x0001 | 0x0004;
 	/* octet 2 0b00000001   fmmu bit operation
 	 *              0b00000100      dc
 	 *              0b00001000  dc 64 bit
 	 **/
 	ec_registers[ECT_REG_STADR] = 0x00;
-	ec_registers[ECT_REG_DLSTAT] = 0b00001000;	/* data link state */
+	ec_registers[ECT_REG_DLSTAT] = 0x008;	/* data link state */
 	ec_registers[ECT_REG_DLSTAT + 1] = 0x00;	/* data link state */
 }
 
