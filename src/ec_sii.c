@@ -74,12 +74,12 @@ typedef struct {
 #define RX_PDO1_NAME		"RXPDO1 LIBIX"
 #define RX_PDO2_NAME		"RXPDO2 LIBIX"
 
-#define SDO_ENABLED 		0b000001
-#define	SDO_INFO			0b000010
-#define	PDO_ASSIGN			0b000100
-#define	PDO_CONF			0b001000
-#define	STARTUP_UPLOAD		0b010000
-#define	SDO_COMPLETE_ACCESS	0b100000
+#define SDO_ENABLED 		0x001
+#define	SDO_INFO		0x002
+#define	PDO_ASSIGN		0x004
+#define	PDO_CONF		0x008
+#define	STARTUP_UPLOAD		0x010
+#define	SDO_COMPLETE_ACCESS	0x020
 
 #define STRING0 GROUP_STRING
 #define STRING1 IMAGE_STRING
@@ -93,7 +93,7 @@ typedef struct {
 #define STRING9 RX_PDO1_NAME
 
 #define NR_STRINGS  10
-#define PORT_MII	0b01
+#define PORT_MII	0x01
 #define PORT0_SHIFT	0
 #define NR_PDOS		2
 
@@ -300,8 +300,8 @@ void init_fmmu(category_fmmu * fmmu,category_header * hdr)
 void init_end_hdr(category_header * hdr)
 {
 	hdr->size = 0;
-	hdr->type = 0b111111111111111;
-	hdr->vendor_specific = 0b1; // etherlab does not care for vendor
+	hdr->type = 0x7FFF;
+	hdr->vendor_specific = 0x1; // etherlab does not care for vendor
 }
 
 void init_strings(category_strings * str, category_header * hdr)
