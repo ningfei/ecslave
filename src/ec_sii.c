@@ -13,16 +13,16 @@
 
 #define CAT_TYPE_NOP	0x00
 
-#define CAT_TYPE_STRINGS 0x10
+#define CAT_TYPE_STRINGS 0x000A
 
-#define CAT_TYPE_DATA_TYPE 0x20
+#define CAT_TYPE_DATA_TYPE 0x014
 
-#define CAT_TYPE_GENERAL  0x30
-#define CAT_TYPE_FMMU	 0x40
-#define CAT_TYPE_SYNCM	 0x41
-#define CAT_TYPE_TXPDO	 0x50
-#define CAT_TYPE_RXPDO	 0x51
-#define CAT_TYPE_DC		0x60
+#define CAT_TYPE_GENERAL  0x001E
+#define CAT_TYPE_FMMU	 0x0028
+#define CAT_TYPE_SYNCM	 0x0028
+#define CAT_TYPE_TXPDO	 0x0032
+#define CAT_TYPE_RXPDO	 0x0033
+#define CAT_TYPE_DC		0x003C
 #define CAT_TYPE_END	0xFFFF
 
 typedef struct {
@@ -361,8 +361,8 @@ void init_hdr_dbg()
 {
 	int cat_off =0;
 
-	printf("%s sizes sii %d str=%d gen=%d"
-			"tx=%d rx=%d fm=%d sync=%d end=%d\n",	__FUNCTION__,
+	printf("%s sizes sii %lu str=%d gen=%d"
+			"tx=%d rx=%d fm=%d sync=%d end=%u\n",	__FUNCTION__,
 			sizeof(categories.sii),
 			categories.strings_hdr.size,
 			categories.general_hdr.size,
