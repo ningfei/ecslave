@@ -59,13 +59,15 @@ static inline int ec_dgram_command(uint8_t * d)
 static inline uint16_t ec_dgram_size(uint8_t * d)
 {
 	ec_comt *datagram = (ec_comt *) __ecat_frameheader(d);
-	return (datagram->elength & 0b011111111111);
+//	return (datagram->elength & 0b011111111111);
+	return (datagram->elength & 0x07FF);
 }
 
 static inline uint16_t ec_dgram_data_length(uint8_t * d)
 {
 	ec_comt *datagram = (ec_comt *) __ecat_frameheader(d);
-	uint16_t datalen = (datagram->dlength & 0b011111111111);
+//	uint16_t datalen = (datagram->dlength & 0b011111111111);
+	uint16_t datalen = (datagram->dlength & 0x07FF);
 	return datalen;
 }
 
