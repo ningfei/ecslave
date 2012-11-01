@@ -118,12 +118,12 @@ typedef struct {
 typedef struct {
 	uint16_t pdo_index;
 	uint8_t entries;
-	uint8_t syncm;
+	int8_t syncm;
 	uint8_t synchronization;
 	uint8_t name_idx;
 	uint16_t flags;
 	pdo_entry pdo[NR_PDOS];
-} category_pdo;
+} category_pdo __attribute__ ((packed));
 
 // table 23
 typedef struct {
@@ -191,7 +191,7 @@ typedef struct {
 } category_header;
 
 typedef struct {
-	ec_sii_t sii;  __attribute__ ((packed))
+	ec_sii_t sii __attribute__ ((packed));
 	category_header strings_hdr __attribute__ ((packed));
 	category_strings strings;
 
@@ -238,7 +238,7 @@ void read_category_hdr(int off,int datalen, uint8_t *data)
 				sizeof(categories));
 		return;
 	}
-	memcpy(data, cat_off + offset, datalen);
+	memcpy(data, &(cat_off[offset]), datalen);
 }
 
 void init_general(category_general * general,category_header * hdr)
@@ -365,7 +365,7 @@ void init_pdo(pdo_entry * pdo,
 void init_hdr_dbg()
 {
 	int cat_off =0;
-	printf("sz = category_fmmu = %d\n",sizeof(category_fmmu));
+	printf("sz = category pdo = %d\n",sizeof(category_pdo));
 
 	printf("%s sizes sii %lu str=%d gen=%d "
 			"tx=%d rx=%d fm=%d sync=%d end=%u\n",	__FUNCTION__,
@@ -423,7 +423,7 @@ void init_sii(void)
 	categories.rxpdo.flags = 0;
 	categories.rxpdo.name_idx = RXPDO_CAT_NAME_IDX;
 	categories.rxpdo.synchronization = 0;
-	categories.rxpdo.syncm = 0;
+	categories.rxpdo.syncm = -1;
 	categories.rxpdo.pdo_index = 0x1600;
 
 	init_pdo(&categories.rxpdo.pdo[0], 0x1614, 0X02, RX_PDO1_NAME_IDX, 0,	// index in the object dictionary
@@ -436,7 +436,7 @@ void init_sii(void)
 	categories.txpdo.flags = 0;
 	categories.txpdo.name_idx = TXPDO_CAT_NAME_IDX;
 	categories.txpdo.synchronization = 0;
-	categories.txpdo.syncm = 0;
+	categories.txpdo.syncm = -1;
 	categories.txpdo.pdo_index = 0x1a00;
 	categories.txpdo_hdr.size = sizeof(categories.txpdo)/2;
 	categories.txpdo_hdr.type = CAT_TYPE_TXPDO;
