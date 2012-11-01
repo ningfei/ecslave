@@ -19,6 +19,7 @@ void ec_cmd_brw(e_slave * slave)
 	       __FUNCTION__, slave->pkt_index);
 
 	ado = ec_dgram_ado(slave->pkt);
+	__ec_inc_wkc(slave);
 	if (ec_dgram_adp(slave->pkt) == 0) {
 		/*
 		 * if slave is addressed it is the only one who reads
