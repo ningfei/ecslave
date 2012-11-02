@@ -12,3 +12,6 @@ src/ecs_slave.c \
 src/ec_debug.c
 
 ec_slave_CFLAGS = -lrt -O0 -Wall -Werror
+if HAVE_DEBUG
+ec_slave_CFLAGS += -D__DEBUG__ 
+endif

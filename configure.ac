@@ -6,17 +6,15 @@ AM_INIT_AUTOMAKE(ec_slave, 2.0)
 # Checks for programs.
 AC_PROG_CC
 
-# Checks for syslog
-AC_ARG_WITH( syslog,
-  AS_HELP_STRING([--with-syslog],[compile with syslog]),
-  syslog=$withval, syslog=no )
-
-if test x$syslog = xyes ; then
-	AC_MSG_NOTICE([syslog enabled])
-	AC_DEFINE(HAVE_SYSLOG)
-else
-	AC_MSG_NOTICE([syslog disabled])
-fi
+# Checks for debug
+     AC_ARG_ENABLE([debug],
+     [  --enable-debug    Turn on debugging],
+     [case "${enableval}" in
+       yes) debug=true ;;
+       no)  debug=false ;;
+       *) AC_MSG_ERROR([bad value ${enableval} for --enable-debug]) ;;
+     esac],[debug=false])
+     AM_CONDITIONAL([HAVE_DEBUG], [test x$debug = xtrue])
 
 AC_CHECK_HEADERS([sys/socket.h])
 AC_CHECK_HEADERS([stdlib.h])
