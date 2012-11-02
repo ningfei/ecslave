@@ -7,7 +7,7 @@
 #include "fsm_slave.h"
 #include "ecs_slave.h"
 #include "ec_regs.h"
-#include <arpa/inet.h>
+#include "ec_sii.h"
 
 #define EC_FIRST_SII_CATEGORY_OFFSET 0x040
 
@@ -24,6 +24,10 @@
 #define CAT_TYPE_RXPDO	 0x0033
 #define CAT_TYPE_DC		0x003C
 #define CAT_TYPE_END	0xFFFF
+
+#define NR_SYNCM	2
+#define	SYNMC_SIZE	1024
+
 
 typedef struct {
 	uint16_t pdi_control; // 0x000
@@ -52,10 +56,10 @@ typedef struct {
 	uint16_t version; //0x03f
 } ec_sii_t;
 
-#define GROUP_IDX			0
-#define IMAGE_IDX			1
-#define ORDER_IDX			2
-#define NAME_IDX			3
+#define GROUP_IDX		0
+#define IMAGE_IDX		1
+#define ORDER_IDX		2
+#define NAME_IDX		3
 #define RXPDO_CAT_NAME_IDX	4
 #define TXPDO_CAT_NAME_IDX	5
 #define TX_PDO1_NAME_IDX	6
@@ -123,7 +127,7 @@ typedef struct {
 	uint8_t name_idx;
 	uint16_t flags;
 	pdo_entry pdo[NR_PDOS];
-} category_pdo __attribute__ ((packed));
+} category_pdo;
 
 // table 23
 typedef struct {
@@ -208,7 +212,7 @@ typedef struct {
 	category_fmmu fmmu;
 
 	category_header syncm_hdr __attribute__ ((packed));
-	category_syncm syncm __attribute__ ((packed));
+	category_syncm syncm[NR_SYNCM] __attribute__ ((packed));
 
 	category_header endhdr __attribute__ ((packed));
 
@@ -232,7 +236,7 @@ void read_category_hdr(int off,int datalen, uint8_t *data)
 
 	if (offset + datalen > sizeof(categories)){
 		printf("%s insane offset offset=%d "
-					"datalen=%d sizeof cat%d\n",
+					"datalen=%d sizeof cat %lu\n",
 				__FUNCTION__,
 				offset ,datalen,
 				sizeof(categories));
@@ -272,22 +276,25 @@ void init_general(category_general * general,category_header * hdr)
 	general->physical_port = (PORT_MII << PORT0_SHIFT);
 }
 
-void init_syncm(category_syncm * syncm,category_header * hdr)
+void init_syncm(category_syncm * syncm,int nr,category_header * hdr)
 {
-	hdr->size = sizeof(*syncm) / 2;
+	int i;
+
+	hdr->size = ( sizeof(*syncm) * nr) / 2;
 	if (sizeof(*syncm) %2){
 		printf("ilegal size\n");
 		exit(0);
 	}
 
 	hdr->type = CAT_TYPE_SYNCM;
-
-	syncm->ctrl_reg = 0;
-	syncm->enable_syncm = 0;
-	syncm->length = 0;
-	syncm->phys_start_address = 0;
-	syncm->status_reg = 0;
-	syncm->syncm_type = 0;	// not used
+	for ( i = 0 ; i < nr; i++, syncm++ ) {
+		syncm->ctrl_reg = ECT_REG_SM0 + (i* 0x08);
+		syncm->enable_syncm = 0x01 | 0x04;
+		syncm->length = SYNMC_SIZE;
+		syncm->phys_start_address = (long)syncm;
+		syncm->status_reg = 0;
+		syncm->syncm_type = i % 2 ? 0x03:0x04; /* 0x03 = out*/
+	}
 }
 
 void init_fmmu(category_fmmu *fmmu,category_header *hdr)
@@ -365,7 +372,7 @@ void init_pdo(pdo_entry * pdo,
 void init_hdr_dbg()
 {
 	int cat_off =0;
-	printf("sz = category pdo = %d\n",sizeof(category_pdo));
+	printf("sz = category pdo = %lu\n",sizeof(category_pdo));
 
 	printf("%s sizes sii %lu str=%d gen=%d "
 			"tx=%d rx=%d fm=%d sync=%d end=%u\n",	__FUNCTION__,
@@ -412,7 +419,7 @@ void init_sii(void)
 	init_si_info(&categories.sii);
 	init_strings(&categories.strings, &categories.strings_hdr);
 	init_fmmu(&categories.fmmu, &categories.fmmu_hdr);
-	init_syncm(&categories.syncm, &categories.syncm_hdr);
+	init_syncm(&categories.syncm[0], NR_SYNCM ,&categories.syncm_hdr);
 	init_general(&categories.general, &categories.general_hdr);
 	init_end_hdr(&categories.endhdr);
 
@@ -423,7 +430,7 @@ void init_sii(void)
 	categories.rxpdo.flags = 0;
 	categories.rxpdo.name_idx = RXPDO_CAT_NAME_IDX;
 	categories.rxpdo.synchronization = 0;
-	categories.rxpdo.syncm = -1;
+	categories.rxpdo.syncm = 0;
 	categories.rxpdo.pdo_index = 0x1600;
 
 	init_pdo(&categories.rxpdo.pdo[0], 0x1614, 0X02, RX_PDO1_NAME_IDX, 0,	// index in the object dictionary
@@ -436,7 +443,7 @@ void init_sii(void)
 	categories.txpdo.flags = 0;
 	categories.txpdo.name_idx = TXPDO_CAT_NAME_IDX;
 	categories.txpdo.synchronization = 0;
-	categories.txpdo.syncm = -1;
+	categories.txpdo.syncm = 1;
 	categories.txpdo.pdo_index = 0x1a00;
 	categories.txpdo_hdr.size = sizeof(categories.txpdo)/2;
 	categories.txpdo_hdr.type = CAT_TYPE_TXPDO;
@@ -452,7 +459,7 @@ void init_sii(void)
 
 void (*sii_command)(int offset, int datalen, uint8_t * data) = 0;
 
-int ec_sii_rw(uint8_t * data, int datalen)
+void ec_sii_rw(uint8_t * data, int datalen)
 {
 	if (sii_command){
 			dprintf("%s datalen =%d\n",__FUNCTION__,datalen);
