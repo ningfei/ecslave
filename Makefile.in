@@ -33,10 +33,11 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 bin_PROGRAMS = ec_slave$(EXEEXT)
+@HAVE_DEBUG_TRUE@am__append_1 = -D__DEBUG__ 
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/configure AUTHORS COPYING \
-	ChangeLog INSTALL NEWS compile depcomp install-sh missing
+	ChangeLog INSTALL NEWS TODO compile depcomp install-sh missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -179,7 +180,7 @@ src/ec_regs.c \
 src/ecs_slave.c \
 src/ec_debug.c
 
-ec_slave_CFLAGS = -lrt -O0 -Wall -Werror
+ec_slave_CFLAGS = -lrt -O0 -Wall -Werror $(am__append_1)
 all: all-am
 
 .SUFFIXES:

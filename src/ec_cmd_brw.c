@@ -25,12 +25,12 @@ void ec_cmd_brw(e_slave * slave)
 		 * if slave is addressed it is the only one who reads
 		 * */
 		ec_raw_get_ado(ado, data, datalen);
-		printf("ADO R 0x%x Val=0x%x dlen=%d\n",
+		ec_printf("ADO R 0x%x Val=0x%x dlen=%d\n",
 				ado, data[0], datalen);
 		goto BRW_EXIT;
 	}
 	__ec_inc_wkc(slave);
-	printf("ADO 0x%x Val=0x%x\n", ado, val);
+	ec_printf("ADO 0x%x Val=0x%x\n", ado, val);
 	ec_raw_set_ado(ado, data, datalen);
 BRW_EXIT:
 

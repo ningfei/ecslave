@@ -601,6 +601,8 @@ LIBOBJS
 EGREP
 GREP
 CPP
+HAVE_DEBUG_FALSE
+HAVE_DEBUG_TRUE
 am__fastdepCC_FALSE
 am__fastdepCC_TRUE
 CCDEPMODE
@@ -682,7 +684,7 @@ ac_subst_files=''
 ac_user_opts='
 enable_option_checking
 enable_dependency_tracking
-with_syslog
+enable_debug
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1310,11 +1312,7 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
-
-Optional Packages:
-  --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
-  --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
-  --with-syslog           compile with syslog
+  --enable-debug    Turn on debugging
 
 Some influential environment variables:
   CC          C compiler command
@@ -3596,25 +3594,26 @@ fi
 
 
 
-# Checks for syslog
-
-# Check whether --with-syslog was given.
-if test "${with_syslog+set}" = set; then :
-  withval=$with_syslog; syslog=$withval
+# Checks for debug
+     # Check whether --enable-debug was given.
+if test "${enable_debug+set}" = set; then :
+  enableval=$enable_debug; case "${enableval}" in
+       yes) debug=true ;;
+       no)  debug=false ;;
+       *) as_fn_error "bad value ${enableval} for --enable-debug" "$LINENO" 5 ;;
+     esac
 else
-  syslog=no
+  debug=false
 fi
 
-
-if test x$syslog = xyes ; then
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: syslog enabled" >&5
-$as_echo "$as_me: syslog enabled" >&6;}
-	$as_echo "#define HAVE_SYSLOG 1" >>confdefs.h
-
+      if test x$debug = xtrue; then
+  HAVE_DEBUG_TRUE=
+  HAVE_DEBUG_FALSE='#'
 else
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: syslog disabled" >&5
-$as_echo "$as_me: syslog disabled" >&6;}
+  HAVE_DEBUG_TRUE='#'
+  HAVE_DEBUG_FALSE=
 fi
+
 
 
 ac_ext=c
@@ -4379,6 +4378,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${am__fastdepCC_TRUE}" && test -z "${am__fastdepCC_FALSE}"; then
   as_fn_error "conditional \"am__fastdepCC\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_DEBUG_TRUE}" && test -z "${HAVE_DEBUG_FALSE}"; then
+  as_fn_error "conditional \"HAVE_DEBUG\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 

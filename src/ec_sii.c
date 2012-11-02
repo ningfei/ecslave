@@ -223,7 +223,7 @@ int last_word_offset = -1;
 
 void write_category_hdr(int off,int datalen, uint8_t *data)
 {
-	printf("%s off%d \n",__FUNCTION__,off);
+	ec_printf("%s off%d \n",__FUNCTION__,off);
 }
 
 void read_category_hdr(int off,int datalen, uint8_t *data)
@@ -231,11 +231,11 @@ void read_category_hdr(int off,int datalen, uint8_t *data)
 	int offset = off*2;
 	uint8_t* cat_off = (uint8_t *)&categories;
 
-	printf("%s off %d offset %d data len=%d\n",
+	ec_printf("%s off %d offset %d data len=%d\n",
 			__FUNCTION__,off, offset ,datalen);
 
 	if (offset + datalen > sizeof(categories)){
-		printf("%s insane offset offset=%d "
+		ec_printf("%s insane offset offset=%d "
 					"datalen=%d sizeof cat %lu\n",
 				__FUNCTION__,
 				offset ,datalen,
@@ -250,7 +250,7 @@ void init_general(category_general * general,category_header * hdr)
 	hdr->size = sizeof(*general)/2;
 
 	if (sizeof(*general) %2){
-		printf("%s illegal size\n",__FUNCTION__);
+		ec_printf("%s illegal size\n",__FUNCTION__);
 		exit(0);
 	}
 
@@ -280,7 +280,7 @@ void init_syncm(category_syncm *syncm,int index,category_header * hdr)
 {
 	hdr->size = ( sizeof(category_syncm)) / 2;
 	if (sizeof(*syncm) %2){
-		printf("ilegal size\n");
+		ec_printf("ilegal size\n");
 		exit(0);
 	}
 
@@ -298,7 +298,7 @@ void init_fmmu(category_fmmu *fmmu,category_header *hdr)
 {
 	hdr->size = sizeof(category_fmmu) / 2;
 	if (sizeof(*fmmu) %2){
-		printf("ilegal size\n");
+		ec_printf("ilegal size\n");
 		exit(0);
 	}
 
@@ -318,7 +318,7 @@ void init_strings(category_strings * str, category_header * hdr)
 	hdr->size = sizeof(*str) / 2;
 
 	if (sizeof(*str) %2){
-		printf("ilegal size\n");
+		ec_printf("ilegal size\n");
 		exit(0);
 	}
 	
@@ -370,9 +370,9 @@ void init_pdo(pdo_entry * pdo,
 void init_hdr_dbg()
 {
 	int cat_off =0;
-	printf("sz = category pdo = %lu\n",sizeof(category_pdo));
+	ec_printf("sz = category pdo = %lu\n",sizeof(category_pdo));
 
-	printf("%s sizes sii %lu str=%d gen=%d "
+	ec_printf("%s sizes sii %lu str=%d gen=%d "
 			"tx=%d rx=%d fm=%d sync=%d end=%u\n",	__FUNCTION__,
 			sizeof(categories.sii),
 			categories.strings_hdr.size,
@@ -384,25 +384,25 @@ void init_hdr_dbg()
 			categories.endhdr.size);
 
 	cat_off = (uint8_t *)&categories.general_hdr - (uint8_t *) &categories.sii;
-	printf("%s offset =%d\n",__FUNCTION__,cat_off/2);
+	ec_printf("%s offset =%d\n",__FUNCTION__,cat_off/2);
 
 	cat_off = (uint8_t *)&categories.txpdo_hdr - (uint8_t *) &categories.sii;
-	printf("%s offset =%d\n",__FUNCTION__,cat_off/2);
+	ec_printf("%s offset =%d\n",__FUNCTION__,cat_off/2);
 
 	cat_off = (uint8_t *)&categories.rxpdo_hdr - (uint8_t *) &categories.sii;
-	printf("%s offset =%d\n",__FUNCTION__,cat_off/2);
+	ec_printf("%s offset =%d\n",__FUNCTION__,cat_off/2);
 
 	cat_off = (uint8_t *)&categories.fmmu_hdr - (uint8_t *) &categories.sii;
-	printf("%s offset =%d\n",__FUNCTION__,cat_off/2);
+	ec_printf("%s offset =%d\n",__FUNCTION__,cat_off/2);
 
 	cat_off = (uint8_t *)&categories.syncm_hdr0 - (uint8_t *) &categories.sii;
-	printf("%s offset =%d\n",__FUNCTION__,cat_off/2);
+	ec_printf("%s offset =%d\n",__FUNCTION__,cat_off/2);
 
 	cat_off = (uint8_t *)&categories.syncm_hdr1 - (uint8_t *) &categories.sii;
-	printf("%s offset =%d\n",__FUNCTION__,cat_off/2);
+	ec_printf("%s offset =%d\n",__FUNCTION__,cat_off/2);
 
 	cat_off = (uint8_t *)&categories.endhdr - (uint8_t *) &categories.sii;
-	printf("%s offset =%d\n",__FUNCTION__,cat_off/2);
+	ec_printf("%s offset =%d\n",__FUNCTION__,cat_off/2);
 }
 
 void init_si_info(ec_sii_t *sii)

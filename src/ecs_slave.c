@@ -60,7 +60,7 @@ int ecs_get_local_conf(e_slave * slave)
 	}
 	inet_ntop(AF_INET, &sin_ip.sin_addr,
 		  slave->hostip, sizeof(slave->hostip));
-	printf("%s:\nLOCAL IP %s\n", ifr.ifr_name, slave->hostip);
+	ec_printf("%s:\nLOCAL IP %s\n", ifr.ifr_name, slave->hostip);
 	/*
 	 * get host's subnet mask
 	 */
@@ -68,10 +68,10 @@ int ecs_get_local_conf(e_slave * slave)
 	if (ret < 0) {
 		/* no mask. put all zeros */
 		memset(&sin_mask, 0, sizeof(struct sockaddr));
-		printf("LOCAL SUBNET MASK 0.0.0.0\n");
+		ec_printf("LOCAL SUBNET MASK 0.0.0.0\n");
 	} else {
 		memcpy(&sin_mask, &ifr.ifr_netmask, sizeof(struct sockaddr));
-		printf("LOCAL SUBNET MASK %s\n",
+		ec_printf("LOCAL SUBNET MASK %s\n",
 		       inet_ntop(AF_INET, &sin_mask.sin_addr, temp_str,
 				 sizeof(temp_str)));
 	}
@@ -95,14 +95,14 @@ int ecs_get_local_conf(e_slave * slave)
 	/* other six bytes the actual addresses */
 	memcpy(&slave->mac.ether_shost, sa->sa_data, 6);
 
-	sprintf(slave->macaddr,
+	ec_printf(slave->macaddr,
 		"%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X",
 		slave->mac.ether_shost[0],
 		slave->mac.ether_shost[1],
 		slave->mac.ether_shost[2],
 		slave->mac.ether_shost[3],
 		slave->mac.ether_shost[4], slave->mac.ether_shost[5]);
-	printf("LOCAL MAC %s\n", slave->macaddr);
+	ec_printf("LOCAL MAC %s\n", slave->macaddr);
 	return 0;
 }
 
@@ -278,7 +278,7 @@ int main(int argc, char *argv[])
 	e_slave slave = { 0 };
 
 	if (argc < 2) {
-		printf("%s <interface>\n", argv[0]);
+		printf("%s RX <interface> TX <interface>\n", argv[0]);
 		return 0;
 	}
 	strncpy(eth_interface, argv[1], sizeof(eth_interface));
