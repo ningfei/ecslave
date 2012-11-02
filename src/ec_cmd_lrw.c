@@ -21,18 +21,19 @@ void get_data_lrw(uint8_t * data, uint16_t offset, uint16_t datalen)
  /** Logical Read Write */
 void ec_cmd_lrw(e_slave * slave)
 {
+/*
 	int val = 0;
 	uint16_t datalen = ec_dgram_data_length(slave->pkt);
 	uint8_t *datagram = (uint8_t *) __ecat_frameheader(slave->pkt);
 	uint16_t size = ec_dgram_size(slave->pkt);
 	uint8_t *data = ec_dgram_data(slave->pkt);
 	uint32_t offset = 0;
-
+*/
 	__ec_inc_wkc(slave);
 	printf("%s index=%d\n",
 	       __FUNCTION__, slave->pkt_index);
 
-LWR_OUT:
+//LWR_OUT:
 	ecs_tx_packet(slave);
 	__set_fsm_state(slave, ecs_rx_packet);
 }

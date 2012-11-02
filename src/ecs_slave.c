@@ -24,6 +24,7 @@
 #include "ec_regs.h"
 #include "fsm_slave.h"
 #include "ecs_slave.h"
+#include "ec_sii.h"
 
 int ecs_net_init(e_slave * slave)
 {

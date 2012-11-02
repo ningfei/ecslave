@@ -9,6 +9,7 @@
 #include "fsm_slave.h"
 #include "ecs_slave.h"
 #include "ec_regs.h"
+#include "ec_sii.h"
 
 /** Configured Address Read */
 void ec_cmd_fprd(e_slave * slave)

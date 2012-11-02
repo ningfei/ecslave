@@ -72,8 +72,9 @@ typedef signed int          int32;
 typedef unsigned char       uint8;
 typedef unsigned short      uint16;
 typedef unsigned int        uint32;
-typedef signed long long    int64;
-typedef unsigned long long  uint64;
+typedef signed long long int int64;
+typedef unsigned long long int uint64;
+
 
 /** return value general error */
 #define EC_ERROR			-3
@@ -86,7 +87,7 @@ typedef unsigned long long  uint64;
 /** maximum EtherCAT LRW frame length in bytes */
 /* MTU - Ethernet header - length - datagram header - WCK - FCS */
 #define EC_MAXLRWDATA		EC_MAXECATFRAME - 14 - 2 - 10 - 2 - 4
-//#define EC_MAXLRWDATA		45
+/* #define EC_MAXLRWDATA		45 */
 /** size of DC datagram used in first LRW frame */
 #define EC_FIRSTDCDATAGRAM	20
 /** standard frame buffer size in bytes */
@@ -97,7 +98,6 @@ typedef unsigned long long  uint64;
 #define EC_MAXBUF			16
 /** timeout value in us for tx frame to return to rx */
 #define EC_TIMEOUTRET		500
-//#define EC_TIMEOUTRET		20000
 /** timeout value in us for return "safe" variant (f.e. wireless) */
 #define EC_TIMEOUTSAFE		20000
 /** timeout value in us for EEPROM access */
@@ -116,7 +116,6 @@ typedef unsigned long long  uint64;
 #define EC_DEFAULTRETRIES	3
 
 /** definition for frame buffers */
-typedef uint8 ec_bufT[EC_BUFSIZE];
 
 /** ethernet header definition */
 typedef struct PACKED 
@@ -523,8 +522,8 @@ typedef struct
             uint8   b1;
             uint16  w1;
             uint16  w2;
-        };
-    };
+        }u1;
+    }u2;
 } ec_errort;
 
 /** Helper macros */
@@ -588,6 +587,6 @@ typedef struct
 
 #endif
 
-#define dprintf
+#define dprintf	printf
 
 #endif /* _EC_TYPE_H */

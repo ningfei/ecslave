@@ -10,4 +10,4 @@ src/ec_sii.c \
 src/ec_regs.c \
 src/ecs_slave.c
 
-ec_slave_CFLAGS = -lrt
+ec_slave_CFLAGS = -lrt -O0 -Wall -Werror

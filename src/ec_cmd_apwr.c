@@ -7,12 +7,12 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <arpa/inet.h>
 
 #include "ethercattype.h"
 #include "fsm_slave.h"
 #include "ecs_slave.h"
 #include "ec_regs.h"
-#include <arpa/inet.h>
 
  /** Auto Increment Write. by ring position */
 void ec_cmd_apwr(e_slave * slave)
@@ -41,7 +41,6 @@ void ec_cmd_apwr(e_slave * slave)
 		       ado,
 		       val[0], val[1]);
 	}
-APWR_OUT:
 	ecs_tx_packet(slave);
 	__set_fsm_state(slave, ecs_rx_packet);
 }

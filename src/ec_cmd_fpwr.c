@@ -9,11 +9,11 @@
 #include "fsm_slave.h"
 #include "ecs_slave.h"
 #include "ec_regs.h"
+#include "ec_sii.h"
 
 /** Configured Address Write */
 void ec_cmd_fpwr(e_slave * slave)
 {
-	long val = 0;
 	uint16_t ado = 0;
 	uint16_t adp = 0;
 	uint16_t datalen = ec_dgram_data_length(slave->pkt);
