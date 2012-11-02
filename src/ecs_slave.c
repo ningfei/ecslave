@@ -141,7 +141,7 @@ void ecs_tx_packet(e_slave * slave)
 	memcpy(eh->ether_shost,
 	       &slave->mac.ether_shost, sizeof(slave->mac.ether_shost));
 	eh->ether_type = htons(ETHERCAT_TYPE);
-	dprintf("%s Index=0x%x\n", __FUNCTION__, ec_dgram_pkt_index(slave->pkt));
+	ec_printf("%s Index=0x%x\n", __FUNCTION__, ec_dgram_pkt_index(slave->pkt));
 
 	bytes = sendto(slave->m_sendsock,
 		       slave->pkt,
@@ -183,7 +183,7 @@ void ecs_rx_packet(e_slave * slave)
 		slave->pkt_index = ec_dgram_pkt_index(slave->pkt);
 		break;
 	}
-	dprintf("%s: bytes read=%d element"
+	ec_printf("%s: bytes read=%d element"
 	       "index=0x%x size=%d data cmd=%d length=%d\n",
 	        __FUNCTION__,
 		slave->pkt_size,

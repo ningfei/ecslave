@@ -28,7 +28,7 @@ void ec_cmd_fprd(e_slave * slave)
 		goto FPRD_OUT;
 	}
 	__ec_inc_wkc(slave);
-	dprintf("%s index=%d ADO=0x%x data len=%d\n",
+	ec_printf("%s index=%d ADO=0x%x data len=%d\n",
 	       __FUNCTION__, slave->pkt_index,  ado, datalen);
 
 	if (datalen == 0) {

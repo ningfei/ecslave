@@ -23,7 +23,7 @@ void ec_cmd_apwr(e_slave * slave)
 	uint8_t *data = ec_dgram_data(slave->pkt);
 
 	adp = ec_dgram_adp(slave->pkt);
-	dprintf("%s ADP = %d\n", __FUNCTION__, adp);
+	ec_printf("%s ADP = %d\n", __FUNCTION__, adp);
 	ado = ec_dgram_ado(slave->pkt);
 	((ec_comt *) datagram)->ADP++;	/* each slave ++ in APWR */
 	__ec_inc_wkc(slave);
@@ -35,7 +35,7 @@ void ec_cmd_apwr(e_slave * slave)
 		ec_raw_get_ado(ado, &val[0], datalen);
 		ec_raw_set_ado(ado, data, datalen);
 		memcpy(data, &val, datalen);
-		dprintf("%s index=0x%x ADO 0x%x WRITE 0x %x %x\n",
+		ec_printf("%s index=0x%x ADO 0x%x WRITE 0x %x %x\n",
 		       __FUNCTION__,
 		       slave->pkt_index,
 		       ado,

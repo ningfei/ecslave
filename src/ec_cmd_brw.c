@@ -15,7 +15,7 @@ void ec_cmd_brw(e_slave * slave)
 	uint16_t datalen = ec_dgram_data_length(slave->pkt);
 
 
-	dprintf("%s index=%d\n",
+	ec_printf("%s index=%d\n",
 	       __FUNCTION__, slave->pkt_index);
 
 	ado = ec_dgram_ado(slave->pkt);

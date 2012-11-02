@@ -587,6 +587,10 @@ typedef struct
 
 #endif
 
-#define dprintf	printf
+#ifdef __MAKE_DEBUG__
+	#define ec_printf	printf
+#else
+	void ec_printf(const char *str, ...);
+#endif
 
 #endif /* _EC_TYPE_H */

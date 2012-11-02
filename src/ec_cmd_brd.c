@@ -18,7 +18,7 @@ void ec_cmd_brd(e_slave * slave)
 
 	__ec_inc_wkc(slave);
 	ado = ec_dgram_ado(slave->pkt);
-	dprintf("%s index=%d data len=%d ado=0x%x adp=0x%x\n",
+	ec_printf("%s index=%d data len=%d ado=0x%x adp=0x%x\n",
 	       __FUNCTION__,
 	       slave->pkt_index, datalen, ado, ec_dgram_adp(slave->pkt));
 	ec_raw_get_ado(ado, data, datalen);
