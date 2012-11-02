@@ -321,7 +321,8 @@ void init_strings(category_strings * str, category_header * hdr)
 		printf("ilegal size\n");
 		exit(0);
 	}
-
+	
+	str->nr_strings = NR_STRINGS;
 	hdr->type = CAT_TYPE_STRINGS;
 
 	str->str1_len = sizeof(STRING1);
@@ -358,7 +359,7 @@ void init_pdo(pdo_entry * pdo,
 	      uint8_t name_idx,
 	      uint8_t data_type, uint8_t bit_len, uint16_t flags)
 {
-	pdo->bit_len = index;
+	pdo->bit_len = bit_len;
 	pdo->data_type = data_type;
 	pdo->flags = flags;
 	pdo->index = index;
@@ -435,7 +436,7 @@ void init_sii(void)
 	categories.rxpdo.pdo_index = 0x1600;
 
 	init_pdo(&categories.rxpdo.pdo[0], 0x1614, 0X02, RX_PDO1_NAME_IDX, 0,	// index in the object dictionary
-		 32, 0);
+		 8, 0);
 
 	init_pdo(&categories.rxpdo.pdo[1], 0x1748, 0X01, RX_PDO2_NAME_IDX, 0,	// index in the object dictionary
 		 32, 0);
