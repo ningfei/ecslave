@@ -18,12 +18,12 @@
 #define CAT_TYPE_DATA_TYPE 0x014
 
 #define CAT_TYPE_GENERAL  0x001E
-#define CAT_TYPE_FMMU	 0x0028
-#define CAT_TYPE_SYNCM	 0x0028
-#define CAT_TYPE_TXPDO	 0x0032
-#define CAT_TYPE_RXPDO	 0x0033
-#define CAT_TYPE_DC		0x003C
-#define CAT_TYPE_END	0xFFFF
+#define CAT_TYPE_FMMU	  0x0028
+#define CAT_TYPE_SYNCM	  0x0029
+#define CAT_TYPE_TXPDO	  0x0032
+#define CAT_TYPE_RXPDO	  0x0033
+#define CAT_TYPE_DC	  0x003C
+#define CAT_TYPE_END	  0xFFFF
 
 #define NR_SYNCM	2
 #define	SYNMC_SIZE	1024
@@ -139,12 +139,8 @@ typedef struct {
 	uint8_t syncm_type;
 } category_syncm;
 
-typedef unsigned short category_fmmu;
+typedef uint16_t category_fmmu;
 category_fmmu fmmu;
-//typedef struct {
-//	unsigned short fmmu0:8,
-//		 	 fmmu1:8  __attribute__ (( packed ));
-//} category_fmmu;
 
 typedef struct {
 	uint8_t groupd_idx;	/*index to strings  */
@@ -196,23 +192,27 @@ typedef struct {
 
 typedef struct {
 	ec_sii_t sii __attribute__ ((packed));
+
 	category_header strings_hdr __attribute__ ((packed));
 	category_strings strings;
 
 	category_header general_hdr __attribute__ ((packed));
 	category_general general __attribute__ ((packed));
 
+	category_header fmmu_hdr __attribute__ ((packed));
+	category_fmmu fmmu;
+
+	category_header syncm_hdr0 __attribute__ ((packed));
+	category_syncm syncm0  __attribute__ ((packed));
+
+	category_header syncm_hdr1 __attribute__ ((packed));
+	category_syncm syncm1  __attribute__ ((packed));
+
 	category_header txpdo_hdr __attribute__ ((packed));
 	category_pdo txpdo  __attribute__ ((packed));
 
 	category_header rxpdo_hdr __attribute__ ((packed));
 	category_pdo rxpdo  __attribute__ ((packed));
-
-	category_header fmmu_hdr __attribute__ ((packed));
-	category_fmmu fmmu;
-
-	category_header syncm_hdr __attribute__ ((packed));
-	category_syncm syncm[NR_SYNCM] __attribute__ ((packed));
 
 	category_header endhdr __attribute__ ((packed));
 
@@ -276,25 +276,22 @@ void init_general(category_general * general,category_header * hdr)
 	general->physical_port = (PORT_MII << PORT0_SHIFT);
 }
 
-void init_syncm(category_syncm * syncm,int nr,category_header * hdr)
+void init_syncm(category_syncm *syncm,int index,category_header * hdr)
 {
-	int i;
-
-	hdr->size = ( sizeof(*syncm) * nr) / 2;
+	hdr->size = ( sizeof(category_syncm)) / 2;
 	if (sizeof(*syncm) %2){
 		printf("ilegal size\n");
 		exit(0);
 	}
 
 	hdr->type = CAT_TYPE_SYNCM;
-	for ( i = 0 ; i < nr; i++, syncm++ ) {
-		syncm->ctrl_reg = ECT_REG_SM0 + (i* 0x08);
-		syncm->enable_syncm = 0x01 | 0x04;
-		syncm->length = SYNMC_SIZE;
-		syncm->phys_start_address = (long)syncm;
-		syncm->status_reg = 0;
-		syncm->syncm_type = i % 2 ? 0x03:0x04; /* 0x03 = out*/
-	}
+	syncm->ctrl_reg = ECT_REG_SM0 + (index* 0x08);
+	syncm->enable_syncm = 0x01 | 0x04;
+	syncm->length = SYNMC_SIZE;
+	syncm->phys_start_address = (long)syncm;
+	syncm->status_reg = 0;
+	syncm->syncm_type = index % 2 ? 0x03:0x04; /* 0x03 = out*/
+
 }
 
 void init_fmmu(category_fmmu *fmmu,category_header *hdr)
@@ -382,26 +379,29 @@ void init_hdr_dbg()
 			categories.txpdo_hdr.size,
 			categories.rxpdo_hdr.size,
 			categories.fmmu_hdr.size,
-			categories.syncm_hdr.size,
+			categories.syncm_hdr0.size,
 			categories.endhdr.size);
 
-	cat_off = (uint8_t *)&categories.general_hdr - (uint8_t *) &categories.strings_hdr;
-	printf("%s offset =%d\n",__FUNCTION__,cat_off);
+	cat_off = (uint8_t *)&categories.general_hdr - (uint8_t *) &categories.sii;
+	printf("%s offset =%d\n",__FUNCTION__,cat_off/2);
 
-	cat_off = (uint8_t *)&categories.txpdo_hdr - (uint8_t *) &categories.strings_hdr;
-	printf("%s offset =%d\n",__FUNCTION__,cat_off);
+	cat_off = (uint8_t *)&categories.txpdo_hdr - (uint8_t *) &categories.sii;
+	printf("%s offset =%d\n",__FUNCTION__,cat_off/2);
 
-	cat_off = (uint8_t *)&categories.rxpdo_hdr - (uint8_t *) &categories.strings_hdr;
-	printf("%s offset =%d\n",__FUNCTION__,cat_off);
+	cat_off = (uint8_t *)&categories.rxpdo_hdr - (uint8_t *) &categories.sii;
+	printf("%s offset =%d\n",__FUNCTION__,cat_off/2);
 
-	cat_off = (uint8_t *)&categories.fmmu_hdr - (uint8_t *) &categories.strings_hdr;
-	printf("%s offset =%d\n",__FUNCTION__,cat_off);
+	cat_off = (uint8_t *)&categories.fmmu_hdr - (uint8_t *) &categories.sii;
+	printf("%s offset =%d\n",__FUNCTION__,cat_off/2);
 
-	cat_off = (uint8_t *)&categories.syncm_hdr - (uint8_t *) &categories.strings_hdr;
-	printf("%s offset =%d\n",__FUNCTION__,cat_off);
+	cat_off = (uint8_t *)&categories.syncm_hdr0 - (uint8_t *) &categories.sii;
+	printf("%s offset =%d\n",__FUNCTION__,cat_off/2);
 
-	cat_off = (uint8_t *)&categories.endhdr - (uint8_t *) &categories.strings_hdr;
-	printf("%s offset =%d\n",__FUNCTION__,cat_off);
+	cat_off = (uint8_t *)&categories.syncm_hdr1 - (uint8_t *) &categories.sii;
+	printf("%s offset =%d\n",__FUNCTION__,cat_off/2);
+
+	cat_off = (uint8_t *)&categories.endhdr - (uint8_t *) &categories.sii;
+	printf("%s offset =%d\n",__FUNCTION__,cat_off/2);
 }
 
 void init_si_info(ec_sii_t *sii)
@@ -419,7 +419,8 @@ void init_sii(void)
 	init_si_info(&categories.sii);
 	init_strings(&categories.strings, &categories.strings_hdr);
 	init_fmmu(&categories.fmmu, &categories.fmmu_hdr);
-	init_syncm(&categories.syncm[0], NR_SYNCM ,&categories.syncm_hdr);
+	init_syncm(&categories.syncm0, 0 ,&categories.syncm_hdr0);
+	init_syncm(&categories.syncm1, 1 ,&categories.syncm_hdr1);
 	init_general(&categories.general, &categories.general_hdr);
 	init_end_hdr(&categories.endhdr);
 
@@ -439,6 +440,7 @@ void init_sii(void)
 	init_pdo(&categories.rxpdo.pdo[1], 0x1748, 0X01, RX_PDO2_NAME_IDX, 0,	// index in the object dictionary
 		 32, 0);
 
+	categories.txpdo_hdr.type = CAT_TYPE_TXPDO;
 	categories.txpdo.entries = 2;
 	categories.txpdo.flags = 0;
 	categories.txpdo.name_idx = TXPDO_CAT_NAME_IDX;
@@ -446,7 +448,6 @@ void init_sii(void)
 	categories.txpdo.syncm = 1;
 	categories.txpdo.pdo_index = 0x1a00;
 	categories.txpdo_hdr.size = sizeof(categories.txpdo)/2;
-	categories.txpdo_hdr.type = CAT_TYPE_TXPDO;
 
 	init_pdo(&categories.txpdo.pdo[0], 0x1a01, 0X02, TX_PDO1_NAME_IDX, 0,	// index in the object dictionary
 		 32, 0);
