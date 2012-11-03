@@ -455,9 +455,7 @@ void init_sii(void)
 
 	init_pdo(&categories.txpdo.pdo[1], 0x1a03, 0X01, TX_PDO2_NAME_IDX, 0,	// index in the object dictionary
 		 16, 0);
-#ifdef __MAKDE_DEBUG
 	init_hdr_dbg();
-#endif
 }
 
 void (*sii_command)(int offset, int datalen, uint8_t * data) = 0;
