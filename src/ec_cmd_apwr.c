@@ -4,10 +4,9 @@
  *  Created on: Oct 18, 2012
  *      Author: root
  */
-
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-#include <arpa/inet.h>
 
 #include "ethercattype.h"
 #include "fsm_slave.h"
@@ -15,7 +14,7 @@
 #include "ec_regs.h"
 
  /** Auto Increment Write. by ring position */
-void ec_cmd_apwr(e_slave * slave)
+void ec_cmd_apwr(e_slave *slave)
 {
 	uint16_t adp;
 	uint16_t ado;

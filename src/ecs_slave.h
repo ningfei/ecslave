@@ -1,33 +1,59 @@
 #ifndef __ECS_SLAVE_H__
 #define __ECS_SLAVE_H__
 
+#include <unistd.h>
+#include <stdio.h>
+#include <errno.h>
+#include <string.h>
+#include <arpa/inet.h>
+#include <asm/types.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <stdio.h>
+#include <net/if.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <netpacket/packet.h>
+#include <net/ethernet.h>
+#include <netinet/ip.h>
+#include <fcntl.h>
+#include <sys/time.h>
+
+#include <net/if_arp.h>
+#include <arpa/inet.h>
+#include <string.h>
 #include "ethercattype.h"
 #include <net/ethernet.h>
 #include <arpa/inet.h>
 
+#define EC_MAX_PORTS 4
+
 struct fsm_slave;
+
+typedef struct __ec_interface__ {
+	int index;
+	struct sockaddr_in m_addr;
+	struct ifreq ifr;
+	char ip[32];
+	char macaddr[32];
+	struct ether_header mac;
+	int sock;
+	int subnet_mask;
+	int link_up;
+}ec_interface;
 
 typedef struct __e_slave__ {
 
-	int subnet_mask;
-	struct sockaddr_in m_addr;
-	long m_bcast_addr;
-	int m_sendsock;
-	int m_recvsock;
-	char macaddr[32];
-	char hostip[32];
-	struct ether_header mac;
 	uint8_t pkt[1492];
 	uint8_t pkt_index;
 	int pkt_size;
 
+	ec_interface intr[EC_MAX_PORTS];
 	struct fsm_slave *fsm;	/* finite state machine */
 } e_slave;
 
-int ecs_get_local_conf(e_slave *);
-void ecs_setup_jeaders(e_slave *);
-int ecs_net_init(e_slave *);
-int ecs_init(e_slave *);
+int  ecs_net_init(int ,char *argv[], e_slave *);
+int  ecs_init(e_slave *);
 void ecs_run(e_slave *);
 
 #define HTYPE_ETHER     	0x1	/* Ethernet  */
@@ -107,12 +133,6 @@ static inline int ec_is_ethercat(uint8_t * h)
 {
 	struct ether_header *eh = (struct ether_header *)h;
 	return htons(eh->ether_type) == ETHERCAT_TYPE;
-}
-
-static char eth_interface[10];
-static inline char *__eth_interface(void)
-{
-	return eth_interface;
 }
 
 static inline void __ec_inc_wkc(e_slave *slave)

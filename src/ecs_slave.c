@@ -1,151 +1,42 @@
 
-#include <unistd.h>
-#include <stdio.h>
-#include <errno.h>
-#include <string.h>
-#include <arpa/inet.h>
-#include <asm/types.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <stdio.h>
-#include <net/if.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
-#include <netpacket/packet.h>
-#include <net/ethernet.h>
-#include <netinet/ip.h>
-#include <fcntl.h>
-#include <sys/time.h>
 
-#include <net/if_arp.h>
-#include <arpa/inet.h>
-#include <string.h>
-
-#include "ec_regs.h"
+#include <stdint.h>
+#include "ethercattype.h"
 #include "fsm_slave.h"
 #include "ecs_slave.h"
 #include "ec_sii.h"
+#include "ec_regs.h"
+#include "ec_net.h"
 
-int ecs_net_init(e_slave * slave)
-{
-	slave->m_recvsock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
-	slave->m_sendsock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
-	if (slave->m_recvsock < 0 || slave->m_sendsock < 0) {
-		perror("socket failed:");
-		return -1;
-	}
-	slave->m_bcast_addr = inet_addr("255.255.255.255");
-	return 0;
-}
-
-int ecs_get_local_conf(e_slave * slave)
-{
-	int ret;
-
-	char temp_str[20];
-	struct ifreq ifr;
-	struct sockaddr_in sin_ip;
-	struct sockaddr_in sin_mask;
-	struct sockaddr *sa;
-
-	strcpy(ifr.ifr_name, __eth_interface());
-
-	/* Get host's ip */
-	ret = ioctl(slave->m_sendsock, SIOCGIFADDR, &ifr);
-	if (ret < 0) {
-		/* no IP. put all zeros */
-		memset(&sin_ip, 0, sizeof(struct sockaddr));
-	} else {
-		memcpy(&sin_ip, &ifr.ifr_addr, sizeof(struct sockaddr));
-	}
-	inet_ntop(AF_INET, &sin_ip.sin_addr,
-		  slave->hostip, sizeof(slave->hostip));
-	ec_printf("%s:\nLOCAL IP %s\n", ifr.ifr_name, slave->hostip);
-	/*
-	 * get host's subnet mask
-	 */
-	ret = ioctl(slave->m_sendsock, SIOCGIFNETMASK, &ifr);
-	if (ret < 0) {
-		/* no mask. put all zeros */
-		memset(&sin_mask, 0, sizeof(struct sockaddr));
-		ec_printf("LOCAL SUBNET MASK 0.0.0.0\n");
-	} else {
-		memcpy(&sin_mask, &ifr.ifr_netmask, sizeof(struct sockaddr));
-		ec_printf("LOCAL SUBNET MASK %s\n",
-		       inet_ntop(AF_INET, &sin_mask.sin_addr, temp_str,
-				 sizeof(temp_str)));
-	}
-	slave->subnet_mask = sin_mask.sin_addr.s_addr;
-
-	/* get mac address */
-	memset(&ifr, 0, sizeof(ifr));
-	strcpy(ifr.ifr_name, __eth_interface());
-	ret = ioctl(slave->m_sendsock, SIOCGIFHWADDR, &ifr);
-	if (ret < 0) {
-		perror("failed to get interface afdress\n");
-		return -1;
-	}
-	sa = &ifr.ifr_hwaddr;
-	if (sa->sa_family != ARPHRD_ETHER) {
-		perror("interface without ARPHRD_ETHER");
-		return -1;
-	}
-	/* first byte is type */
-	slave->mac.ether_type = HTYPE_ETHER;
-	/* other six bytes the actual addresses */
-	memcpy(&slave->mac.ether_shost, sa->sa_data, 6);
-
-	ec_printf(slave->macaddr,
-		"%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X",
-		slave->mac.ether_shost[0],
-		slave->mac.ether_shost[1],
-		slave->mac.ether_shost[2],
-		slave->mac.ether_shost[3],
-		slave->mac.ether_shost[4], slave->mac.ether_shost[5]);
-	ec_printf("LOCAL MAC %s\n", slave->macaddr);
-	return 0;
-}
-
-int ecs_init(e_slave * slave)
-{
-	if (ecs_net_init(slave)) {
-		puts("failed to initialize network\n");
-		return -1;
-	}
-	if (ecs_get_local_conf(slave)) {
-		puts("failed to get local ip\n");
-		return -1;
-	}
-	return 0;
-}
-
-void ecs_tx_packet(e_slave * slave)
+void ecs_tx_packet(e_slave * ecs)
 {
 	int i;
 	int bytes;
-	struct ether_header *eh = (struct ether_header *)slave->pkt;
+	struct ether_header *eh = (struct ether_header *)ecs->pkt;
 	struct sockaddr_ll socket_address = { 0 };
+	ec_interface *intr = ec_tx_interface(ecs);
 
 	for (i = 0; i < ETH_ALEN; i++) {
-		slave->mac.ether_dhost[i] = 0xFF;
+		intr->mac.ether_dhost[i] = 0xFF;
 	}
-	slave->mac.ether_type = htons(ETHERCAT_TYPE);
+	intr->mac.ether_type = htons(ETHERCAT_TYPE);
 	socket_address.sll_family = PF_PACKET;
 	socket_address.sll_protocol = 0;
-	socket_address.sll_ifindex = if_nametoindex(__eth_interface());
+	socket_address.sll_ifindex = intr->index;
 	socket_address.sll_hatype = htons(ETHERCAT_TYPE);
 	socket_address.sll_pkttype = PACKET_BROADCAST;
 	socket_address.sll_halen = ETH_ALEN;
 
-	memcpy(socket_address.sll_addr, slave->mac.ether_dhost, ETH_ALEN);
+	memcpy(socket_address.sll_addr, intr->mac.ether_dhost, ETH_ALEN);
 	memcpy(eh->ether_shost,
-	       &slave->mac.ether_shost, sizeof(slave->mac.ether_shost));
+	       &intr->mac.ether_shost, 
+		sizeof(intr->mac.ether_shost));
 	eh->ether_type = htons(ETHERCAT_TYPE);
-	ec_printf("%s Index=0x%x\n", __FUNCTION__, ec_dgram_pkt_index(slave->pkt));
+	ec_printf("%s Index=0x%x\n", __FUNCTION__, ec_dgram_pkt_index(ecs->pkt));
 
-	bytes = sendto(slave->m_sendsock,
-		       slave->pkt,
-		       slave->pkt_size, 0,
+	bytes = sendto(intr->sock,
+		       ecs->pkt,
+		       ecs->pkt_size, 0,
 		       (struct sockaddr *)&socket_address,
 		       (socklen_t) sizeof(socket_address));
 
@@ -156,16 +47,17 @@ void ecs_tx_packet(e_slave * slave)
 
 void ecs_rx_packet(e_slave * slave)
 {
-	unsigned int addr_size = sizeof(slave->m_addr);
 	int flags = 0;
+	ec_interface *intr = ec_rx_interface(slave);
+	unsigned int addr_size = sizeof(intr->m_addr);
 
 	while (1) {
 
 		memset(slave->pkt, 0, sizeof(slave->pkt));
-		slave->pkt_size = recvfrom(slave->m_recvsock,
+		slave->pkt_size = recvfrom(intr->sock,
 					   (void *)&slave->pkt,
 					   sizeof(slave->pkt), flags,
-					   (struct sockaddr *)&slave->m_addr,
+					   (struct sockaddr *)&intr->m_addr,
 					   &addr_size);
 
 		if (slave->pkt_size < 0) {
@@ -176,8 +68,8 @@ void ecs_rx_packet(e_slave * slave)
 			continue;
 		}
 		if (!memcmp(ec_get_shost(slave->pkt),
-					slave->mac.ether_shost,
-					sizeof(slave->mac.ether_shost)) ){
+					intr->mac.ether_shost,
+					sizeof(intr->mac.ether_shost)) ){
 			continue;
 		}
 		slave->pkt_index = ec_dgram_pkt_index(slave->pkt);
@@ -275,22 +167,27 @@ void ecs_run(e_slave * slave)
 int main(int argc, char *argv[])
 {
 	struct fsm_slave fsm_slave;
-	e_slave slave = { 0 };
+	e_slave ecs;
 
 	if (argc < 2) {
+		/*
+		 * if you provide two different interfaces 
+		 *  then it is considered an open loop,
+ 		  * else it is a closed loop ,ie, last slave.
+		*/
 		printf("%s RX <interface> TX <interface>\n", argv[0]);
 		return 0;
 	}
-	strncpy(eth_interface, argv[1], sizeof(eth_interface));
-	ec_init_regs();
+  	if (ecs_net_init(argc, argv, &ecs) < 0){
+		return -1;
+	}
+	ec_init_regs(&ecs);
 	init_sii();
 
-	slave.fsm = &fsm_slave;
+	ecs.fsm = &fsm_slave;
 
-	__set_fsm_state(&slave, ecs_rx_packet);
+	__set_fsm_state(&ecs, ecs_rx_packet);
 
-	if (ecs_init(&slave) < 0)
-		return -1;
-	ecs_run(&slave);
+	ecs_run(&ecs);
 	return 0;
 }

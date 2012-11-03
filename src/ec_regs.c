@@ -5,6 +5,9 @@
 #include <time.h>
 
 #include "ethercattype.h"
+#include "ecs_slave.h"
+#include "ec_net.h"
+
 
 #define NSEC_PER_SEC (1000000000L)
 #define FREQUENCY 1000
@@ -14,8 +17,11 @@
 
 static uint8_t ec_registers[ECT_REG_DCCYCLE1] = { 0 };
 
-void ec_init_regs(void)
+void ec_init_regs(e_slave* esv, int nic)
 {
+	int i = 0;
+	uint16_t *dl;
+
 	ec_registers[ECT_REG_ALSTAT] = EC_STATE_PRE_OP;
 
 	ec_registers[ECT_REG_TYPE] = 0;	/* base type 1byte fsm_slave_scan.c line 296 */
@@ -30,9 +36,15 @@ void ec_init_regs(void)
 	 *              0b00000100      dc
 	 *              0b00001000  dc 64 bit
 	 **/
-	ec_registers[ECT_REG_STADR] = 0x00;
-	ec_registers[ECT_REG_DLSTAT] = 0x008;	/* data link state */
-	ec_registers[ECT_REG_DLSTAT + 1] = 0x00;	/* data link state */
+	dl = (uint16_t *)&ec_registers[ECT_REG_STADR];
+	for (i = 0 ; i < nic ; i++){
+		if (is_nic_link_up(esv, i))
+			*dl |= (1 << (4 + i));
+		if (is_nic_loop_closed(esv, i))
+			*dl |=	(1 << (8 + i * 2));
+		if (is_nic_signal_detected(esv, i))
+			*dl |= (1 << (9 + i * 2));
+	}
 }
 
 int16_t ec_station_address(void)

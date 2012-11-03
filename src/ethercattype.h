@@ -63,18 +63,18 @@
 #include <sys/time.h>
 
 /* General types */
-typedef unsigned char       boolean;
-#define TRUE                1
-#define FALSE               0
-typedef signed char         int8;
-typedef signed short        int16;
-typedef signed int          int32;
-typedef unsigned char       uint8;
-typedef unsigned short      uint16;
-typedef unsigned int        uint32;
-typedef signed long long int int64;
-typedef unsigned long long int uint64;
+//typedef unsigned char       boolean;
+//#define TRUE                1
+//#define FALSE               0
 
+typedef unsigned char       uint8_t;
+typedef signed char         int8_t;
+typedef unsigned short      uint16_t;
+typedef signed short        int16_t;
+typedef signed int          int32_t;
+typedef unsigned int        uint32_t;
+//typedef signed long long int int64_t;
+//typedef unsigned long long int uint64_t;
 
 /** return value general error */
 #define EC_ERROR			-3
@@ -121,11 +121,11 @@ typedef unsigned long long int uint64;
 typedef struct PACKED 
 {
 	/** destination MAC */
-	uint16  da0,da1,da2;
+	uint16_t  da0,da1,da2;
 	/** source MAC */
-	uint16  sa0,sa1,sa2;
+	uint16_t  sa0,sa1,sa2;
 	/** ethernet type */
-	uint16  etype;
+	uint16_t  etype;
 } ec_etherheadert;
 
 /** ethernet header size */
@@ -135,19 +135,19 @@ typedef struct PACKED
 typedef struct PACKED
 {
 	/** length of EtherCAT datagram */
-	uint16	elength;
+	uint16_t	elength;
 	/** EtherCAT command, see ec_cmdtype */
-	uint8   command;
+	uint8_t   command;
 	/** index, used in SOEM for Tx to Rx recombination */
-	uint8   index;
+	uint8_t   index;
 	/** ADP */
-	uint16  ADP;
+	uint16_t  ADP;
 	/** ADO */
-	uint16  ADO;
+	uint16_t  ADO;
 	/** length of data portion in datagram */
-	uint16  dlength;
+	uint16_t  dlength;
 	/** interrupt, currently unused */
-	uint16  irpt;
+	uint16_t  irpt;
 } ec_comt;
 
 /** EtherCAT header size */
@@ -501,27 +501,27 @@ typedef struct
     /** Time at which the error was generated. */
     struct timeval Time;
 	/** Signal bit, error set but not read */
-    boolean     Signal;
+    int     Signal;
 	/** Slave number that generated the error */
-    uint16      Slave;
+    uint16_t      Slave;
 	/** CoE SDO index that generated the error */
-    uint16      Index;
+    uint16_t      Index;
 	/** CoE SDO subindex that generated the error */
-    uint8       SubIdx;
+    uint8_t       SubIdx;
     /** Type of error */
     ec_err_type Etype;
     union
     {
 		/** General abortcode */
-        int32   AbortCode;
+        int32_t   AbortCode;
 		/** Specific error for Emergency mailbox */
         struct
         {
-            uint16  ErrorCode;
-            uint8   ErrorReg;
-            uint8   b1;
-            uint16  w1;
-            uint16  w2;
+            uint16_t  ErrorCode;
+            uint8_t   ErrorReg;
+            uint8_t   b1;
+            uint16_t  w1;
+            uint16_t  w2;
         }u1;
     }u2;
 } ec_errort;

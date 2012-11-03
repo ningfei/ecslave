@@ -9,6 +9,7 @@ src/ec_cmd_lrw.c \
 src/ec_sii.c \
 src/ec_regs.c \
 src/ecs_slave.c \
+src/ec_net.c \
 src/ec_debug.c
 
 ec_slave_CFLAGS = -lrt -O0 -Wall -Werror
