@@ -32,11 +32,12 @@ void ec_init_regs(e_slave* esv)
 	ec_registers[ECT_BASE_SYNCM] = 0x0;	/* base sync count 1byte */
 	ec_registers[ECT_REG_PORTDES] = 0x000F;	/* octet 1      0x000F one port. mii */
 	ec_registers[ECT_REG_ESCSUP] = 0x0001 | 0x0004;
+	ec_registers[ECT_REG_STADR] = 0x07;
 	/* octet 2 0b00000001   fmmu bit operation
 	 *              0b00000100      dc
 	 *              0b00001000  dc 64 bit
 	 **/
-	dl = (uint16_t *)&ec_registers[ECT_REG_STADR];
+	dl = (uint16_t *)&ec_registers[ECT_REG_DLSTAT];
 	for (i = 0 ; i < esv->interfaces_nr ; i++){
 		if (ec_is_nic_link_up(esv, i))
 			*dl |= (1 << (4 + i));
