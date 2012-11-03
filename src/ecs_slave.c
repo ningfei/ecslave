@@ -175,7 +175,7 @@ int main(int argc, char *argv[])
 		 *  then it is considered an open loop,
  		  * else it is a closed loop ,ie, last slave.
 		*/
-		printf("%s RX <interface> TX <interface>\n", argv[0]);
+		printf("%s < rx interface> < tx interface>\n", argv[0]);
 		return 0;
 	}
   	if (ecs_net_init(argc, argv, &ecs) < 0){

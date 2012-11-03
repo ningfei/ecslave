@@ -434,11 +434,11 @@ void init_sii(void)
 	categories.rxpdo.synchronization = 0;
 	categories.rxpdo.syncm = 0;
 	categories.rxpdo.pdo_index = 0x1600;
-
-	init_pdo(&categories.rxpdo.pdo[0], 0x1614, 0X02, RX_PDO1_NAME_IDX, 0,	// index in the object dictionary
+	
+	init_pdo(&categories.rxpdo.pdo[0], 0x1614, 0X02, RX_PDO1_NAME_IDX, 0,
 		 8, 0);
 
-	init_pdo(&categories.rxpdo.pdo[1], 0x1748, 0X01, RX_PDO2_NAME_IDX, 0,	// index in the object dictionary
+	init_pdo(&categories.rxpdo.pdo[1], 0x1748, 0X01, RX_PDO2_NAME_IDX, 0,
 		 32, 0);
 
 	categories.txpdo_hdr.type = CAT_TYPE_TXPDO;

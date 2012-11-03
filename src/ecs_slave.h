@@ -26,7 +26,7 @@
 #include <net/ethernet.h>
 #include <arpa/inet.h>
 
-#define EC_MAX_PORTS 4
+#define EC_MAX_PORTS 2
 
 struct fsm_slave;
 
@@ -34,6 +34,7 @@ typedef struct __ec_interface__ {
 	int index;
 	struct sockaddr_in m_addr;
 	struct ifreq ifr;
+	char name[16];
 	char ip[32];
 	char macaddr[32];
 	struct ether_header mac;
@@ -48,7 +49,8 @@ typedef struct __e_slave__ {
 	uint8_t pkt_index;
 	int pkt_size;
 
-	ec_interface intr[EC_MAX_PORTS];
+	int interfaces_nr;
+	ec_interface* intr[EC_MAX_PORTS];
 	struct fsm_slave *fsm;	/* finite state machine */
 } e_slave;
 

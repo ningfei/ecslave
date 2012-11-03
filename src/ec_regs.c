@@ -17,7 +17,7 @@
 
 static uint8_t ec_registers[ECT_REG_DCCYCLE1] = { 0 };
 
-void ec_init_regs(e_slave* esv, int nic)
+void ec_init_regs(e_slave* esv)
 {
 	int i = 0;
 	uint16_t *dl;
@@ -37,12 +37,12 @@ void ec_init_regs(e_slave* esv, int nic)
 	 *              0b00001000  dc 64 bit
 	 **/
 	dl = (uint16_t *)&ec_registers[ECT_REG_STADR];
-	for (i = 0 ; i < nic ; i++){
-		if (is_nic_link_up(esv, i))
+	for (i = 0 ; i < esv->interfaces_nr ; i++){
+		if (ec_is_nic_link_up(esv, i))
 			*dl |= (1 << (4 + i));
-		if (is_nic_loop_closed(esv, i))
+		if (ec_is_nic_loop_closed(esv, i))
 			*dl |=	(1 << (8 + i * 2));
-		if (is_nic_signal_detected(esv, i))
+		if (ec_is_nic_signal_detected(esv, i))
 			*dl |= (1 << (9 + i * 2));
 	}
 }
