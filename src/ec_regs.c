@@ -31,12 +31,16 @@ void ec_init_regs(e_slave* esv)
 	ec_registers[ECT_BASE_FMMUS] = 0x0;	/* base fmmu count 1byte */
 	ec_registers[ECT_BASE_SYNCM] = 0x0;	/* base sync count 1byte */
 	ec_registers[ECT_REG_PORTDES] = 0x000F;	/* octet 1      0x000F one port. mii */
-	ec_registers[ECT_REG_ESCSUP] = 0x0001 | 0x0004;
 	ec_registers[ECT_REG_STADR] = 0x07;
+
 	/* octet 2 0b00000001   fmmu bit operation
 	 *              0b00000100      dc
 	 *              0b00001000  dc 64 bit
 	 **/
+	ec_registers[ECT_REG_ESCSUP] = 0x0001 | 0x0004;
+	/*
+	 * link state
+	*/
 	dl = (uint16_t *)&ec_registers[ECT_REG_DLSTAT];
 	for (i = 0 ; i < esv->interfaces_nr ; i++){
 		if (ec_is_nic_link_up(esv, i))
@@ -69,19 +73,19 @@ int ec_raw_set_ado(int reg, uint8_t * data, int datalen)
 void ec_raw_get_ado(int reg, uint8_t * data, int datalen)
 {
 	if (reg > ECT_REG_DCCYCLE1 || reg < ECT_REG_TYPE) {
-		printf("%s insane ado\n",__FUNCTION__);
+		printf("%s insane ado 0x%x\n",__FUNCTION__,reg);
 		return;
 	}
 	if (reg == ECT_REG_DCSYSTIME){
 
-		struct timespec tm;
+	    struct timespec tm;
 	    uint64_t t;
-	    uint8_t *p = (uint8_t *)&t;
-
+	    uint8_t* p = (uint8_t *)&t;
+	   
 	    clock_gettime(CLOCK_TO_USE, &tm);
 	    t = TIMESPEC2NS(tm);
 	    if (datalen == 4)
-	    	p += 4;
+		p = (uint8_t*)&tm.tv_nsec;
 	    memcpy(data, p, datalen);
 	    return;
 	  }
