@@ -413,6 +413,8 @@ void init_si_info(ec_sii_t *sii)
 	sii->product_code = 0x0e;
 	sii->revision_number = 0x12;
 	sii->serial_number = 0x45;
+	sii->mailbox_protocols = EC_MBOX_COE;
+	
 }
 
 void init_sii(void)

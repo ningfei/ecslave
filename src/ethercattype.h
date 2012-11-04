@@ -587,6 +587,18 @@ typedef struct
 
 #endif
 
+/** Supported mailbox protocols.
+ */ 
+enum {
+    EC_MBOX_AOE = 0x01, /**< ADS over EtherCAT */
+    EC_MBOX_EOE = 0x02, /**< Ethernet over EtherCAT */
+    EC_MBOX_COE = 0x04, /**< CANopen over EtherCAT */
+    EC_MBOX_FOE = 0x08, /**< File-Access over EtherCAT */
+    EC_MBOX_SOE = 0x10, /**< Servo-Profile over EtherCAT */
+    EC_MBOX_VOE = 0x20  /**< Vendor specific */
+};  
+
+
 #ifdef __MAKE_DEBUG__
 	#define ec_printf	printf
 #else
