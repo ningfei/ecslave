@@ -7,7 +7,7 @@
 #include "ethercattype.h"
 #include "ecs_slave.h"
 #include "ec_net.h"
-#include "ec_coe.h"
+#include "ec_mbox.h"
 
 #define NSEC_PER_SEC (1000000000L)
 #define FREQUENCY 1000
@@ -16,7 +16,12 @@
 #define TIMESPEC2NS(T) ((uint64_t) (T).tv_sec * NSEC_PER_SEC + (T).tv_nsec)
 #define SDOS_ADDR_SPACE	4096
 
-static uint8_t ec_registers[ECT_REG_DCCYCLE1 + SDOS_ADDR_SPACE ] = { 0 };
+static uint8_t ec_registers[ECT_REG_DCCYCLE1 + SDOS_ADDR_SPACE] = { 0 };
+
+long sdo_high(void)
+{
+	return (long ) &ec_registers[ECT_REG_DCCYCLE1 + SDOS_ADDR_SPACE];
+}
 
 void ec_init_regs(e_slave* esv)
 {
@@ -61,7 +66,7 @@ int16_t ec_station_address(void)
 void ec_raw_set_ado(int reg, uint8_t * data, int datalen)
 {
 	if (reg > ECT_REG_DCCYCLE1) {
-		return ec_set_sdo(reg, data, datalen);
+		return ec_mbox(reg, data, datalen);
 	}
 	if (reg < ECT_REG_TYPE) {
 		printf("%s insane ado\n",__FUNCTION__);
@@ -76,7 +81,7 @@ void ec_raw_set_ado(int reg, uint8_t * data, int datalen)
 void ec_raw_get_ado(int reg, uint8_t * data, int datalen)
 {
 	if (reg > ECT_REG_DCCYCLE1) {
-		return ec_get_sdo(reg, data, datalen);
+		return ec_mbox(reg, data, datalen);
 	}
 	if (reg < ECT_REG_TYPE) {
 		printf("%s insane ado 0x%x\n",__FUNCTION__,reg);
