@@ -3,5 +3,6 @@
 
 #include "ec_mbox.h"
 
+void coe_parser(int reg, uint8_t * data, int datalen);
 
 #endif

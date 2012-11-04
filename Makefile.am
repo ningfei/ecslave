@@ -11,6 +11,7 @@ src/ec_regs.c \
 src/ecs_slave.c \
 src/ec_net.c \
 src/ec_coe.c \
+src/ec_mbox.c \
 src/ec_debug.c
 
 ec_slave_CFLAGS  = -m32 -Wall -Werror

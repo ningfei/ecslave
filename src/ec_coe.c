@@ -6,7 +6,6 @@
 #include "ec_mbox.h"
 #include "ec_regs.h"
 
-#define MBOX_COE_TYPE 0x03
 
 enum {
 	OD_LIST_REQUEST   = 0x01,	
@@ -99,15 +98,4 @@ void coe_parser(int reg, uint8_t * data, int datalen)
 		coe_sdo_info(data, datalen);
 		break;
 	}
-}
-
-void ec_mbox(int reg, uint8_t * data, int datalen)
-{
-	mbox_header *mbxhdr = __mbox_hdr(data);
-	
-	if (mbxhdr->type ==  MBOX_COE_TYPE){
-		coe_parser(reg, data, datalen);
-		return;
-	}
-	puts("MBOX AIIIEEE");
 }
