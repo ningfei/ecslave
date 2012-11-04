@@ -12,7 +12,7 @@ src/ecs_slave.c \
 src/ec_net.c \
 src/ec_debug.c
 
-ec_slave_CFLAGS  = -Wall -Werror
+ec_slave_CFLAGS  = -m32 -Wall -Werror
 if HAVE_DEBUG
 ec_slave_CFLAGS += -D__MAKE_DEBUG__
 endif
