@@ -236,7 +236,7 @@ void read_category_hdr(int off,int datalen, uint8_t *data)
 
 	if (offset + datalen > sizeof(categories)){
 		ec_printf("%s insane offset offset=%d "
-					"datalen=%d sizeof cat %lu\n",
+					"datalen=%d sizeof cat %d\n",
 				__FUNCTION__,
 				offset ,datalen,
 				sizeof(categories));
@@ -370,9 +370,9 @@ void init_pdo(pdo_entry * pdo,
 void init_hdr_dbg()
 {
 	int cat_off =0;
-	ec_printf("sz = category pdo = %lu\n",sizeof(category_pdo));
+	ec_printf("sz = category pdo = %u\n",sizeof(category_pdo));
 
-	ec_printf("%s sizes sii %lu str=%d gen=%d "
+	ec_printf("%s sizes sii %u str=%d gen=%d "
 			"tx=%d rx=%d fm=%d sync=%d end=%u\n",	__FUNCTION__,
 			sizeof(categories.sii),
 			categories.strings_hdr.size,
