@@ -12,7 +12,8 @@ src/ecs_slave.c \
 src/ec_net.c \
 src/ec_debug.c
 
-ec_slave_CFLAGS = -lrt -O0 -Wall -Werror
+ec_slave_CFLAGS  = -Wall -Werror
 if HAVE_DEBUG
-ec_slave_CFLAGS += -D__MAKE_DEBUG__  -g
+ec_slave_CFLAGS += -D__MAKE_DEBUG__
 endif
+ec_slave_LDADD = -lrt
