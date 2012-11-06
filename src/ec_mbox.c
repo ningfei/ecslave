@@ -13,7 +13,14 @@ void ec_mbox(int reg, uint8_t * data, int datalen)
 	
 	if (mbxhdr->type ==  MBOX_COE_TYPE){
 		coe_parser(reg, data, datalen);
+		mbxhdr->cnt++;
 		return;
 	}
 	puts("MBOX AIIIEEE");
+}
+
+//  etherlan gave Sync manager and wishes to get a mail box
+void ec_mbox_syncm(int reg, uint8_t* data, int datalen)
+{
+	
 }
