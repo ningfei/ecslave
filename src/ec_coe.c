@@ -5,19 +5,9 @@
 #include "ecs_slave.h"
 #include "ec_mbox.h"
 #include "ec_regs.h"
+#include "ec_coe.h"
 
-
-enum {
-	OD_LIST_REQUEST   = 0x01,	
-	OD_LIST_RESPONSE  = 0x02,
-	OBJ_DESC_REQUEST  = 0x03,
-	OBJ_DESC_RESPONSE = 0x04,
-	ENTRY_DESC_REQUEST = 0X05,
-	ENTRY_DESC_RESPONSE = 0X06,
-	SDO_INFO_ERROR_REQUEST  = 0X07
-}sdo_info_hdr_opcode;
-
-static void obj_desc_request(uint8_t *data, int datalen)
+void obj_desc_request(uint8_t *data, int datalen)
 {
 	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
 	uint32_t *sdo_index;
@@ -27,7 +17,7 @@ static void obj_desc_request(uint8_t *data, int datalen)
 	*sdo_index = 0x8888;
 }
 
-static void entry_desc_request(uint8_t *data, int datalen)
+void entry_desc_request(uint8_t *data, int datalen)
 {
 	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
 	uint16_t *sdo_index;
@@ -40,6 +30,18 @@ static void entry_desc_request(uint8_t *data, int datalen)
 		*sdo_index, *sdo_subindex);
 }
 
+void od_list_request(uint8_t * data, int datalen)
+{	
+	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
+	coe_sdo_service_data *srvdata =
+		(coe_sdo_service_data *)&data[sizeof(mbox_header) + sizeof(coe_header) + sizeof(coe_sdo_info_header)];
+	
+	srvdata->list_type = 0x1;
+	// do the reponse
+	sdoinfo->opcode = 0x02; // table 43
+	printf("%s\n",__FUNCTION__);
+}
+
 void coe_sdo_info(uint8_t * data, int datalen)
 {
 	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
@@ -48,6 +50,7 @@ void coe_sdo_info(uint8_t * data, int datalen)
 	switch(sdoinfo->opcode)
 	{
 	case OD_LIST_REQUEST:
+		od_list_request(data, datalen);
 		break;
 	case OD_LIST_RESPONSE:
 		break;
