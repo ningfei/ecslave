@@ -7,27 +7,49 @@
 #include "ec_regs.h"
 #include "ec_coe.h"
 
+// table 45
 void obj_desc_request(uint8_t *data, int datalen)
 {
-	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
-	uint32_t *sdo_index;
+	typedef struct {
+		uint16_t index;	
+		uint16_t data_type;
+		uint8_t  max_subindex;
+		uint8_t  object_code;
+		char     name[1];
+	}sdo_info_service_data;
 
-	sdo_index =  (uint32_t *)&sdoinfo->sdo_info_service_data;
-	printf("%s sdo index = %d\n",__FUNCTION__, *sdo_index);
-	*sdo_index = 0x8888;
+	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
+	sdo_info_service_data *obj_desc = 
+		(sdo_info_service_data *)&sdoinfo->sdo_info_service_data[0];
+	printf("%s index = 0x%x\n",__FUNCTION__,obj_desc->index);
+	obj_desc->data_type = 0x05;
+	obj_desc->max_subindex = 1;
+	obj_desc->object_code = 7;
+	sprintf(obj_desc->name,"LINUX HD SDO %d",obj_desc->index);
 }
 
 void entry_desc_request(uint8_t *data, int datalen)
 {
-	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
-	uint16_t *sdo_index;
-	uint8_t *sdo_subindex;
+	typedef struct {
+		uint16_t index;	
+		uint8_t  subindex;
+		uint8_t  valueinfo;
+		uint16_t datatype;
+		uint16_t bit_len;
+		uint16_t object_access;
+	}sdo_entry_info_data;
 
-	sdo_index =  (uint16_t *)&sdoinfo->sdo_info_service_data;
-	sdo_subindex = (uint8_t *)&sdoinfo->sdo_info_service_data[2];
-	printf("%s sdo index 0x%x:0x%x\n", 
+	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
+	sdo_entry_info_data *entry_desc = 
+		(sdo_entry_info_data *)&sdoinfo->sdo_info_service_data[0];
+	
+	printf("%s %x:%x\n",
 		__FUNCTION__,
-		*sdo_index, *sdo_subindex);
+		entry_desc->index,entry_desc->subindex);
+	entry_desc->valueinfo =  0b1000;
+	entry_desc->datatype = 0;
+	entry_desc->bit_len = 8;
+	entry_desc->object_access = 0x0FFF;
 }
 
 void od_list_request(uint8_t * data, int datalen)

@@ -19,6 +19,7 @@ void ec_mbox(int reg, uint8_t * data, int datalen)
 		mbxhdr->cnt++;
 		return;
 	}
+	printf("%s\n",__FUNCTION__);
 	{
 	int i;
 	coe_header *coehdr = __coe_header(data);
