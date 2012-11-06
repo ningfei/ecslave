@@ -101,9 +101,9 @@ void ec_raw_get_ado(int reg, uint8_t * data, int datalen)
 	    memcpy(data, p, datalen);
 	    return;
 	  }
-	if (reg >= ECT_REG_SM0 || reg <= ECT_REG_SM3) {
+	if (reg >= ECT_REG_SM0 && reg <= ECT_REG_SM3) {
 		/* ethelan expects here a mail box*/
-		return	ec_mbox_syncm(reg,  data, datalen);
+		return	ec_sii_syncm(reg,  data, datalen);
 	}
 	memcpy(data, &ec_registers[reg], datalen);
 }
