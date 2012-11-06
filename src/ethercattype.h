@@ -470,6 +470,18 @@ enum
     ECT_REG_DCCYCLE1    = 0x09A4
 };
 
+#define SDOS_ADDR_SPACE	4096
+
+static inline long __sdo_high(void)
+{
+	return ECT_REG_DCCYCLE1 + SDOS_ADDR_SPACE;
+}
+
+static inline long __sdo_start(void)
+{
+	return ECT_REG_DCCYCLE1 + 1;
+}
+
 /** standard SDO Sync Manager Communication Type */
 #define ECT_SDO_SMCOMMTYPE		0x1c00
 /** standard SDO PDO assignment */

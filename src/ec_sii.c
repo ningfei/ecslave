@@ -25,6 +25,7 @@
 #define CAT_TYPE_DC	  0x003C
 #define CAT_TYPE_END	  0xFFFF
 
+#define MBOX_SIZE	30
 #define NR_SYNCM	2
 #define	SYNMC_SIZE	1024
 
@@ -286,13 +287,14 @@ void init_syncm(category_syncm *syncm,int index,category_header * hdr)
 	hdr->type = CAT_TYPE_SYNCM;
 
 	syncm->length = SYNMC_SIZE;
-	syncm->phys_start_address = (long)syncm;
-
 	syncm->ctrl_reg = 0b00110010;  
 	syncm->status_reg = 0b00001000; /*b1000 - 1-buf written,b0000 1-buf read */
 	syncm->enable_syncm = 0b01;
 	syncm->syncm_type = index % 2 ? 0x03:0x04; /* 0x03 = out*/
-
+	syncm->phys_start_address = (long)categories.sii.std_tx_mailbox_offset; 
+	if(syncm->syncm_type == 0x04)
+		syncm->phys_start_address = (long)categories.sii.std_rx_mailbox_offset; 
+	
 }
 
 void toggle_rw_bit(category_syncm *syncm)
@@ -436,13 +438,35 @@ void init_hdr_dbg()
 void init_si_info(ec_sii_t *sii)
 {
 	memset(sii,0x00,sizeof(*sii));
+
 	sii->alias = 0x04;
 	sii->vendor_id = 0x1ee;
 	sii->product_code = 0x0e;
 	sii->revision_number = 0x12;
 	sii->serial_number = 0x45;
-	sii->mailbox_protocols = EC_MBOX_COE;
+
+	sii->boot_rx_mailbox_offset = __sdo_start() ; 
+	sii->boot_rx_mailbox_size = MBOX_SIZE ; 
+	sii->boot_tx_mailbox_offset = sii->boot_rx_mailbox_offset + MBOX_SIZE;
+	sii->boot_tx_mailbox_size  = MBOX_SIZE; 
+	sii->std_rx_mailbox_offset = sii->boot_tx_mailbox_offset + MBOX_SIZE;
+	sii->std_rx_mailbox_size = MBOX_SIZE;
+	sii->std_tx_mailbox_offset = sii->std_rx_mailbox_offset + MBOX_SIZE;
+	sii->std_tx_mailbox_size =  MBOX_SIZE;
 	
+	printf("sii boot_rx_mailbox_offset %x\n", 
+		sii->boot_rx_mailbox_offset);
+
+	printf("sii->boot_tx_mailbox_offset %x\n",
+	sii->boot_tx_mailbox_offset);
+
+	printf("sii->std_rx_mailbox_offset %x\n",
+		sii->std_rx_mailbox_offset);
+
+	printf("sii->std_tx_mailbox_offset %x\n",
+		sii->std_tx_mailbox_offset);
+
+	sii->mailbox_protocols = EC_MBOX_COE;
 }
 
 void init_sii(void)

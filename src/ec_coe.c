@@ -70,7 +70,7 @@ void coe_parser(int reg, uint8_t * data, int datalen)
 {
 	coe_header *hdr = __coe_header(data);
 
-	if (reg > sdo_high()){
+	if (reg > __sdo_high()){
 		printf("%s no such address %d\n",
 			__FUNCTION__,
 			reg);

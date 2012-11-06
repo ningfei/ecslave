@@ -15,14 +15,8 @@
 #define CLOCK_TO_USE CLOCK_REALTIME
 #define PERIOD_NS (NSEC_PER_SEC / FREQUENCY)
 #define TIMESPEC2NS(T) ((uint64_t) (T).tv_sec * NSEC_PER_SEC + (T).tv_nsec)
-#define SDOS_ADDR_SPACE	4096
 
 static uint8_t ec_registers[ECT_REG_DCCYCLE1 + SDOS_ADDR_SPACE] = { 0 };
-
-long sdo_high(void)
-{
-	return (long ) &ec_registers[ECT_REG_DCCYCLE1 + SDOS_ADDR_SPACE];
-}
 
 void ec_init_regs(e_slave* esv)
 {
