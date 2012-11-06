@@ -26,6 +26,5 @@ void ec_mbox(int reg, uint8_t * data, int datalen)
 	if (mbox.state) {
 		mbox.state(data, datalen);
 	}
-	printf("%s\n",__FUNCTION__);
 
 }
