@@ -275,7 +275,7 @@ void init_general(category_general * general,category_header * hdr)
 	general->pad_byte1 = 0;
 	general->physical_port = (PORT_MII << PORT0_SHIFT);
 }
-
+// table 23
 void init_syncm(category_syncm *syncm,int index,category_header * hdr)
 {
 	hdr->size = ( sizeof(category_syncm)) / 2;
@@ -283,15 +283,43 @@ void init_syncm(category_syncm *syncm,int index,category_header * hdr)
 		ec_printf("ilegal size\n");
 		exit(0);
 	}
-
 	hdr->type = CAT_TYPE_SYNCM;
-	syncm->ctrl_reg = ECT_REG_SM0 + (index* 0x08);
-	syncm->enable_syncm = 0x01 | 0x04;
+
 	syncm->length = SYNMC_SIZE;
 	syncm->phys_start_address = (long)syncm;
-	syncm->status_reg = 0;
+
+	syncm->ctrl_reg = 0b00110010;  
+	syncm->status_reg = 0b00001000; /*b1000 - 1-buf written,b0000 1-buf read */
+	syncm->enable_syncm = 0b01;
 	syncm->syncm_type = index % 2 ? 0x03:0x04; /* 0x03 = out*/
 
+}
+
+void toggle_rw_bit(category_syncm *syncm)
+{
+	if (syncm->status_reg & 0b1000) {
+		syncm->status_reg = 0b0000;
+	} else{
+		syncm->status_reg = 0b1000;
+	}
+}
+
+void ec_sii_syncm(int reg, uint8_t* data, int datalen)
+{
+	category_syncm *syncm;
+
+	switch(reg)
+	{
+		case 0:
+			syncm = &categories.syncm0;
+			break;
+		default:
+		case 1:
+			syncm = &categories.syncm1;
+	}
+	
+	toggle_rw_bit(syncm);
+	memcpy(data, syncm, datalen);
 }
 
 void init_fmmu(category_fmmu *fmmu,category_header *hdr)

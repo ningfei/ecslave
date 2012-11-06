@@ -18,9 +18,3 @@ void ec_mbox(int reg, uint8_t * data, int datalen)
 	}
 	puts("MBOX AIIIEEE");
 }
-
-//  etherlan gave Sync manager and wishes to get a mail box
-void ec_mbox_syncm(int reg, uint8_t* data, int datalen)
-{
-	
-}
