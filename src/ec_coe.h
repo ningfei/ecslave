@@ -14,6 +14,7 @@ enum {
 	SDO_INFO_ERROR_REQUEST  = 0X07
 }sdo_info_hdr_opcode;
 
+#define MBOX_UNKNOWN_TYPE 0x0
 #define MBOX_COE_TYPE 0x03
 #define NR_SDOS 8
 
