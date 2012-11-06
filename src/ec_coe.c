@@ -7,8 +7,42 @@
 #include "ec_regs.h"
 #include "ec_coe.h"
 
-// table 45
+void od_list_response(uint8_t* data,int datalen)
+{
+	int i;
+
+	coe_header *coehdr = __coe_header(data);
+	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
+	coe_sdo_service_data *srvdata =
+		(coe_sdo_service_data *)&data[sizeof(mbox_header) + sizeof(coe_header) + sizeof(coe_sdo_info_header)];
+	uint64_t *sdo_data = (uint64_t *) (&srvdata->list_type); /* each sdo is 8 bytes */	
+
+	mbxhdr->type =  MBOX_COE_TYPE;
+	mbxhdr->len = sdo_list_len;
+	coehdr->coe_service = COE_SDO_INFO;
+	sdoinfo->opcode = OD_LIST_RESPONSE;
+	srvdata->list_type = 0x1;
+	// do the reponse
+	sdoinfo->opcode = 0x02; // table 43
+	for (i = 0  ; i < 8; i++) 
+		sdo_data[i] = 0x1888 + i;
+}
+
+// table 44
 void obj_desc_request(uint8_t *data, int datalen)
+{
+	typedef struct {
+		uint16_t  index;
+	}sdo_info_service_data;
+
+	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
+	sdo_info_service_data *obj_desc = 
+		(sdo_info_service_data *)&sdoinfo->sdo_info_service_data[0];
+	printf("%s asked for index = 0x%x\n",__FUNCTION__,obj_desc->index);
+}
+
+// table 45
+void obj_desc_response(uint8_t *data, int datalen)
 {
 	typedef struct {
 		uint16_t index;	
@@ -26,9 +60,10 @@ void obj_desc_request(uint8_t *data, int datalen)
 	obj_desc->max_subindex = 1;
 	obj_desc->object_code = 7;
 	sprintf(obj_desc->name,"LINUX HD SDO %d",obj_desc->index);
+	mbox_set_state(obj_desc_response);
 }
 
-void entry_desc_request(uint8_t *data, int datalen)
+void entry_desc_response(uint8_t *data, int datalen)
 {
 	typedef struct {
 		uint16_t index;	
@@ -52,6 +87,25 @@ void entry_desc_request(uint8_t *data, int datalen)
 	entry_desc->object_access = 0x0FFF;
 }
 
+// table 46
+void entry_desc_request(uint8_t *data, int datalen)
+{
+	typedef struct {
+		uint16_t index;	
+		uint8_t  subindex;
+		uint8_t  valueinfo;
+	}sdo_entry_info_data;
+
+	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
+	sdo_entry_info_data *entry_desc = 
+		(sdo_entry_info_data *)&sdoinfo->sdo_info_service_data[0];
+	
+	printf("%s %x:%x\n",
+		__FUNCTION__,
+		entry_desc->index,entry_desc->subindex);
+	mbox_set_state
+}
+
 void od_list_request(uint8_t * data, int datalen)
 {	
 	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
@@ -61,7 +115,8 @@ void od_list_request(uint8_t * data, int datalen)
 	srvdata->list_type = 0x1;
 	// do the reponse
 	sdoinfo->opcode = 0x02; // table 43
-	printf("%s\n",__FUNCTION__);
+	printf("%s setting reponse state\n",__FUNCTION__);
+	mbox_set_state(od_list_response);
 }
 
 void coe_sdo_info(uint8_t * data, int datalen)
@@ -75,6 +130,7 @@ void coe_sdo_info(uint8_t * data, int datalen)
 		od_list_request(data, datalen);
 		break;
 	case OD_LIST_RESPONSE:
+		printf("OD_LIST_RESPONSE\n");
 		break;
 	case OBJ_DESC_REQUEST:
 		obj_desc_request(data, datalen);
