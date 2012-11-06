@@ -46,15 +46,6 @@ static inline coe_sdo_info_header * __sdo_info_hdr(uint8_t *data)
 		&data[sizeof(mbox_header) + sizeof(coe_header)];
 }
 
-typedef struct __coe_sdo__ {
-
-	mbox_header mbxhdr;
-	coe_header coehdr;
-	uint8_t res:4, complete_access:1, cmd:3;
-	uint16_t index;
-	uint8_t subindex;
-	uint8_t data[4];
-}coe_sdo;
 
 static inline mbox_header *__mbox_hdr(uint8_t* data)
 {

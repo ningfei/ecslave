@@ -11,21 +11,21 @@ void od_list_response(uint8_t* data,int datalen)
 {
 	int i;
 
+	mbox_header *mbxhdr = __mbox_hdr(data);
 	coe_header *coehdr = __coe_header(data);
 	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
-	coe_sdo_service_data *srvdata =
-		(coe_sdo_service_data *)&data[sizeof(mbox_header) + sizeof(coe_header) + sizeof(coe_sdo_info_header)];
+	coe_sdo_service_data *srvdata =__coe_sdo_service_data(data);
 	uint64_t *sdo_data = (uint64_t *) (&srvdata->list_type); /* each sdo is 8 bytes */	
-
 	mbxhdr->type =  MBOX_COE_TYPE;
-	mbxhdr->len = sdo_list_len;
+	mbxhdr->len = NR_SDOS * 8;
 	coehdr->coe_service = COE_SDO_INFO;
 	sdoinfo->opcode = OD_LIST_RESPONSE;
 	srvdata->list_type = 0x1;
 	// do the reponse
 	sdoinfo->opcode = 0x02; // table 43
-	for (i = 0  ; i < 8; i++) 
+	for (i = 0  ; i < 8; i++) { 
 		sdo_data[i] = 0x1888 + i;
+	}
 }
 
 // table 44
@@ -103,15 +103,14 @@ void entry_desc_request(uint8_t *data, int datalen)
 	printf("%s %x:%x\n",
 		__FUNCTION__,
 		entry_desc->index,entry_desc->subindex);
-	mbox_set_state
+	mbox_set_state(entry_desc_response);
 }
 
 void od_list_request(uint8_t * data, int datalen)
-{	
+{
 	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
-	coe_sdo_service_data *srvdata =
-		(coe_sdo_service_data *)&data[sizeof(mbox_header) + sizeof(coe_header) + sizeof(coe_sdo_info_header)];
-	
+	coe_sdo_service_data *srvdata =__coe_sdo_service_data(data);
+
 	srvdata->list_type = 0x1;
 	// do the reponse
 	sdoinfo->opcode = 0x02; // table 43

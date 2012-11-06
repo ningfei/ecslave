@@ -6,10 +6,7 @@
 #include "ec_coe.h"
 #include "ec_mbox.h"
 
-#define MBOX_COE_TYPE 0x03
-#define NR_SDOS 8
 
-static int sdo_list_len = NR_SDOS * 8;
 fsm_mbox mbox={0};
 
 void mbox_set_state(void (*state)(uint8_t* data,int datalen))
