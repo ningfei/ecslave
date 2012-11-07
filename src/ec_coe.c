@@ -42,23 +42,24 @@ void obj_desc_response(uint8_t *data, int datalen)
 		char     name[1];
 	}sdo_info_service_data;
 
-//	coe_header *coehdr = __coe_header(data);
+	coe_header *coehdr = __coe_header(data);
 	mbox_header *mbxhdr = __mbox_hdr(data);
 	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
 	sdo_info_service_data *obj_desc = 
 		(sdo_info_service_data *)&sdoinfo->sdo_info_service_data[0];
 
 	mbxhdr->type =  MBOX_COE_TYPE;
-//	coehdr->coe_service = 0b1111; 
-
+	
+	coehdr->coe_service = COE_SDO_INFO;
+	sdoinfo->opcode = OBJ_DESC_RESPONSE;
 	obj_desc->index = obj_index;
 	obj_desc->data_type = 0x05;
 	obj_desc->max_subindex = 1;
 	obj_desc->object_code = 7;
 
 	sprintf(obj_desc->name,"LINUX HD SDO %d",obj_desc->index);
-	printf("%s index = 0x%x\n",__FUNCTION__,obj_desc->index);
 	mbxhdr->len = sizeof(*obj_desc) +strlen(obj_desc->name) -1;
+	printf("%s index = 0x%x \n",__FUNCTION__,obj_desc->index);
 }
 
 // table 44
@@ -92,7 +93,8 @@ void entry_desc_response(uint8_t *data, int datalen)
 	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
 	sdo_entry_info_data *entry_desc = 
 		(sdo_entry_info_data *)&sdoinfo->sdo_info_service_data[0];
-	
+
+	sdoinfo->opcode = ENTRY_DESC_RESPONSE;
 	mbxhdr->len = sizeof(*entry_desc);
 	mbxhdr->type =  MBOX_COE_TYPE;
 	printf("%s %x:%x\n",

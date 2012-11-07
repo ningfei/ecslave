@@ -312,14 +312,14 @@ void ec_sii_syncm(int reg, uint8_t* data, int datalen)
 
 	switch(reg)
 	{
-		case 0:
+		case ECT_REG_SM0:
 			syncm = &categories.syncm0;
 			break;
 		default:
-		case 1:
+		case ECT_REG_SM1:
 			syncm = &categories.syncm1;
 	}
-	
+	printf("%s reg=%d\n",__FUNCTION__,reg);
 	toggle_rw_bit(syncm);
 	memcpy(data, syncm, datalen);
 }
