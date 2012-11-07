@@ -25,7 +25,8 @@ void od_list_response(uint8_t* data,int datalen)
 	// do the reponse
 	sdoinfo->opcode = 0x02; // table 43
 	for (i = 0  ; i < NR_SDOS; i++) { 
-		sdo_data[i] = 0x1888 + i;
+		/* starting from 0x1888 create NR SDOS */
+		sdo_data[i] = 0x1888 + i; 	
 	}
 }
 
@@ -50,17 +51,22 @@ void obj_desc_response(uint8_t *data, int datalen)
 		(sdo_info_service_data *)&sdoinfo->sdo_info_service_data[0];
 
 	mbxhdr->type =  MBOX_COE_TYPE;
-	
+
+	coehdr->number =0;
+	coehdr->reserved = 0;
 	coehdr->coe_service = COE_SDO_INFO;
+
+	sdoinfo->reserved = 0;
+	sdoinfo->frag_list = 0;
 	sdoinfo->opcode = OBJ_DESC_RESPONSE;
+
 	obj_desc->index = obj_index;
 	obj_desc->data_type = 0x05;
-	obj_desc->max_subindex = 1;
+	obj_desc->max_subindex = 4;
 	obj_desc->object_code = 7;
 
-	sprintf(obj_desc->name,"LINUX HD SDO %d",obj_desc->index);
-	mbxhdr->len = sizeof(*obj_desc) +strlen(obj_desc->name) -1;
-	printf("%s index = 0x%x \n",__FUNCTION__,obj_desc->index);
+	sprintf(obj_desc->name,"LINUX DRIVE SDO %d",obj_desc->index);
+	mbxhdr->len = sizeof(*sdoinfo) + sizeof(*coehdr) + sizeof(*obj_desc) + strlen(obj_desc->name);
 }
 
 // table 44
