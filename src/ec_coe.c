@@ -52,7 +52,7 @@ void obj_desc_response(uint8_t *data, int datalen)
 
 	mbxhdr->type =  MBOX_COE_TYPE;
 
-	coehdr->number =0;
+	coehdr->number = 0;
 	coehdr->reserved = 0;
 	coehdr->coe_service = COE_SDO_INFO;
 
@@ -110,7 +110,7 @@ void entry_desc_response(uint8_t *data, int datalen)
 	mbxhdr->type =  MBOX_COE_TYPE;
 
 	entry_desc->valueinfo =  0b1000;
-	entry_desc->datatype  = 0;
+	entry_desc->datatype  = 0x5;
 	entry_desc->bit_len   = 8;
 	entry_desc->object_access = 0x0FFF;
 	entry_desc->index	  = obj_index;
