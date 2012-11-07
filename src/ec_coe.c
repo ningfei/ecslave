@@ -65,7 +65,7 @@ void obj_desc_response(uint8_t *data, int datalen)
 	obj_desc->max_subindex = 4;
 	obj_desc->object_code = 7;
 
-	sprintf(obj_desc->name,"LINUX DRIVE SDO %d",obj_desc->index);
+	sprintf(obj_desc->name,"LINUX DRIVE SDO 0x%X",obj_desc->index);
 	mbxhdr->len = sizeof(*sdoinfo) + sizeof(*coehdr) + sizeof(*obj_desc) + strlen(obj_desc->name);
 }
 
@@ -92,6 +92,7 @@ void entry_desc_response(uint8_t *data, int datalen)
 		uint16_t datatype;
 		uint16_t bit_len;
 		uint16_t object_access;
+		char     name[1];
 	}sdo_entry_info_data;
 
 	coe_header *coehdr = __coe_header(data);
@@ -106,7 +107,6 @@ void entry_desc_response(uint8_t *data, int datalen)
 	sdoinfo->opcode = ENTRY_DESC_RESPONSE;
 	sdoinfo->frag_list = 0;
 
-	mbxhdr->len = 0x10;
 	mbxhdr->type =  MBOX_COE_TYPE;
 
 	entry_desc->valueinfo =  0b1000;
@@ -115,7 +115,10 @@ void entry_desc_response(uint8_t *data, int datalen)
 	entry_desc->object_access = 0x0FFF;
 	entry_desc->index	  = obj_index;
 	entry_desc->subindex 	  = obj_subindex; 
-
+	sprintf(entry_desc->name,"LINUX SDO ENTRY 0x%4X:0x%X",entry_desc->index,entry_desc->subindex);
+	mbxhdr->len = 	sizeof(*sdoinfo) + 
+			sizeof(*coehdr) + 
+			sizeof(*entry_desc) + strlen(entry_desc->name);
 }
 
 // table 46
