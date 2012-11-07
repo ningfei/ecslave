@@ -79,14 +79,12 @@ void obj_desc_request(uint8_t *data, int datalen)
 	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
 	sdo_info_service_data *obj_desc = 
 		(sdo_info_service_data *)&sdoinfo->sdo_info_service_data[0];
-
-	printf("%s asked for index = 0x%x\n",__FUNCTION__,obj_desc->index);
 	obj_index = obj_desc->index;
 	mbox_set_state(obj_desc_response);
 }
 
 void entry_desc_response(uint8_t *data, int datalen)
-{
+{	// table 47
 	typedef struct {
 		uint16_t index;	
 		uint8_t  subindex;
@@ -101,7 +99,8 @@ void entry_desc_response(uint8_t *data, int datalen)
 	coe_sdo_info_header *sdoinfo = __sdo_info_hdr(data);
 	sdo_entry_info_data *entry_desc = 
 		(sdo_entry_info_data *)&sdoinfo->sdo_info_service_data[0];
-
+	
+	coehdr->number 	    = 0;
 	coehdr->coe_service =  COE_SDO_INFO;
 
 	sdoinfo->opcode = ENTRY_DESC_RESPONSE;
@@ -111,15 +110,12 @@ void entry_desc_response(uint8_t *data, int datalen)
 	mbxhdr->type =  MBOX_COE_TYPE;
 
 	entry_desc->valueinfo =  0b1000;
-	entry_desc->datatype = 0;
-	entry_desc->bit_len = 8;
+	entry_desc->datatype  = 0;
+	entry_desc->bit_len   = 8;
 	entry_desc->object_access = 0x0FFF;
-	entry_desc->index = obj_index;
-	entry_desc->subindex = obj_subindex; 
+	entry_desc->index	  = obj_index;
+	entry_desc->subindex 	  = obj_subindex; 
 
-	printf("%s %x:%x\n",
-		__FUNCTION__,
-		entry_desc->index,entry_desc->subindex);
 }
 
 // table 46
@@ -136,9 +132,6 @@ void entry_desc_request(uint8_t *data, int datalen)
 		(sdo_entry_info_data *)&sdoinfo->sdo_info_service_data[0];
 	obj_index = entry_desc->index;
 	obj_subindex = entry_desc->subindex;
-	printf("%s %x:%x\n",
-		__FUNCTION__,
-		entry_desc->index,entry_desc->subindex);
 	mbox_set_state(entry_desc_response);
 }
 
@@ -150,7 +143,6 @@ void od_list_request(uint8_t * data, int datalen)
 	srvdata->list_type = 0x1;
 	// do the reponse
 	sdoinfo->opcode = 0x02; // table 43
-	printf("%s setting reponse state\n",__FUNCTION__);
 	mbox_set_state(od_list_response);
 }
 
@@ -158,14 +150,12 @@ void coe_sdo_info(uint8_t * data, int datalen)
 {
 	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
 
-	printf("%s opcode=%d\n",__FUNCTION__,sdoinfo->opcode);
 	switch(sdoinfo->opcode)
 	{
 	case OD_LIST_REQUEST:
 		od_list_request(data, datalen);
 		break;
 	case OD_LIST_RESPONSE:
-		printf("OD_LIST_RESPONSE\n");
 		break;
 	case OBJ_DESC_REQUEST:
 		obj_desc_request(data, datalen);
@@ -192,8 +182,6 @@ void coe_parser(int reg, uint8_t * data, int datalen)
 			reg);
 		return;
 	}
-	printf("coe header ->service  %d \n",
-		hdr->coe_service);
 	switch (hdr->coe_service) 
 	{
 	case COE_EMERGENCY:
