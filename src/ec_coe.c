@@ -15,21 +15,22 @@ void od_list_response(uint8_t* data,int datalen)
 	coe_header *coehdr = __coe_header(data);
 	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
 	coe_sdo_service_data *srvdata =__coe_sdo_service_data(data);
-	uint64_t *sdo_data = (uint64_t *) (&srvdata->list_type); /* each sdo is 8 bytes */	
+	uint32_t *sdo_data = (uint32_t *) (&srvdata->list_type); /* each sdo is 8 bytes */	
 
 	mbxhdr->type =  MBOX_COE_TYPE;
-	mbxhdr->len = NR_SDOS * 8;
+	mbxhdr->len = 8 + NR_SDOS * 4;
 	coehdr->coe_service = COE_SDO_INFO;
 	sdoinfo->opcode = OD_LIST_RESPONSE;
 	srvdata->list_type = 0x1;
 	// do the reponse
 	sdoinfo->opcode = 0x02; // table 43
-	for (i = 0  ; i < 8; i++) { 
+	for (i = 0  ; i < NR_SDOS; i++) { 
 		sdo_data[i] = 0x1888 + i;
 	}
 }
 
 static int obj_index = 0;
+static int obj_subindex = 0;
 
 // table 45
 void obj_desc_response(uint8_t *data, int datalen)
@@ -89,21 +90,30 @@ void entry_desc_response(uint8_t *data, int datalen)
 		uint16_t object_access;
 	}sdo_entry_info_data;
 
+	coe_header *coehdr = __coe_header(data);
 	mbox_header *mbxhdr = __mbox_hdr(data);
-	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
+	coe_sdo_info_header *sdoinfo = __sdo_info_hdr(data);
 	sdo_entry_info_data *entry_desc = 
 		(sdo_entry_info_data *)&sdoinfo->sdo_info_service_data[0];
 
+	coehdr->coe_service =  COE_SDO_INFO;
+
 	sdoinfo->opcode = ENTRY_DESC_RESPONSE;
-	mbxhdr->len = sizeof(*entry_desc);
+	sdoinfo->frag_list = 0;
+
+	mbxhdr->len = 0x10;
 	mbxhdr->type =  MBOX_COE_TYPE;
-	printf("%s %x:%x\n",
-		__FUNCTION__,
-		entry_desc->index,entry_desc->subindex);
+
 	entry_desc->valueinfo =  0b1000;
 	entry_desc->datatype = 0;
 	entry_desc->bit_len = 8;
 	entry_desc->object_access = 0x0FFF;
+	entry_desc->index = obj_index;
+	entry_desc->subindex = obj_subindex; 
+
+	printf("%s %x:%x\n",
+		__FUNCTION__,
+		entry_desc->index,entry_desc->subindex);
 }
 
 // table 46
@@ -118,7 +128,8 @@ void entry_desc_request(uint8_t *data, int datalen)
 	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
 	sdo_entry_info_data *entry_desc = 
 		(sdo_entry_info_data *)&sdoinfo->sdo_info_service_data[0];
-	
+	obj_index = entry_desc->index;
+	obj_subindex = entry_desc->subindex;
 	printf("%s %x:%x\n",
 		__FUNCTION__,
 		entry_desc->index,entry_desc->subindex);

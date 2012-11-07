@@ -16,7 +16,7 @@ enum {
 
 #define MBOX_UNKNOWN_TYPE 0x0
 #define MBOX_COE_TYPE 0x03
-#define NR_SDOS 8
+#define NR_SDOS 2
 
 void coe_parser(int reg, uint8_t * data, int datalen);
 
