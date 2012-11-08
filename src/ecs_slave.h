@@ -106,7 +106,6 @@ static inline int __ec_is_last_dgram(uint8_t *d)
 static inline uint16_t __ec_dgram_dlength(uint8_t *d)
 {
 	ec_dgram *datagram = (ec_dgram *)d;
-//	uint16_t datalen = (datagram->dlength & 0b011111111111);
 	uint16_t datalen = (datagram->dlength & 0x07FF);
 	return datalen;
 }
@@ -174,7 +173,6 @@ static inline uint8_t *__ecat_frameheader(uint8_t *h)
 static inline uint16_t __ec_frame_size(uint8_t * d)
 {
 	ec_frame_header *ec_frame = (ec_frame_header *) __ecat_frameheader(d);
-//	return (datagram->elength & 0b011111111111);
 	return (ec_frame->elength & 0x07FF); /* old compilers do not like binary numbers*/
 }
 
