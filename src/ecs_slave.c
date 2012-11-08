@@ -8,11 +8,13 @@
 #include "ec_regs.h"
 #include "ec_net.h"
 
-void ecs_tx_packet(e_slave * ecs)
+#define  WORKING_CNT_SIZE 2
+
+void raw_ecs_tx_packet(e_slave * ecs)
 {
 	int i;
 	int bytes;
-	struct ether_header *eh = (struct ether_header *)ecs->pkt;
+	struct ether_header *eh = (struct ether_header *)&ecs->pkt_head[0];
 	struct sockaddr_ll socket_address = { 0 };
 	ec_interface *intr = ec_tx_interface(ecs);
 
@@ -32,10 +34,9 @@ void ecs_tx_packet(e_slave * ecs)
 	       &intr->mac.ether_shost, 
 		sizeof(intr->mac.ether_shost));
 	eh->ether_type = htons(ETHERCAT_TYPE);
-	ec_printf("%s Index=0x%x\n", __FUNCTION__, ec_dgram_pkt_index(ecs->pkt));
 
 	bytes = sendto(intr->sock,
-		       ecs->pkt,
+		       ecs->pkt_head,
 		       ecs->pkt_size, 0,
 		       (struct sockaddr *)&socket_address,
 		       (socklen_t) sizeof(socket_address));
@@ -45,18 +46,51 @@ void ecs_tx_packet(e_slave * ecs)
 	}
 }
 
-void ecs_rx_packet(e_slave * slave)
+void ecs_tx_packet(e_slave * ecs,uint8_t *d)
+{
+	raw_ecs_tx_packet(ecs);
+	 __set_fsm_state(ecs, ecs_rx_packet);
+}
+
+void ecs_process_next_dgram(e_slave * ecs,uint8_t *d)
+{
+	if (--ecs->dgrams_cnt) {
+		/* move to next packet */
+		ecs->dgram_processed += WORKING_CNT_SIZE + sizeof(ec_dgram) + __ec_dgram_dlength(d);
+		return __set_fsm_state(ecs, ecs_process_packet);
+	}
+	 __set_fsm_state(ecs, ecs_tx_packet);
+}
+
+int  ec_nr_dgrams(uint8_t *raw_pkt)
+{
+	int i = 0;
+	int f;
+	int frame_size = __ec_frame_size(raw_pkt);
+	uint8_t* dgram  = __ecat_frameheader(raw_pkt) +  sizeof(ec_frame_header);
+		
+	f = frame_size;
+	for (;frame_size > 0;i++){
+		frame_size -= (sizeof(ec_dgram) + __ec_dgram_dlength(dgram) + WORKING_CNT_SIZE) ;
+		dgram += sizeof(ec_dgram) + WORKING_CNT_SIZE + __ec_dgram_dlength(dgram); 		
+	}
+	if (frame_size < 0){
+		printf("aieeee %d %d\n",frame_size,f);
+	}
+	return i;
+}
+
+void raw_ecs_rx_packet(e_slave* slave)
 {
 	int flags = 0;
 	ec_interface *intr = ec_rx_interface(slave);
 	unsigned int addr_size = sizeof(intr->m_addr);
 
 	while (1) {
-
-		memset(slave->pkt, 0, sizeof(slave->pkt));
+		memset(slave->pkt_head, 0, sizeof(slave->pkt_head));
 		slave->pkt_size = recvfrom(intr->sock,
-					   (void *)&slave->pkt,
-					   sizeof(slave->pkt), flags,
+					   (void *)&slave->pkt_head,
+					   sizeof(slave->pkt_head), flags,
 					   (struct sockaddr *)&intr->m_addr,
 					   &addr_size);
 
@@ -64,34 +98,33 @@ void ecs_rx_packet(e_slave * slave)
 			perror("");
 			continue;
 		}
-		if (!ec_is_ethercat(slave->pkt)) {
+		if (!__ec_is_ethercat(slave->pkt_head)) {
 			continue;
 		}
-		if (!memcmp(ec_get_shost(slave->pkt),
+		/* we might get the packet we just sent */
+		if (!memcmp(__ec_get_shost(slave->pkt_head),
 					intr->mac.ether_shost,
 					sizeof(intr->mac.ether_shost)) ){
 			continue;
 		}
-		slave->pkt_index = ec_dgram_pkt_index(slave->pkt);
 		break;
 	}
-	ec_printf("%s: bytes read=%d element"
-	       "index=0x%x size=%d data cmd=%d length=%d\n",
-	        __FUNCTION__,
-		slave->pkt_size,
-	       	slave->pkt_index,
-	       	ec_dgram_size(slave->pkt), 
-		ec_dgram_command(slave->pkt),
-		ec_dgram_data_length(slave->pkt));
-
+	// grab first ecat dgram
+	slave->dgram_processed =  __ecat_frameheader(slave->pkt_head) + sizeof(ec_frame_header);
+	slave->dgrams_cnt = ec_nr_dgrams(slave->pkt_head);
 	__set_fsm_state(slave, ecs_process_packet);
 }
 
-void ecs_process_packet(e_slave * slave)
+void ecs_rx_packet(e_slave *ecs,uint8_t *d)
 {
-	__set_fsm_state(slave, ec_cmd_nop);
+	raw_ecs_rx_packet(ecs);
+}
 
-	switch (ec_dgram_command(slave->pkt)) {
+void ecs_process_packet(e_slave * ecs, uint8_t *dgram_ec)
+{
+	__set_fsm_state(ecs, ec_cmd_nop);
+	
+	switch (__ec_dgram_command(dgram_ec)) {
 	case EC_CMD_NOP:
 		puts("Command NOP");
 		break;
@@ -101,7 +134,7 @@ void ecs_process_packet(e_slave * slave)
 		break;
 
 	case EC_CMD_APWR:
-		__set_fsm_state(slave, ec_cmd_apwr);
+		__set_fsm_state(ecs, ec_cmd_apwr);
 		break;
 
 	case EC_CMD_APRW:
@@ -109,11 +142,11 @@ void ecs_process_packet(e_slave * slave)
 		break;
 
 	case EC_CMD_FPRD:
-		__set_fsm_state(slave, ec_cmd_fprd);
+		__set_fsm_state(ecs, ec_cmd_fprd);
 		break;
 
 	case EC_CMD_FPWR:
-		__set_fsm_state(slave, ec_cmd_fpwr);
+		__set_fsm_state(ecs, ec_cmd_fpwr);
 		break;
 
 	case EC_CMD_FPRW:
@@ -121,11 +154,11 @@ void ecs_process_packet(e_slave * slave)
 		break;
 
 	case EC_CMD_BRD:
-		__set_fsm_state(slave, ec_cmd_brd);
+		__set_fsm_state(ecs, ec_cmd_brd);
 		break;
 
 	case EC_CMD_BWR:
-		__set_fsm_state(slave, ec_cmd_brw);
+		__set_fsm_state(ecs, ec_cmd_brw);
 		break;
 
 	case EC_CMD_BRW:
@@ -133,7 +166,7 @@ void ecs_process_packet(e_slave * slave)
 		break;
 
 	case EC_CMD_LRD:
-		puts("Logical Memory Read");
+		__set_fsm_state(ecs, ec_cmd_lrd);
 		break;
 
 	case EC_CMD_LWR:
@@ -154,13 +187,13 @@ void ecs_process_packet(e_slave * slave)
 	default:
 		puts("unknown command");
 	}
-	slave->fsm->state(slave);
+	ecs->fsm->state(ecs, dgram_ec);
 }
 
-void ecs_run(e_slave * slave)
+void ecs_run(e_slave *ecs)
 {
 	while (1) {
-		slave->fsm->state(slave);
+		ecs->fsm->state(ecs, ecs->dgram_processed);
 	}
 }
 
@@ -185,7 +218,8 @@ int main(int argc, char *argv[])
 	init_sii();
 
 	ecs.fsm = &fsm_slave;
-
+	ecs.dgram_processed = &ecs.pkt_head[0];
+	ecs.dgrams_cnt = 0;
 	__set_fsm_state(&ecs, ecs_rx_packet);
 
 	ecs_run(&ecs);

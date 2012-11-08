@@ -12,21 +12,20 @@
 #include "ec_sii.h"
 
 /** Configured Address Write */
-void ec_cmd_fpwr(e_slave * slave)
+void ec_cmd_fpwr(e_slave *ecs,uint8_t *dgram_ec)
 {
 	uint16_t ado = 0;
 	uint16_t adp = 0;
-	uint16_t datalen = ec_dgram_data_length(slave->pkt);
-	uint8_t *data = ec_dgram_data(slave->pkt);
+	uint16_t datalen = __ec_dgram_dlength(dgram_ec);
+	uint8_t *data    = __ec_dgram_data(dgram_ec);
 
-	ado = ec_dgram_ado(slave->pkt);
-	adp = ec_dgram_adp(slave->pkt);
-	__ec_inc_wkc(slave);
+	ado = __ec_dgram_ado(dgram_ec);
+	adp = __ec_dgram_adp(dgram_ec);
+	__ec_inc_wkc__(dgram_ec);
 
-	ec_printf("%s index=%d ado=0x%x adp=0x%x "
+	ec_printf("%s ado=0x%x adp=0x%x "
 			"station addr=0x%x datalen=%d\n",
 	       __FUNCTION__, 
-	       slave->pkt_index,
 	       ado,adp,
 	       ec_station_address(),
 	       datalen);
@@ -41,10 +40,9 @@ void ec_cmd_fpwr(e_slave * slave)
 			// ec_fsm_sii_state_start_reading
 			ec_sii_start_read(data, datalen);
 		} else{
-			ec_raw_set_ado(ado, data, datalen);
+			ec_raw_set_ado(ecs,ado, data, datalen);
 		}
 	}
 FPRD_OUT:
-	ecs_tx_packet(slave);
-	__set_fsm_state(slave, ecs_rx_packet);
+        __set_fsm_state(ecs, ecs_process_next_dgram);
 }

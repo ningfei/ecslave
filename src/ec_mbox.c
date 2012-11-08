@@ -7,24 +7,24 @@
 #include "ec_mbox.h"
 
 
-fsm_mbox mbox={0};
 
-void mbox_set_state(void (*state)(uint8_t* data,int datalen))
+void mbox_set_state(e_slave* ecs,
+	void (*state)(e_slave*, uint8_t* data,int datalen))
 {
-	mbox.state = state;
+	ecs->mbox.state = state;
 }
 
-void ec_mbox(int reg, uint8_t * data, int datalen)
+void ec_mbox(e_slave* ecs, int reg, uint8_t * data, int datalen)
 {
 	mbox_header *mbxhdr = __mbox_hdr(data);
 	
 	if (mbxhdr->type ==  MBOX_COE_TYPE){
-		coe_parser(reg, data, datalen);
+		coe_parser(ecs, reg, data, datalen);
 		mbxhdr->cnt++;
 		return;
 	}
-	if (mbox.state) {
-		mbox.state(data, datalen);
+	if (ecs->mbox.state) {
+		ecs->mbox.state(ecs, data, datalen);
 	}
 
 }

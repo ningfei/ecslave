@@ -53,19 +53,7 @@
 #ifndef _EC_TYPE_H
 #define _EC_TYPE_H
 
-/** Define Little or Big endian target */
-#define EC_LITTLE_ENDIAN
-
-#ifndef PACKED
-#define PACKED  __attribute__((__packed__))
-#endif
-
 #include <sys/time.h>
-
-/* General types */
-//typedef unsigned char       boolean;
-//#define TRUE                1
-//#define FALSE               0
 
 typedef unsigned char       uint8_t;
 typedef signed char         int8_t;
@@ -118,7 +106,7 @@ typedef unsigned int        uint32_t;
 /** definition for frame buffers */
 
 /** ethernet header definition */
-typedef struct PACKED 
+typedef struct   __attribute__((__packed__))
 {
 	/** destination MAC */
 	uint16_t  da0,da1,da2;
@@ -128,72 +116,44 @@ typedef struct PACKED
 	uint16_t  etype;
 } ec_etherheadert;
 
-/** ethernet header size */
-#define ETH_HEADERSIZE		sizeof(ec_etherheadert)
+
+typedef struct   __attribute__((__packed__)) {
+	uint16_t elength;
+}ec_frame_header;
 
 /** EtherCAT datagram header definition */
-typedef struct PACKED
+typedef struct __attribute__((__packed__))
 {
-	/** length of EtherCAT datagram */
-	uint16_t	elength;
 	/** EtherCAT command, see ec_cmdtype */
 	uint8_t   command;
 	/** index, used in SOEM for Tx to Rx recombination */
 	uint8_t   index;
 	/** ADP */
-	uint16_t  ADP;
+	uint16_t adp;
 	/** ADO */
-	uint16_t  ADO;
+	uint16_t  ado;
 	/** length of data portion in datagram */
 	uint16_t  dlength;
 	/** interrupt, currently unused */
 	uint16_t  irpt;
-} ec_comt;
-
-/** EtherCAT header size */
-#define EC_HEADERSIZE		sizeof(ec_comt)
-/** size of ec_comt.elength item in EtherCAT header */
-#define EC_ELENGTHSIZE		sizeof(uint16)
-/** offset position of command in EtherCAT header */
-#define EC_CMDOFFSET		EC_ELENGTHSIZE
-/** size of workcounter item in EtherCAT datagram */
-#define EC_WKCSIZE			sizeof(uint16)
-/** definition of datagram follows bit in ec_comt.dlength */
-#define EC_DATAGRAMFOLLOWS  (1 << 15)
-
-/** Possible error codes returned. */
-typedef enum
-{
-    /** No error */
-    EC_ERR_OK			= 0,
-    /** Library already initialized. */
-    EC_ERR_ALREADY_INITIALIZED,
-    /** Library not initialized. */
-    EC_ERR_NOT_INITIALIZED,
-    /** Timeout occured during execution of the function. */
-    EC_ERR_TIMEOUT,
-    /** No slaves were found. */
-    EC_ERR_NO_SLAVES,
-    /** Function failed. */
-    EC_ERR_NOK
-} ec_err;
+} ec_dgram;
 
 /** Possible EtherCAT slave states */
 typedef enum
 {
     /** Init state*/
-    EC_STATE_INIT           = 0x01,
+    EC_STATE_INIT       = 0x01,
     /** Pre-operational. */
-    EC_STATE_PRE_OP         = 0x02,
-	/** Boot state*/
-	EC_STATE_BOOT			= 0x03,
+    EC_STATE_PRE_OP     = 0x02,
+    /** Boot state*/
+    EC_STATE_BOOT	= 0x03,
     /** Safe-operational. */
-    EC_STATE_SAFE_OP        = 0x04,
+    EC_STATE_SAFE_OP    = 0x04,
     /** Operational */
-    EC_STATE_OPERATIONAL    = 0x08,
+    EC_STATE_OPERATIONAL= 0x08,
     /** Error or ACK error */
-    EC_STATE_ACK			= 0x10,
-    EC_STATE_ERROR			= 0x10
+    EC_STATE_ACK	= 0x10,
+    EC_STATE_ERROR	= 0x10
 } ec_state;
 
 /** Possible buffer states */
@@ -305,20 +265,6 @@ typedef enum
 
 /** Start address SII sections in Eeprom */
 #define ECT_SII_START   0x0040
-
-enum
-{
-    /** SII category strings */
-    ECT_SII_STRING      = 10,
-    /** SII category general */
-    ECT_SII_GENERAL     = 30,
-    /** SII category FMMU */
-    ECT_SII_FMMU        = 40,
-    /** SII category SM */
-    ECT_SII_SM          = 41,
-    /** SII category PDO */
-    ECT_SII_PDO         = 50
-};
 
 /** Item offsets in SII general section */
 enum
@@ -507,100 +453,7 @@ typedef enum
 	EC_ERR_TYPE_SOE_ERROR		= 8
 } ec_err_type;
 
-/** Struct to retrieve errors. */
-typedef struct
-{
-    /** Time at which the error was generated. */
-    struct timeval Time;
-	/** Signal bit, error set but not read */
-    int     Signal;
-	/** Slave number that generated the error */
-    uint16_t      Slave;
-	/** CoE SDO index that generated the error */
-    uint16_t      Index;
-	/** CoE SDO subindex that generated the error */
-    uint8_t       SubIdx;
-    /** Type of error */
-    ec_err_type Etype;
-    union
-    {
-		/** General abortcode */
-        int32_t   AbortCode;
-		/** Specific error for Emergency mailbox */
-        struct
-        {
-            uint16_t  ErrorCode;
-            uint8_t   ErrorReg;
-            uint8_t   b1;
-            uint16_t  w1;
-            uint16_t  w2;
-        }u1;
-    }u2;
-} ec_errort;
 
-/** Helper macros */
-/** Macro to make a word from 2 bytes */
-#define MK_WORD(msb, lsb)   ((((uint16)(msb))<<8) | (lsb))
-/** Macro to get hi byte of a word */
-#define HI_BYTE(w)          ((w) >> 8)
-/** Macro to get low byte of a word */
-#define LO_BYTE(w)          ((w) & 0x00ff)
-/** Macro to swap hi and low byte of a word */
-#define SWAP(w)             ((((w)& 0xff00) >> 8) | (((w) & 0x00ff) << 8))
-/** Macro to get hi word of a dword */
-#define LO_WORD(l)          ((l) & 0xffff)
-/** Macro to get hi word of a dword */
-#define HI_WORD(l)          ((l) >> 16)
-
-#define get_unaligned(ptr) \
-  ({ __typeof__(*(ptr)) __tmp; memcpy(&__tmp, (ptr), sizeof(*(ptr))); __tmp; })
-
-#define put_unaligned32(val, ptr)        \
-  ({   memcpy((ptr), &(val), 4);         \
-      (void)0; })
-
-#define put_unaligned64(val, ptr)        \
-  ({   memcpy((ptr), &(val), 8);         \
-      (void)0; })
-
-#if !defined(EC_BIG_ENDIAN) && defined(EC_LITTLE_ENDIAN)
-
-  #define htoes(A) (A)
-  #define htoel(A) (A)
-  #define htoell(A) (A)
-  #define etohs(A) (A)
-  #define etohl(A) (A)
-  #define etohll(A) (A)
-
-#elif !defined(EC_LITTLE_ENDIAN) && defined(EC_BIG_ENDIAN)
-
-  #define htoes(A) ((((uint16)(A) & 0xff00) >> 8) | \
-                    (((uint16)(A) & 0x00ff) << 8))
-  #define htoel(A) ((((uint32)(A) & 0xff000000) >> 24) | \
-                    (((uint32)(A) & 0x00ff0000) >> 8)  | \
-                    (((uint32)(A) & 0x0000ff00) << 8)  | \
-                    (((uint32)(A) & 0x000000ff) << 24))
-  #define htoell(A) ((((uint64)(A) & (uint64)0xff00000000000000ULL) >> 56) | \
-                     (((uint64)(A) & (uint64)0x00ff000000000000ULL) >> 40) | \
-                     (((uint64)(A) & (uint64)0x0000ff0000000000ULL) >> 24) | \
-                     (((uint64)(A) & (uint64)0x000000ff00000000ULL) >> 8)  | \
-                     (((uint64)(A) & (uint64)0x00000000ff000000ULL) << 8)  | \
-                     (((uint64)(A) & (uint64)0x0000000000ff0000ULL) << 24) | \
-                     (((uint64)(A) & (uint64)0x000000000000ff00ULL) << 40) | \
-                     (((uint64)(A) & (uint64)0x00000000000000ffULL) << 56))
-
-  #define etohs  htoes
-  #define etohl  htoel
-  #define etohll htoell
-
-#else
-
-  #error "Must define one of EC_BIG_ENDIAN or EC_LITTLE_ENDIAN"
-
-#endif
-
-/** Supported mailbox protocols.
- */ 
 enum {
     EC_MBOX_AOE = 0x01, /**< ADS over EtherCAT */
     EC_MBOX_EOE = 0x02, /**< Ethernet over EtherCAT */

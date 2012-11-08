@@ -58,10 +58,10 @@ int16_t ec_station_address(void)
 	return ec_registers[ECT_REG_STADR];
 }
 
-void ec_raw_set_ado(int reg, uint8_t * data, int datalen)
+void ec_raw_set_ado(e_slave *ecs, int reg, uint8_t * data, int datalen)
 {
 	if (reg > ECT_REG_DCCYCLE1) {
-		return ec_mbox(reg, data, datalen);
+		return ec_mbox(ecs, reg, data, datalen);
 	}
 	if (reg < ECT_REG_TYPE) {
 		printf("%s insane ado\n",__FUNCTION__);
@@ -73,10 +73,10 @@ void ec_raw_set_ado(int reg, uint8_t * data, int datalen)
 	}
 }
 
-void ec_raw_get_ado(int reg, uint8_t * data, int datalen)
+void ec_raw_get_ado(e_slave *ecs, int reg, uint8_t * data, int datalen)
 {
 	if (reg > ECT_REG_DCCYCLE1) {
-		return ec_mbox(reg, data, datalen);
+		return ec_mbox(ecs, reg, data, datalen);
 	}
 	if (reg < ECT_REG_TYPE) {
 		printf("%s insane ado 0x%x\n",__FUNCTION__,reg);

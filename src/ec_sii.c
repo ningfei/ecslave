@@ -452,19 +452,6 @@ void init_si_info(ec_sii_t *sii)
 	sii->std_rx_mailbox_size = MBOX_SIZE;
 	sii->std_tx_mailbox_offset = sii->std_rx_mailbox_offset + MBOX_SIZE;
 	sii->std_tx_mailbox_size =  MBOX_SIZE;
-	
-	printf("sii boot_rx_mailbox_offset %x\n", 
-		sii->boot_rx_mailbox_offset);
-
-	printf("sii->boot_tx_mailbox_offset %x\n",
-	sii->boot_tx_mailbox_offset);
-
-	printf("sii->std_rx_mailbox_offset %x\n",
-		sii->std_rx_mailbox_offset);
-
-	printf("sii->std_tx_mailbox_offset %x\n",
-		sii->std_tx_mailbox_offset);
-
 	sii->mailbox_protocols = EC_MBOX_COE;
 }
 

@@ -1,5 +1,4 @@
-/*
- * ec_cmd_apwr.c
+/* * ec_cmd_apwr.c
  *
  *  Created on: Oct 18, 2012
  *      Author: root
@@ -14,32 +13,29 @@
 #include "ec_regs.h"
 
  /** Auto Increment Write. by ring position */
-void ec_cmd_apwr(e_slave *slave)
+void ec_cmd_apwr(e_slave *ecs, uint8_t *dgram_ec)
 {
 	uint16_t adp;
 	uint16_t ado;
-	uint8_t *datagram = (uint8_t *) __ecat_frameheader(slave->pkt);
-	uint8_t *data = ec_dgram_data(slave->pkt);
+	uint8_t *data = __ec_dgram_data(dgram_ec);
 
-	adp = ec_dgram_adp(slave->pkt);
+	adp = __ec_dgram_adp(dgram_ec);
 	ec_printf("%s ADP = %d\n", __FUNCTION__, adp);
-	ado = ec_dgram_ado(slave->pkt);
-	((ec_comt *) datagram)->ADP++;	/* each slave ++ in APWR */
-	__ec_inc_wkc(slave);
+	ado = __ec_dgram_ado(dgram_ec);
+	( (ec_dgram *) dgram_ec)->adp++;	/* each slave ++ in APWR */
+	__ec_inc_wkc__(dgram_ec);
 	{
-		uint16_t datalen = ec_dgram_data_length(slave->pkt);
+		uint16_t datalen = __ec_dgram_dlength(dgram_ec);
 
 		uint8_t val[datalen];
 
-		ec_raw_get_ado(ado, &val[0], datalen);
-		ec_raw_set_ado(ado, data, datalen);
+		ec_raw_get_ado(ecs, ado, &val[0], datalen);
+		ec_raw_set_ado(ecs, ado, data, datalen);
 		memcpy(data, &val, datalen);
-		ec_printf("%s index=0x%x ADO 0x%x WRITE 0x %x %x\n",
+		ec_printf("%s ADO 0x%x WRITE 0x %x %x\n",
 		       __FUNCTION__,
-		       slave->pkt_index,
 		       ado,
 		       val[0], val[1]);
 	}
-	ecs_tx_packet(slave);
-	__set_fsm_state(slave, ecs_rx_packet);
+	__set_fsm_state(ecs, ecs_process_next_dgram);
 }

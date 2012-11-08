@@ -6,20 +6,8 @@
 #include "ec_regs.h"
 #include <arpa/inet.h>
 
-uint8_t process_data[65536];
-
-void set_data_lrw(uint8_t * data, uint16_t offset, uint16_t datalen)
-{
-	memcpy(&process_data[offset], data, datalen);
-}
-
-void get_data_lrw(uint8_t * data, uint16_t offset, uint16_t datalen)
-{
-	memcpy(data, &process_data[offset], datalen);
-}
-
  /** Logical Read Write */
-void ec_cmd_lrw(e_slave * ecs,uint8_t *dgram_ec)
+void ec_cmd_lrd(e_slave *ecs, uint8_t *dgram_ec)
 {
 /*
 	int val = 0;
@@ -30,7 +18,9 @@ void ec_cmd_lrw(e_slave * ecs,uint8_t *dgram_ec)
 	uint32_t offset = 0;
 */
 	__ec_inc_wkc__(dgram_ec);
+//	printf("%s index=%d\n",
+//	       __FUNCTION__, ecs->pkt_index);
 
 //LWR_OUT:
-     __set_fsm_state(ecs, ecs_process_next_dgram);
+  	__set_fsm_state(ecs, ecs_process_next_dgram);
 }

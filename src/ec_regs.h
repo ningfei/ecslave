@@ -11,8 +11,8 @@
 void ec_init_regs(e_slave *);
 void ec_set_ado(int reg, long val);
 void ec_get_ado(int reg, uint8_t * data);
-void ec_raw_set_ado(int reg, uint8_t * data, int datalen);
-void ec_raw_get_ado(int reg, uint8_t * data, int datalen);
+void ec_raw_set_ado(e_slave *,int reg, uint8_t * data, int datalen);
+void ec_raw_get_ado(e_slave*,int reg, uint8_t * data, int datalen);
 
 long sdo_high(void);
 int16_t ec_station_address(void);

@@ -7,7 +7,7 @@
 #include "ec_regs.h"
 #include "ec_coe.h"
 
-void od_list_response(uint8_t* data,int datalen)
+void od_list_response(e_slave *ecs, uint8_t* data,int datalen)
 {
 	int i;
 
@@ -30,11 +30,9 @@ void od_list_response(uint8_t* data,int datalen)
 	}
 }
 
-static int obj_index = 0;
-static int obj_subindex = 0;
 
 // table 45
-void obj_desc_response(uint8_t *data, int datalen)
+void obj_desc_response(e_slave* ecs, uint8_t *data, int datalen)
 {
 	typedef struct {
 		uint16_t index;	
@@ -60,17 +58,19 @@ void obj_desc_response(uint8_t *data, int datalen)
 	sdoinfo->frag_list = 0;
 	sdoinfo->opcode = OBJ_DESC_RESPONSE;
 
-	obj_desc->index = obj_index;
+	obj_desc->index = ecs->coe.obj_index;
 	obj_desc->data_type = 0x05;
 	obj_desc->max_subindex = 4;
 	obj_desc->object_code = 7;
 
 	sprintf(obj_desc->name,"LINUX DRIVE SDO 0x%X",obj_desc->index);
-	mbxhdr->len = sizeof(*sdoinfo) + sizeof(*coehdr) + sizeof(*obj_desc) + strlen(obj_desc->name);
+	mbxhdr->len = sizeof(*sdoinfo) + 
+		sizeof(*coehdr) + 
+		sizeof(*obj_desc) + strlen(obj_desc->name);
 }
 
 // table 44
-void obj_desc_request(uint8_t *data, int datalen)
+void obj_desc_request(e_slave *ecs, uint8_t *data, int datalen)
 {
 	typedef struct {
 		uint16_t  index;
@@ -79,11 +79,11 @@ void obj_desc_request(uint8_t *data, int datalen)
 	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
 	sdo_info_service_data *obj_desc = 
 		(sdo_info_service_data *)&sdoinfo->sdo_info_service_data[0];
-	obj_index = obj_desc->index;
-	mbox_set_state(obj_desc_response);
+	ecs->coe.obj_index = obj_desc->index;
+	mbox_set_state(ecs, obj_desc_response);
 }
 
-void entry_desc_response(uint8_t *data, int datalen)
+void entry_desc_response(e_slave* ecs, uint8_t *data, int datalen)
 {	// table 47
 	typedef struct {
 		uint16_t index;	
@@ -113,16 +113,18 @@ void entry_desc_response(uint8_t *data, int datalen)
 	entry_desc->datatype  = 0x5;
 	entry_desc->bit_len   = 8;
 	entry_desc->object_access = 0x0FFF;
-	entry_desc->index	  = obj_index;
-	entry_desc->subindex 	  = obj_subindex; 
-	sprintf(entry_desc->name,"LINUX SDO ENTRY 0x%4X:0x%X",entry_desc->index,entry_desc->subindex);
+	entry_desc->index	  = ecs->coe.obj_index;
+	entry_desc->subindex 	  = ecs->coe.obj_subindex; 
+	sprintf(entry_desc->name,"LINUX SDO ENTRY 0x%4X:0x%X",
+		entry_desc->index,
+		entry_desc->subindex);
 	mbxhdr->len = 	sizeof(*sdoinfo) + 
 			sizeof(*coehdr) + 
 			sizeof(*entry_desc) + strlen(entry_desc->name);
 }
 
 // table 46
-void entry_desc_request(uint8_t *data, int datalen)
+void entry_desc_request(e_slave* ecs,uint8_t *data, int datalen)
 {
 	typedef struct {
 		uint16_t index;	
@@ -133,12 +135,12 @@ void entry_desc_request(uint8_t *data, int datalen)
 	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
 	sdo_entry_info_data *entry_desc = 
 		(sdo_entry_info_data *)&sdoinfo->sdo_info_service_data[0];
-	obj_index = entry_desc->index;
-	obj_subindex = entry_desc->subindex;
-	mbox_set_state(entry_desc_response);
+	ecs->coe.obj_index = entry_desc->index;
+	ecs->coe.obj_subindex = entry_desc->subindex;
+	mbox_set_state(ecs, entry_desc_response);
 }
 
-void od_list_request(uint8_t * data, int datalen)
+void od_list_request(e_slave* ecs, uint8_t * data, int datalen)
 {
 	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
 	coe_sdo_service_data *srvdata =__coe_sdo_service_data(data);
@@ -146,27 +148,27 @@ void od_list_request(uint8_t * data, int datalen)
 	srvdata->list_type = 0x1;
 	// do the reponse
 	sdoinfo->opcode = 0x02; // table 43
-	mbox_set_state(od_list_response);
+	mbox_set_state(ecs, od_list_response);
 }
 
-void coe_sdo_info(uint8_t * data, int datalen)
+void coe_sdo_info(e_slave* ecs, uint8_t * data, int datalen)
 {
 	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
 
 	switch(sdoinfo->opcode)
 	{
 	case OD_LIST_REQUEST:
-		od_list_request(data, datalen);
+		od_list_request(ecs, data, datalen);
 		break;
 	case OD_LIST_RESPONSE:
 		break;
 	case OBJ_DESC_REQUEST:
-		obj_desc_request(data, datalen);
+		obj_desc_request(ecs, data, datalen);
 		break;
 	case OBJ_DESC_RESPONSE:
 		break;
 	case ENTRY_DESC_REQUEST:
-		entry_desc_request(data, datalen);
+		entry_desc_request(ecs, data, datalen);
 		break;
 	case ENTRY_DESC_RESPONSE:
 		break;
@@ -175,7 +177,7 @@ void coe_sdo_info(uint8_t * data, int datalen)
 	}
 }
 
-void coe_parser(int reg, uint8_t * data, int datalen)
+void coe_parser(e_slave* ecs, int reg, uint8_t * data, int datalen)
 {
 	coe_header *hdr = __coe_header(data);
 
@@ -202,7 +204,7 @@ void coe_parser(int reg, uint8_t * data, int datalen)
 	case COE_RX_PDO_REMOTE:
 		break;
 	case COE_SDO_INFO:
-		coe_sdo_info(data, datalen);
+		coe_sdo_info(ecs, data, datalen);
 		break;
 	}
 }

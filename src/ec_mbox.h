@@ -52,12 +52,11 @@ static inline mbox_header *__mbox_hdr(uint8_t* data)
 	return (mbox_header *)&data[0];
 }
 
-typedef struct {
-	void (*state)(uint8_t* data,int datalen);
-}fsm_mbox;
 
-void mbox_set_state(void (*state)(uint8_t* data,int datalen));
+void mbox_set_state(e_slave*,
+	void (*state)(e_slave*, uint8_t*,int ));
+
 void ec_mbox_syncm(int reg, uint8_t* data, int datalen);
-void ec_mbox(int reg, uint8_t * data, int datalen);
+void ec_mbox(e_slave* ecs, int reg, uint8_t * data, int datalen);
 
 #endif
