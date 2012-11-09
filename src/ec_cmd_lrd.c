@@ -6,7 +6,6 @@
 #include "ec_regs.h"
 #include "ec_process_data.h"
 
-uint8_t x = 0;
  /** Logical Read Write */
 void ec_cmd_lrd(e_slave *ecs, uint8_t *dgram_ec)
 {
@@ -14,8 +13,9 @@ void ec_cmd_lrd(e_slave *ecs, uint8_t *dgram_ec)
 	uint8_t *data = __ec_dgram_data(dgram_ec);
 	uint32_t offset = __ec_dgram_laddr(dgram_ec);
 	
-	get_process_data(data, offset,datalen);
-
+	get_process_data(data, offset, datalen);
+	//printf("%s %c offset %d datalen=%d\n",
+	//	__FUNCTION__,data[0],offset, datalen);
 	__ec_inc_wkc__(dgram_ec);
   	__set_fsm_state(ecs, ecs_process_next_dgram);
 }
