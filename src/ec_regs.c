@@ -29,8 +29,8 @@ void ec_init_regs(e_slave* esv)
 	ec_registers[ECT_BASE_REVISION] = 0x11;	/* base revision. 1byte */
 	ec_registers[ECT_BASE_BUILD1] = 0x01;	/* base build .2bytes   */
 	ec_registers[ECT_BASE_BUILD2] = 0x22;
-	ec_registers[ECT_BASE_FMMUS] = 0x0;	/* base fmmu count 1byte */
-	ec_registers[ECT_BASE_SYNCM] = 0x0;	/* base sync count 1byte */
+	ec_registers[ECT_BASE_FMMUS] = 0x2;	/* base fmmu count 1byte */
+	ec_registers[ECT_BASE_SYNCM] = 0x2;	/* base sync count 1byte */
 	ec_registers[ECT_REG_PORTDES] = 0x000F;	/* octet 1      0x000F one port. mii */
 	ec_registers[ECT_REG_STADR] = 0x07;
 

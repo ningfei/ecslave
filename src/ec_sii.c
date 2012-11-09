@@ -142,8 +142,10 @@ typedef struct {
 	uint8_t syncm_type;
 } category_syncm;
 
-typedef uint16_t category_fmmu;
-category_fmmu fmmu;
+typedef struct __attribute__ ((packed)) {
+	uint8_t fmmu0;
+	uint8_t fmmu1;
+} category_fmmu;
 
 typedef struct {
 	uint8_t groupd_idx;	/*index to strings  */
@@ -350,7 +352,8 @@ void init_fmmu(category_fmmu *fmmu,category_header *hdr)
 	}
 
 	hdr->type = CAT_TYPE_FMMU;
-	fmmu = 0;	// fmmmu not used
+	fmmu->fmmu0 = 0x1; // outputs
+	fmmu->fmmu1 = 0x2; // inputs
 }
 
 void init_end_hdr(category_header * hdr)
