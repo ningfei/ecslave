@@ -30,9 +30,6 @@ static ec_master_state_t master_state = {};
 static ec_domain_t *domain1 = NULL;
 static ec_domain_state_t domain1_state = {};
 
-static ec_slave_config_t *sc_ana_in = NULL;
-static ec_slave_config_state_t sc_ana_in_state = {};
-
 // Timer
 static unsigned int sig_alarms = 0;
 static unsigned int user_alarms = 0;
@@ -42,22 +39,17 @@ static unsigned int user_alarms = 0;
 // process data
 static uint8_t *domain1_pd = NULL;
 
-#define BusCouplerPos  0, 0
-#define DigOutSlavePos 0, 2
-#define AnaInSlavePos  0, 3
-#define AnaOutSlavePos 0, 4
+#define AnaInSlavePos 0, 0
 
 #define LIBIX_VP 0x000001ee, 0x0000000e /* LIBIX_VP = VENDOR PRODUCT */
 
 // offsets for PDO entries
-static unsigned int off_ana_in_status;
-static unsigned int off_ana_in_value;
-static unsigned int off_ana_out;
-static unsigned int off_dig_out;
+static unsigned int off_ana_in = -1;
+static unsigned int off_ana_out = -1;
 
 const static ec_pdo_entry_reg_t domain1_regs[] = {
-    {AnaInSlavePos,  LIBIX_VP, 0x1614,0x02, &off_ana_in_status},
-    {AnaInSlavePos,  LIBIX_VP, 0x1748,0x01, &off_ana_in_value},
+    {AnaInSlavePos,  LIBIX_VP, 0x1a00,0x02, &off_ana_out},
+    {AnaInSlavePos,  LIBIX_VP, 0x1600,0x02, &off_ana_in},
     {}
 };
 
@@ -66,30 +58,45 @@ static unsigned int blink = 0;
 
 /*****************************************************************************/
 
-
-/* Master 0, Slave 0, "LIBIX_VP ORDER"
+/* Master 0, Slave 0, "LIBIX ORDER"
  * Vendor ID:       0x000001ee
  * Product code:    0x0000000e
  * Revision number: 0x00000012
  */
 
 ec_pdo_entry_info_t slave_0_pdo_entries[] = {
-    {0x1614, 0x02, 8}, /* RXPDO1 LIBIX_VP */
-    {0x1748, 0x01, 32}, /* RXPDO1 LIBIX_VP */
-    {0x1a01, 0x02, 32}, /* LIBIX_VP ORDER */
-    {0x1a03, 0x01, 16}, /* LIBIX_VP ORDER */
+    {0x1600, 0x02, 8}, /* RXPDO1 LIBIX */
+    {0x1600, 0x01, 32}, /* RXPDO2 LIBIX */
+    {0x1a00, 0x02, 32}, /* TXPDO1 LIBIX */
+    {0x1a00, 0x01, 16}, /* TXPDO2 LIBIX */
 };
 
 ec_pdo_info_t slave_0_pdos[] = {
-    {0x1600, 2, slave_0_pdo_entries + 0}, /* LIBIX_VP ORDER */
-    {0x1a00, 2, slave_0_pdo_entries + 2}, /* LIBIX_VP ORDER */
+    {0x1600, 2, slave_0_pdo_entries + 0}, /* LIBIX RX PDO */
+    {0x1a00, 2, slave_0_pdo_entries + 2}, /* LIBIX TX PDO */
 };
 
 ec_sync_info_t slave_0_syncs[] = {
-    {0, EC_DIR_INPUT, 1, slave_0_pdos + 0, EC_WD_DISABLE},
+    {0, EC_DIR_OUTPUT, 1, slave_0_pdos + 0, EC_WD_DISABLE},
     {1, EC_DIR_INPUT, 1, slave_0_pdos + 1, EC_WD_DISABLE},
     {0xff}
 };
+
+/*****************************************************************************/
+
+void check_domain1_state(void)
+{
+    ec_domain_state_t ds;
+
+    ecrt_domain_state(domain1, &ds);
+
+    if (ds.working_counter != domain1_state.working_counter)
+        printf("Domain1: WC %u.\n", ds.working_counter);
+    if (ds.wc_state != domain1_state.wc_state)
+        printf("Domain1: State %u.\n", ds.wc_state);
+
+    domain1_state = ds;
+}
 
 void cyclic_task()
 {
@@ -98,7 +105,8 @@ void cyclic_task()
     // receive process data
     ecrt_master_receive(master);
     ecrt_domain_process(domain1);
-
+    
+    check_domain1_state();
     if (counter) {
         counter--;
     } else { // do this at 1 Hz
@@ -106,18 +114,14 @@ void cyclic_task()
         // calculate new process data
         blink = !blink;
     }
-#if 0
     // read process data
-    printf("AnaIn: state %u value %u\n",
-            EC_READ_U8(domain1_pd + off_ana_in_status),
-            EC_READ_U16(domain1_pd + off_ana_in_value));
-#endif
-
-#if 1
+    printf("AnaIn: value %x\n",
+            EC_READ_U8(domain1_pd + off_ana_in));
+           
     // write process data
-    EC_WRITE_U8(domain1_pd + off_dig_out, blink ? 0x06 : 0x09);
-#endif
-
+    for ( i = 0 ; i < 10; i++) {
+    	EC_WRITE_U8(domain1_pd , 1);
+    }
     // send process data
     ecrt_domain_queue(domain1);
     ecrt_master_send(master);
@@ -146,21 +150,15 @@ int main(int argc, char **argv)
     if (!domain1)
         return -1;
 
-    if (!(sc_ana_in = ecrt_master_slave_config(
+    if (!(sc = ecrt_master_slave_config(
                     master, AnaInSlavePos, LIBIX_VP))) {
         fprintf(stderr, "Failed to get slave configuration.\n");
         return -1;
     }
 
     printf("Configuring PDOs...\n");
-    if (ecrt_slave_config_pdos(sc_ana_in, EC_END, slave_0_syncs)) {
+    if (ecrt_slave_config_pdos(sc, EC_END, slave_0_syncs)) {
         fprintf(stderr, "Failed to configure PDOs.\n");
-        return -1;
-    }
-
-    if (!(sc = ecrt_master_slave_config(
-                    master, AnaOutSlavePos, LIBIX_VP))) {
-        fprintf(stderr, "Failed to get slave configuration.\n");
         return -1;
     }
 
@@ -194,6 +192,9 @@ int main(int argc, char **argv)
         fprintf(stderr, "Failed to start timer: %s\n", strerror(errno));
         return 1;
     }
+
+    printf("Offsets %d %d\n",off_ana_in,
+	off_ana_out);
 
     printf("Started.\n");
     while (1) {
