@@ -71,7 +71,7 @@ typedef struct {
 #define GROUP_STRING "LIBIX GROUP"
 #define IMAGE_STRING "LIBIX IMAGE"
 #define ORDER_STRING "LIBIX ORDER"
-#define NAME_STRING "LIBIX NAME"
+#define NAME_STRING "LIBIX LINUX VIRTUAL DRIVE"
 #define RXPDO_CAT_STRING "LIBIX RX PDO"
 #define TXPDO_CAT_STRING "LIBIX TX PDO"
 #define TX_PDO1_NAME "TXPDO1 LIBIX"
@@ -462,7 +462,7 @@ void init_si_info(ec_sii_t *sii)
 {
 	memset(sii,0x00,sizeof(*sii));
 
-	sii->alias = 0x04;
+	sii->alias = 0x00;
 	sii->vendor_id = 0x1ee;
 	sii->product_code = 0x0e;
 	sii->revision_number = 0x12;
@@ -499,8 +499,8 @@ void init_sii(void)
 	categories.rxpdo.syncm = 0;
 	categories.rxpdo.pdo_index = 0x1600;
 	
-	init_pdo(&categories.rxpdo.pdo[0], 0x1614, 0X02, RX_PDO1_NAME_IDX + 1, 0, 8, 0);
-	init_pdo(&categories.rxpdo.pdo[1], 0x1748, 0X01, RX_PDO2_NAME_IDX + 1, 0, 32, 0);
+	init_pdo(&categories.rxpdo.pdo[0], 0x1600, 0X02, RX_PDO1_NAME_IDX + 1, 0, 8, 0);
+	init_pdo(&categories.rxpdo.pdo[1], 0x1600, 0X01, RX_PDO2_NAME_IDX + 1, 0, 32, 0);
 
 	categories.txpdo_hdr.type = CAT_TYPE_TXPDO;
 	categories.txpdo.entries = 2;
@@ -511,8 +511,8 @@ void init_sii(void)
 	categories.txpdo.pdo_index = 0x1a00;
 	categories.txpdo_hdr.size = sizeof(categories.txpdo)/2;
 
-	init_pdo(&categories.txpdo.pdo[0], 0x1a01, 0X02, TX_PDO1_NAME_IDX + 1, 0, 32, 0);
-	init_pdo(&categories.txpdo.pdo[1], 0x1a03, 0X01, TX_PDO2_NAME_IDX + 1, 0, 16, 0);
+	init_pdo(&categories.txpdo.pdo[0], 0x1a00, 0X02, TX_PDO1_NAME_IDX + 1, 0, 32, 0);
+	init_pdo(&categories.txpdo.pdo[1], 0x1a00, 0X01, TX_PDO2_NAME_IDX + 1, 0, 16, 0);
 	init_hdr_dbg();
 }
 
