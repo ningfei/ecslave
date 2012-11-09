@@ -13,4 +13,6 @@ static inline void get_process_data(uint8_t * data, uint16_t offset, uint16_t da
 	memcpy(data, &process_data[offset], datalen);
 }
 
+void init_process_data(void);
+
 #endif
