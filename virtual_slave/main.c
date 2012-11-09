@@ -48,8 +48,8 @@ static unsigned int off_ana_in = -1;
 static unsigned int off_ana_out = -1;
 
 const static ec_pdo_entry_reg_t domain1_regs[] = {
-    {AnaInSlavePos,  LIBIX_VP, 0x1a00,0x02, &off_ana_out},
-    {AnaInSlavePos,  LIBIX_VP, 0x1600,0x02, &off_ana_in},
+    {AnaInSlavePos,  LIBIX_VP, 0x1a00, 0x02, &off_ana_out},
+    {AnaInSlavePos,  LIBIX_VP, 0x1600, 0x02, &off_ana_in},
     {}
 };
 
@@ -77,8 +77,8 @@ ec_pdo_info_t slave_0_pdos[] = {
 };
 
 ec_sync_info_t slave_0_syncs[] = {
-    {0, EC_DIR_OUTPUT, 1, slave_0_pdos + 0, EC_WD_DISABLE},
-    {1, EC_DIR_INPUT, 1, slave_0_pdos + 1, EC_WD_DISABLE},
+    {0, EC_DIR_INPUT, 1, slave_0_pdos + 0, EC_WD_DISABLE},
+    {1, EC_DIR_OUTPUT, 1, slave_0_pdos + 1, EC_WD_DISABLE},
     {0xff}
 };
 
@@ -109,19 +109,12 @@ void cyclic_task()
     check_domain1_state();
     if (counter) {
         counter--;
-    } else { // do this at 1 Hz
+    } else{ // do this at 1 Hz
         counter = FREQUENCY;
         // calculate new process data
         blink = !blink;
     }
-    // read process data
-    printf("AnaIn: value %x\n",
-            EC_READ_U8(domain1_pd + off_ana_in));
-           
-    // write process data
-    for ( i = 0 ; i < 10; i++) {
-    	EC_WRITE_U8(domain1_pd , 1);
-    }
+    EC_WRITE_U8(domain1_pd + off_ana_out , counter);
     // send process data
     ecrt_domain_queue(domain1);
     ecrt_master_send(master);
@@ -193,7 +186,8 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    printf("Offsets %d %d\n",off_ana_in,
+    printf("Offsets in=%d out=%d\n",
+	off_ana_in,
 	off_ana_out);
 
     printf("Started.\n");
