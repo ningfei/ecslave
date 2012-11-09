@@ -68,16 +68,16 @@ typedef struct {
 #define RX_PDO1_NAME_IDX	8
 #define RX_PDO2_NAME_IDX	9
 
-#define GROUP_STRING		"LIBIX GROUP"
-#define IMAGE_STRING		"LIBIX IMAGE"
-#define ORDER_STRING		"LIBIX ORDER"
-#define NAME_STRING			"LIBIX NAME"
-#define RXPDO_CAT_STRING	"LIBIX RX_PDO"
-#define TXPDO_CAT_STRING	"LIBIX TX_PDO"
-#define TX_PDO1_NAME		"TXPDO1	LIBIX"
-#define TX_PDO2_NAME		"TXPDO2 LIBIX"
-#define RX_PDO1_NAME		"RXPDO1 LIBIX"
-#define RX_PDO2_NAME		"RXPDO2 LIBIX"
+#define GROUP_STRING "LIBIX GROUP"
+#define IMAGE_STRING "LIBIX IMAGE"
+#define ORDER_STRING "LIBIX ORDER"
+#define NAME_STRING "LIBIX NAME"
+#define RXPDO_CAT_STRING "LIBIX RX PDO"
+#define TXPDO_CAT_STRING "LIBIX TX PDO"
+#define TX_PDO1_NAME "TXPDO1 LIBIX"
+#define TX_PDO2_NAME "TXPDO2 LIBIX"
+#define RX_PDO1_NAME "RXPDO1 LIBIX"
+#define RX_PDO2_NAME "RXPDO2 LIBIX"
 
 #define SDO_ENABLED 		0x001
 #define	SDO_INFO		0x002
@@ -95,18 +95,20 @@ typedef struct {
 #define STRING6	TX_PDO1_NAME
 #define STRING7 TX_PDO2_NAME
 #define STRING8 RX_PDO1_NAME
-#define STRING9 RX_PDO1_NAME
-
+#define STRING9 RX_PDO2_NAME
 #define NR_STRINGS  10
+
+#define __SIZEOF__(a) ( sizeof(a) + 1)
+
 #define PORT_MII	0x01
 #define PORT0_SHIFT	0
 #define NR_PDOS		2
 
-#define STRINGS_SIZE ( sizeof(STRING9) + \
-		sizeof(STRING8) + sizeof(STRING7) + sizeof(STRING6) \
-		+ sizeof(STRING5) + sizeof(STRING4) + sizeof(STRING3) \
-		+ sizeof(STRING2) + sizeof(STRING1) + sizeof(STRING0) \
-		+ (NR_STRINGS * sizeof(uint8_t)))
+#define STRINGS_SIZE ( __SIZEOF__( STRING9 ) + \
+		__SIZEOF__( STRING8 ) + __SIZEOF__ (STRING7) + __SIZEOF__ (STRING6)  \
+		+ __SIZEOF__(  STRING5) + __SIZEOF__( STRING4) + __SIZEOF__( STRING3) \
+		+ __SIZEOF__( STRING2) + __SIZEOF__( STRING1) + __SIZEOF__( STRING0) \
+		+ ((NR_STRINGS +1) * sizeof(uint8_t)))
 
 
 // table 25
@@ -162,27 +164,40 @@ typedef struct {
 	uint8_t pad_byte2[14];
 } category_general;
 
-typedef struct __category_strings__{
+typedef struct  __attribute__ ((packed))  __category_strings__{
 	uint8_t nr_strings;
+
+	uint8_t str0_len;
+	char str0[ __SIZEOF__ (STRING0) ];
+
 	uint8_t str1_len;
-	char str1[sizeof(STRING1)];
+	char str1[ __SIZEOF__ (STRING1)];
+
 	uint8_t str2_len;
-	char str2[sizeof(STRING2)];
+	char str2[__SIZEOF__ (STRING2)];
+
 	uint8_t str3_len;
-	char str3[sizeof(STRING3)];
+	char str3[__SIZEOF__ (STRING3)];
+
 	uint8_t str4_len;
-	char str4[sizeof(STRING4)];
+	char str4[__SIZEOF__ (STRING4)];
+
 	uint8_t str5_len;
-	char str5[sizeof(STRING5)];
+	char str5[__SIZEOF__ (STRING5)];
+
 	uint8_t str6_len;
-	char str6[sizeof(STRING6)];
+	char str6[__SIZEOF__ (STRING6)];
+
 	uint8_t str7_len;
-	char str7[sizeof(STRING7)];
+	char str7[__SIZEOF__ (STRING7)];
+
 	uint8_t str8_len;
-	char str8[sizeof(STRING8)];
+	char str8[__SIZEOF__ (STRING8)];
+
 	uint8_t str9_len;
-	char str9[sizeof(STRING9)];
-	uint8_t pad[(((STRINGS_SIZE)/2)*2 + 2) - STRINGS_SIZE];
+	char str9[__SIZEOF__ (STRING9)];
+
+	uint8_t pad[(STRINGS_SIZE % 2) +2];
 } category_strings;
 
 typedef struct {
@@ -258,10 +273,10 @@ void init_general(category_general * general,category_header * hdr)
 	hdr->type = CAT_TYPE_GENERAL;
 
 	memset(general, 0x00, sizeof(*general));
-	general->groupd_idx = GROUP_IDX;
-	general->img_idx = IMAGE_IDX;
-	general->order_idx = ORDER_IDX;
-	general->name_idx = NAME_IDX;
+	general->groupd_idx = GROUP_IDX+1;
+	general->img_idx = IMAGE_IDX+1;
+	general->order_idx = ORDER_IDX+1;
+	general->name_idx = NAME_IDX+1;
 
 	general->coe_details = SDO_ENABLED | SDO_INFO | PDO_ASSIGN
 	    | PDO_CONF | STARTUP_UPLOAD | SDO_COMPLETE_ACCESS;
@@ -290,13 +305,12 @@ void init_syncm(category_syncm *syncm,int index,category_header * hdr)
 	syncm->ctrl_reg = 0b00110010;
 	syncm->status_reg = 0b00001000; /*b1000 - 1-buf written,b0000 1-buf read */
 	syncm->enable_syncm = 0b01;
-	if (index % 2 ){
-		syncm->ctrl_reg |= 
+	if (index % 2){
 		syncm->phys_start_address = (uint16_t)categories.sii.std_tx_mailbox_offset; 
 		syncm->syncm_type = 0x03; /* 0x03 = out*/
 	}else{
-		syncm->syncm_type    = 0x04;
-		syncm->ctrl_reg |= 0x04;
+		syncm->syncm_type = 0x04;
+		syncm->ctrl_reg  |= 0x04;
 		syncm->phys_start_address = (uint16_t)categories.sii.std_rx_mailbox_offset; 
 	}
 }
@@ -350,40 +364,46 @@ void init_strings(category_strings * str, category_header * hdr)
 {
 	hdr->size = sizeof(*str) / 2;
 
-	if (sizeof(*str) %2){
-		ec_printf("ilegal size\n");
+	if (sizeof(*str) % 2){
+		printf("%s ilegal size %d %d\n",
+			__FUNCTION__,
+			sizeof(*str),
+			STRINGS_SIZE);
 		exit(0);
 	}
-	
+
 	str->nr_strings = NR_STRINGS;
 	hdr->type = CAT_TYPE_STRINGS;
 
-	str->str1_len = sizeof(STRING1);
-	strncpy(str->str1, STRING1, str->str1_len);
+	str->str0_len = __SIZEOF__(STRING0);
+	strcpy(str->str0, STRING0);
 
-	str->str2_len = sizeof(STRING2);
-	strncpy(str->str2, STRING2, str->str2_len);
+	str->str1_len = __SIZEOF__(STRING1);
+	strcpy(str->str1, STRING1);
 
-	str->str3_len = sizeof(STRING3);
-	strncpy(str->str3, STRING2, str->str3_len);
+	str->str2_len =  __SIZEOF__(STRING2);
+	strcpy(str->str2, STRING2);
 
-	str->str4_len = sizeof(STRING4);
-	strncpy(str->str4, STRING2, str->str4_len);
+	str->str3_len =  __SIZEOF__(STRING3);
+	strcpy(str->str3, STRING3);
 
-	str->str5_len = sizeof(STRING5);
-	strncpy(str->str5, STRING2, str->str5_len);
+	str->str4_len =  __SIZEOF__(STRING4);
+	strcpy(str->str4, STRING4);
 
-	str->str6_len = sizeof(STRING6);
-	strncpy(str->str6, STRING2, str->str6_len);
+	str->str5_len = __SIZEOF__(STRING5);
+	strcpy(str->str5, STRING5);
 
-	str->str7_len = sizeof(STRING7);
-	strncpy(str->str7, STRING2, str->str7_len);
+	str->str6_len =__SIZEOF__(STRING6);
+	strcpy(str->str6, STRING6);
 
-	str->str8_len = sizeof(STRING8);
-	strncpy(str->str8, STRING8, str->str8_len);
+	str->str7_len = __SIZEOF__(STRING7);
+	strcpy(str->str7, STRING7);
 
-	str->str9_len = sizeof(STRING9);
-	strncpy(str->str9, STRING9, str->str9_len);
+	str->str8_len = __SIZEOF__(STRING8);
+	strcpy(str->str8, STRING8);
+
+	str->str9_len =__SIZEOF__(STRING9);
+	strcpy(str->str9, STRING9);
 }
 
 void init_pdo(pdo_entry * pdo,
@@ -474,31 +494,25 @@ void init_sii(void)
 	categories.rxpdo_hdr.size = sizeof(categories.rxpdo)/2;
 	categories.rxpdo.entries = 2;
 	categories.rxpdo.flags = 0;
-	categories.rxpdo.name_idx = RXPDO_CAT_NAME_IDX;
+	categories.rxpdo.name_idx = RXPDO_CAT_NAME_IDX + 1;
 	categories.rxpdo.synchronization = 0;
 	categories.rxpdo.syncm = 0;
 	categories.rxpdo.pdo_index = 0x1600;
 	
-	init_pdo(&categories.rxpdo.pdo[0], 0x1614, 0X02, RX_PDO1_NAME_IDX, 0,
-		 8, 0);
-
-	init_pdo(&categories.rxpdo.pdo[1], 0x1748, 0X01, RX_PDO2_NAME_IDX, 0,
-		 32, 0);
+	init_pdo(&categories.rxpdo.pdo[0], 0x1614, 0X02, RX_PDO1_NAME_IDX + 1, 0, 8, 0);
+	init_pdo(&categories.rxpdo.pdo[1], 0x1748, 0X01, RX_PDO2_NAME_IDX + 1, 0, 32, 0);
 
 	categories.txpdo_hdr.type = CAT_TYPE_TXPDO;
 	categories.txpdo.entries = 2;
 	categories.txpdo.flags = 0;
-	categories.txpdo.name_idx = TXPDO_CAT_NAME_IDX;
+	categories.txpdo.name_idx = TXPDO_CAT_NAME_IDX  +1;
 	categories.txpdo.synchronization = 0;
 	categories.txpdo.syncm = 1;
 	categories.txpdo.pdo_index = 0x1a00;
 	categories.txpdo_hdr.size = sizeof(categories.txpdo)/2;
 
-	init_pdo(&categories.txpdo.pdo[0], 0x1a01, 0X02, TX_PDO1_NAME_IDX, 0,	// index in the object dictionary
-		 32, 0);
-
-	init_pdo(&categories.txpdo.pdo[1], 0x1a03, 0X01, TX_PDO2_NAME_IDX, 0,	// index in the object dictionary
-		 16, 0);
+	init_pdo(&categories.txpdo.pdo[0], 0x1a01, 0X02, TX_PDO1_NAME_IDX + 1, 0, 32, 0);
+	init_pdo(&categories.txpdo.pdo[1], 0x1a03, 0X01, TX_PDO2_NAME_IDX + 1, 0, 16, 0);
 	init_hdr_dbg();
 }
 
