@@ -7,6 +7,7 @@
 #include "ec_sii.h"
 #include "ec_regs.h"
 #include "ec_net.h"
+#include "ec_process_data.h"
 
 #define  WORKING_CNT_SIZE 2
 
@@ -170,11 +171,11 @@ void ecs_process_packet(e_slave * ecs, uint8_t *dgram_ec)
 		break;
 
 	case EC_CMD_LWR:
-		puts("Logical Memory Write");
+		puts("Logical Memory Write Read");
 		break;
 
 	case EC_CMD_LRW:
-		puts("Logical Memory Read Write");
+		__set_fsm_state(ecs, ec_cmd_lrw);
 		break;
 
 	case EC_CMD_ARMW:
@@ -216,7 +217,7 @@ int main(int argc, char *argv[])
 	}
 	ec_init_regs(&ecs);
 	init_sii();
-
+	init_process_data();
 	ecs.fsm = &fsm_slave;
 	ecs.dgram_processed = &ecs.pkt_head[0];
 	ecs.dgrams_cnt = 0;
