@@ -287,14 +287,18 @@ void init_syncm(category_syncm *syncm,int index,category_header * hdr)
 	hdr->type = CAT_TYPE_SYNCM;
 
 	syncm->length = SYNMC_SIZE;
-	syncm->ctrl_reg = 0b00110010;  
+	syncm->ctrl_reg = 0b00110010;
 	syncm->status_reg = 0b00001000; /*b1000 - 1-buf written,b0000 1-buf read */
 	syncm->enable_syncm = 0b01;
-	syncm->syncm_type = index % 2 ? 0x03:0x04; /* 0x03 = out*/
-	syncm->phys_start_address = (long)categories.sii.std_tx_mailbox_offset; 
-	if(syncm->syncm_type == 0x04)
-		syncm->phys_start_address = (long)categories.sii.std_rx_mailbox_offset; 
-	
+	if (index % 2 ){
+		syncm->ctrl_reg |= 
+		syncm->phys_start_address = (uint16_t)categories.sii.std_tx_mailbox_offset; 
+		syncm->syncm_type = 0x03; /* 0x03 = out*/
+	}else{
+		syncm->syncm_type    = 0x04;
+		syncm->ctrl_reg |= 0x04;
+		syncm->phys_start_address = (uint16_t)categories.sii.std_rx_mailbox_offset; 
+	}
 }
 
 void toggle_rw_bit(category_syncm *syncm)
