@@ -81,6 +81,7 @@ void ec_cmd_brw(e_slave * slave,  uint8_t *ecdgram);
 void ec_cmd_brd(e_slave * slave,  uint8_t *ecdgram);
 void ec_cmd_nop(e_slave * slave,  uint8_t *ecdgram);
 void ec_cmd_lrd(e_slave * slave,  uint8_t *ecdgram);
+void ec_cmd_lrw(e_slave * slave,  uint8_t *ecdgram);
 
 void ecs_process_next_dgram(e_slave * slave,  uint8_t *ecdgram);
 
