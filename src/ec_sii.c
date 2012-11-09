@@ -308,12 +308,12 @@ void init_syncm(category_syncm *syncm,int index,category_header * hdr)
 	syncm->status_reg = 0b00001000; /*b1000 - 1-buf written,b0000 1-buf read */
 	syncm->enable_syncm = 0b01;
 	if (index % 2){
-		syncm->phys_start_address = (uint16_t)categories.sii.std_tx_mailbox_offset; 
-		syncm->syncm_type = 0x03; /* 0x03 = out*/
-	}else{
 		syncm->syncm_type = 0x04;
 		syncm->ctrl_reg  |= 0x04;
 		syncm->phys_start_address = (uint16_t)categories.sii.std_rx_mailbox_offset; 
+	}else{
+		syncm->phys_start_address = (uint16_t)categories.sii.std_tx_mailbox_offset; 
+		syncm->syncm_type = 0x03; /* 0x03 = out*/
 	}
 }
 
