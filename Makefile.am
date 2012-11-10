@@ -9,7 +9,8 @@ src/ec_cmd_lrw.c \
 src/ec_cmd_lrd.c \
 src/ec_sii.c \
 src/ec_regs.c \
-src/ecs_slave.c \
+src/ec_slave.c \
+src/ec_com.c \
 src/ec_net.c \
 src/ec_coe.c \
 src/ec_mbox.c \

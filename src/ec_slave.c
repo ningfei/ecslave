@@ -8,44 +8,9 @@
 #include "ec_regs.h"
 #include "ec_net.h"
 #include "ec_process_data.h"
+#include "ec_com.h"
 
 #define  WORKING_CNT_SIZE 2
-
-void raw_ecs_tx_packet(e_slave * ecs)
-{
-	int i;
-	int bytes;
-	struct ether_header *eh = (struct ether_header *)&ecs->pkt_head[0];
-	struct sockaddr_ll socket_address = { 0 };
-	ec_interface *intr = ec_tx_interface(ecs);
-
-	for (i = 0; i < ETH_ALEN; i++) {
-		intr->mac.ether_dhost[i] = 0xFF;
-	}
-	intr->mac.ether_type = htons(ETHERCAT_TYPE);
-	socket_address.sll_family = PF_PACKET;
-	socket_address.sll_protocol = 0;
-	socket_address.sll_ifindex = intr->index;
-	socket_address.sll_hatype = htons(ETHERCAT_TYPE);
-	socket_address.sll_pkttype = PACKET_BROADCAST;
-	socket_address.sll_halen = ETH_ALEN;
-
-	memcpy(socket_address.sll_addr, intr->mac.ether_dhost, ETH_ALEN);
-	memcpy(eh->ether_shost,
-	       &intr->mac.ether_shost, 
-		sizeof(intr->mac.ether_shost));
-	eh->ether_type = htons(ETHERCAT_TYPE);
-
-	bytes = sendto(intr->sock,
-		       ecs->pkt_head,
-		       ecs->pkt_size, 0,
-		       (struct sockaddr *)&socket_address,
-		       (socklen_t) sizeof(socket_address));
-
-	if (bytes < 0) {
-		perror("tx packet: ");
-	}
-}
 
 void ecs_tx_packet(e_slave * ecs,uint8_t *d)
 {
@@ -79,46 +44,6 @@ int  ec_nr_dgrams(uint8_t *raw_pkt)
 		printf("aieeee %d %d\n",frame_size,f);
 	}
 	return i;
-}
-
-void raw_ecs_rx_packet(e_slave* slave)
-{
-	int flags = 0;
-	ec_interface *intr = ec_rx_interface(slave);
-	unsigned int addr_size = sizeof(intr->m_addr);
-
-	while (1) {
-		memset(slave->pkt_head, 0, sizeof(slave->pkt_head));
-		slave->pkt_size = recvfrom(intr->sock,
-					   (void *)&slave->pkt_head,
-					   sizeof(slave->pkt_head), flags,
-					   (struct sockaddr *)&intr->m_addr,
-					   &addr_size);
-
-		if (slave->pkt_size < 0) {
-			perror("");
-			continue;
-		}
-		if (!__ec_is_ethercat(slave->pkt_head)) {
-			continue;
-		}
-		/* we might get the packet we just sent */
-		if (!memcmp(__ec_get_shost(slave->pkt_head),
-					intr->mac.ether_shost,
-					sizeof(intr->mac.ether_shost)) ){
-			continue;
-		}
-		break;
-	}
-	// grab first ecat dgram
-	slave->dgram_processed =  __ecat_frameheader(slave->pkt_head) + sizeof(ec_frame_header);
-	slave->dgrams_cnt = ec_nr_dgrams(slave->pkt_head);
-	__set_fsm_state(slave, ecs_process_packet);
-}
-
-void ecs_rx_packet(e_slave *ecs,uint8_t *d)
-{
-	raw_ecs_rx_packet(ecs);
 }
 
 void ecs_process_packet(e_slave * ecs, uint8_t *dgram_ec)
@@ -198,6 +123,18 @@ void ecs_run(e_slave *ecs)
 	}
 }
 
+void ecs_rx_packet(e_slave *ecs,uint8_t *d)
+{
+	do{
+		raw_ecs_rx_packet(ecs);
+	} while (!__ec_is_ethercat(ecs->pkt_head));
+
+	// grab first ecat dgram
+	ecs->dgram_processed =  __ecat_frameheader(ecs->pkt_head) + sizeof(ec_frame_header);
+	ecs->dgrams_cnt = ec_nr_dgrams(ecs->pkt_head);
+	__set_fsm_state(ecs, ecs_process_packet);
+}
+
 int main(int argc, char *argv[])
 {
 	struct fsm_slave fsm_slave;
@@ -226,3 +163,4 @@ int main(int argc, char *argv[])
 	ecs_run(&ecs);
 	return 0;
 }
+
