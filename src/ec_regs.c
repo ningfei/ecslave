@@ -53,6 +53,47 @@ void ec_init_regs(e_slave* esv)
 	}
 }
 
+/*
+  0x0981.0 Activate Cyclic Operation
+  0x0981.1 Activate SYNC0
+  0x0981.2 Activate SYNC1
+*/
+uint32_t ec_cyclic_activation(void)
+{
+//	uint16_t *pdi_control = (uint16_t *)&ec_registers[ECT_REG_PDICTL];
+//	return *pdi_control & 0x0C00;
+	return ec_registers[ECT_REG_DCSYNCACT] & 0b001;
+}
+
+uint32_t ec_cylic_activation_sync0(void)
+{
+	return ec_registers[ECT_REG_DCSYNCACT] & 0b010;
+}
+
+uint64_t ec_system_time_offset(void)
+{
+	uint64_t *p = (uint64_t *)&ec_registers[ECT_REG_DCSYSOFFSET];
+	return *p;
+}
+
+uint32_t ec_get_cyclic_length(void)
+{
+	uint32_t *p = (uint32_t *)&ec_registers[ECT_REG_DCCYCLE0];
+	return *p;
+}
+
+uint64_t ec_get_sync(int port)
+{
+	uint64_t *p = (uint64_t *)&ec_registers[ECT_REG_DCSTART0];
+	return *p;
+}
+
+uint32_t ec_recieve_time(int port)
+{
+	uint32_t *p = (uint32_t *)&ec_registers[ECT_REG_DCTIME0 + port * 4];
+	return *p;
+}
+
 int16_t ec_station_address(void)
 {
 	return ec_registers[ECT_REG_STADR];
@@ -71,6 +112,9 @@ void ec_raw_set_ado(e_slave *ecs, int reg, uint8_t * data, int datalen)
 	if (reg == ECT_REG_ALCTL){
 		memcpy(&ec_registers[ECT_REG_ALSTAT], data, datalen);
 	}
+	if (reg == ECT_REG_DCTIME0){
+		ecs->trigger_latch = 1;
+	} 
 }
 
 void ec_raw_get_ado(e_slave *ecs, int reg, uint8_t * data, int datalen)

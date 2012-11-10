@@ -59,7 +59,7 @@ typedef struct __e_slave__ {
 	uint8_t *dgram_processed; /* current ethercat dgram processed */
 	uint8_t dgrams_cnt;
 	int pkt_size;
-
+	int trigger_latch;
 	int interfaces_nr;
 	ec_interface* intr[EC_MAX_PORTS];
 	struct fsm_slave *fsm;	/* finite state machine */
