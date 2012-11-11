@@ -20,14 +20,11 @@ void ec_cmd_apwr(e_slave *ecs, uint8_t *dgram_ec)
 	uint8_t *data = __ec_dgram_data(dgram_ec);
 
 	adp = __ec_dgram_adp(dgram_ec);
-	printf("%s ADP = %d\n", __FUNCTION__, adp);
 	ado = __ec_dgram_ado(dgram_ec);
-	( (ec_dgram *) dgram_ec)->adp++;	/* each slave ++ in APWR */
-	__ec_inc_wkc__(dgram_ec);
-	// should check if i am addressed
+	if(adp != 0)
+		goto APWR_OUT; 
 	{
 		uint16_t datalen = __ec_dgram_dlength(dgram_ec);
-
 		uint8_t val[datalen];
 
 		ec_raw_get_ado(ecs, ado, &val[0], datalen);
@@ -38,5 +35,8 @@ void ec_cmd_apwr(e_slave *ecs, uint8_t *dgram_ec)
 		       ado,
 		       val[0], val[1]);
 	}
+APWR_OUT:
+	__ec_inc_wkc__(dgram_ec);
+	( (ec_dgram *) dgram_ec)->adp++;	/* each slave ++ in APWR */
 	__set_fsm_state(ecs, ecs_process_next_dgram);
 }
