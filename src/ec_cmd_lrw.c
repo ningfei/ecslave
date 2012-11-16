@@ -6,16 +6,6 @@
 #include "ec_regs.h"
 #include "ec_process_data.h"
 
-void ec_dump_string(uint8_t *c,int len)
-{
-	int i ;
-
-	for  (i = 0 ; i < len ; i++){
-		printf("%02X ", c[i]);
-	}
-	puts("");
-}
-
 /** Logical Read Write */
 void ec_cmd_lrw(e_slave * ecs,uint8_t *dgram_ec)
 {
@@ -24,9 +14,10 @@ void ec_cmd_lrw(e_slave * ecs,uint8_t *dgram_ec)
 	uint32_t offset = __ec_dgram_laddr(dgram_ec);
 	uint8_t temp[datalen];
 
-	get_process_data(temp, offset, datalen);
-	set_process_data(data, offset, datalen);
-	memcpy(data, temp, datalen);
+	if ( !get_process_data(temp, offset, datalen) ) {
+		set_process_data(data, offset, datalen);
+		memcpy(data, temp, datalen);
+	}
 #ifdef __MAKE_DEBUG__
 	ec_dump_string(data, datalen);
 #endif
