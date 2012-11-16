@@ -1,5 +1,4 @@
-#include <string.h>
-#include <stdio.h>
+#include "std.h"
 #include "ethercattype.h"
 #include "ec_process_data.h"
 

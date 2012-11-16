@@ -1,9 +1,4 @@
-#include <stdio.h>
-#include <arpa/inet.h>
-#include <string.h>
-#include <net/ethernet.h>
-#include <time.h>
-
+#include "std.h"
 #include "ethercattype.h"
 #include "ecs_slave.h"
 #include "ec_net.h"
