@@ -127,8 +127,11 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 	ec_init_regs(&ecs);
-	init_sii();
-	init_process_data();
+	init_sii(&ecs);
+	if (init_process_data(&ecs) < 0){
+		printf ("%s illegal pdo configuration\n",argv[0]);
+		return -1;
+	}
 	ecs.fsm = &fsm_slave;
 	ecs.dgram_processed = &ecs.pkt_head[0];
 	ecs.dgrams_cnt = 0;

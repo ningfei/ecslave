@@ -423,44 +423,6 @@ void init_pdo(pdo_entry * pdo,
 	pdo->subindex = subindex;
 }
 
-void init_hdr_dbg()
-{
-	int cat_off =0;
-	ec_printf("sz = category pdo = %u\n",sizeof(category_pdo));
-
-	ec_printf("%s sizes sii %u str=%d gen=%d "
-			"tx=%d rx=%d fm=%d sync=%d end=%u\n",	__FUNCTION__,
-			sizeof(categories.sii),
-			categories.strings_hdr.size,
-			categories.general_hdr.size,
-			categories.txpdo_hdr.size,
-			categories.rxpdo_hdr.size,
-			categories.fmmu_hdr.size,
-			categories.syncm_hdr0.size,
-			categories.endhdr.size);
-
-	cat_off = (uint8_t *)&categories.general_hdr - (uint8_t *) &categories.sii;
-	ec_printf("%s offset =%d\n",__FUNCTION__,cat_off/2);
-
-	cat_off = (uint8_t *)&categories.txpdo_hdr - (uint8_t *) &categories.sii;
-	ec_printf("%s offset =%d\n",__FUNCTION__,cat_off/2);
-
-	cat_off = (uint8_t *)&categories.rxpdo_hdr - (uint8_t *) &categories.sii;
-	ec_printf("%s offset =%d\n",__FUNCTION__,cat_off/2);
-
-	cat_off = (uint8_t *)&categories.fmmu_hdr - (uint8_t *) &categories.sii;
-	ec_printf("%s offset =%d\n",__FUNCTION__,cat_off/2);
-
-	cat_off = (uint8_t *)&categories.syncm_hdr0 - (uint8_t *) &categories.sii;
-	ec_printf("%s offset =%d\n",__FUNCTION__,cat_off/2);
-
-	cat_off = (uint8_t *)&categories.syncm_hdr1 - (uint8_t *) &categories.sii;
-	ec_printf("%s offset =%d\n",__FUNCTION__,cat_off/2);
-
-	cat_off = (uint8_t *)&categories.endhdr - (uint8_t *) &categories.sii;
-	ec_printf("%s offset =%d\n",__FUNCTION__,cat_off/2);
-}
-
 void init_si_info(ec_sii_t *sii)
 {
 	memset(sii,0x00,sizeof(*sii));
@@ -482,8 +444,11 @@ void init_si_info(ec_sii_t *sii)
 	sii->mailbox_protocols = EC_MBOX_COE;
 }
 
-void init_sii(void)
+/* slave information interface */
+void init_sii(e_slave *esc)
 {
+	int pdoe_idx = 0;
+
 	init_si_info(&categories.sii);
 	init_strings(&categories.strings, &categories.strings_hdr);
 	init_fmmu(&categories.fmmu, &categories.fmmu_hdr);
@@ -491,7 +456,7 @@ void init_sii(void)
 	init_syncm(&categories.syncm1, 1 ,&categories.syncm_hdr1);
 	init_general(&categories.general, &categories.general_hdr);
 	init_end_hdr(&categories.endhdr);
-
+	
 	// pdos
 	categories.rxpdo_hdr.type = CAT_TYPE_RXPDO;
 	categories.rxpdo_hdr.size = sizeof(categories.rxpdo)/2;
@@ -503,7 +468,9 @@ void init_sii(void)
 	categories.rxpdo.pdo_index = 0x1600;
 	
 	init_pdo(&categories.rxpdo.pdo[0], 0x1600, 0X02, RX_PDO1_NAME_IDX + 1, 0, 8, 0);
+	esc->pdoe_sizes[pdoe_idx++] = 8;
 	init_pdo(&categories.rxpdo.pdo[1], 0x1600, 0X01, RX_PDO2_NAME_IDX + 1, 0, 32, 0);
+	esc->pdoe_sizes[pdoe_idx++]  = 32;
 
 	categories.txpdo_hdr.type = CAT_TYPE_TXPDO;
 	categories.txpdo.entries = 2;
@@ -515,8 +482,9 @@ void init_sii(void)
 	categories.txpdo_hdr.size = sizeof(categories.txpdo)/2;
 
 	init_pdo(&categories.txpdo.pdo[0], 0x1a00, 0X02, TX_PDO1_NAME_IDX + 1, 0, 32, 0);
+	esc->pdoe_sizes[pdoe_idx++]  = 32;
 	init_pdo(&categories.txpdo.pdo[1], 0x1a00, 0X01, TX_PDO2_NAME_IDX + 1, 0, 16, 0);
-	init_hdr_dbg();
+	esc->pdoe_sizes[pdoe_idx++]  = 16;
 }
 
 void (*sii_command)(int offset, int datalen, uint8_t * data) = 0;
@@ -568,3 +536,15 @@ int ec_sii_start_read(uint8_t * data, int datalen)
 
 	return 0;
 }
+
+int ec_sii_pdoes_sizes(e_slave *ecs)
+{
+	int i = 0;
+	int size_bits = 0;
+
+	for (; i < TOT_PDOS; i++){
+		size_bits += ecs->pdoe_sizes[i];
+	}
+	return size_bits>>3;
+}
+

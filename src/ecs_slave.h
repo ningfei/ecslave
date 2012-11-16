@@ -53,6 +53,8 @@ typedef struct {
 	uint8_t obj_subindex;
 }fsm_coe; 
 
+#define TOT_PDOS	4 /* change when change pdo entries number */
+
 typedef struct __e_slave__ {
 	
 	uint8_t *pkt_head;
@@ -62,7 +64,7 @@ typedef struct __e_slave__ {
 	int trigger_latch;
 	int interfaces_nr;
 	ec_interface* intr[EC_MAX_PORTS];
-//	ec_interface* current_intr;
+	int pdoe_sizes[TOT_PDOS]; /* description array of pdos sizes */
 	struct fsm_slave *fsm;	/* finite state machine */
 	fsm_coe  coe;
 	fsm_mbox mbox;

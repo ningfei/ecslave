@@ -2,20 +2,44 @@
 #include <stdio.h>
 #include "ethercattype.h"
 #include "ec_process_data.h"
+#include "ecs_slave.h"
+#include "ec_sii.h"
 
-uint8_t process_data[66500];
+typedef struct {
+	uint8_t* data;
+	int size;
+}process_data;
 
-void init_process_data(void)
+static process_data pd;
+
+int init_process_data(e_slave *ecs)
 {
-	memset(process_data, 'x', sizeof(process_data));
+	pd.size = ec_sii_pdoes_sizes(ecs);
+	if (pd.size <= 0 ){
+		return -1;
+	}	
+	pd.data = malloc(pd.size);
+	memset(pd.data, 'x', pd.size);
+	printf("Process data size = %d\n",pd.size);
+	return 0;
 }
 
-void set_process_data(uint8_t *data, uint16_t offset, uint16_t datalen)
+int set_process_data(uint8_t *data, uint16_t offset, uint16_t datalen)
 {
-	memcpy(&process_data[offset], data, datalen);
+	if (offset + datalen > pd.size) {
+		printf("%s ilegal pd access\n",__FUNCTION__);
+		return -1;
+	}
+	memcpy(&pd.data[offset], data, datalen);
+	return 0;
 }
 
-void get_process_data(uint8_t * data, uint16_t offset, uint16_t datalen)
+int get_process_data(uint8_t * data, uint16_t offset, uint16_t datalen)
 {
-	memcpy(data, &process_data[offset], datalen);
+	if (offset + datalen > pd.size) {
+		printf("%s ilegal pd access\n",__FUNCTION__);
+		return -1;
+	}
+	memcpy(data, &pd.data[offset], datalen);
+	return 0;
 }

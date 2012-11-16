@@ -1,9 +1,10 @@
 #ifndef  __EC_PROCESS_DATA_H__
 #define  __EC_PROCESS_DATA_H__
 
-extern uint8_t process_data[];
-void set_process_data(uint8_t * data, uint16_t offset, uint16_t datalen);
-void get_process_data(uint8_t * data, uint16_t offset, uint16_t datalen);
-void init_process_data(void);
+struct __e_slave__ ;
+
+int set_process_data(uint8_t * data, uint16_t offset, uint16_t datalen);
+int get_process_data(uint8_t * data, uint16_t offset, uint16_t datalen);
+int init_process_data(struct __e_slave__ *);
 
 #endif
