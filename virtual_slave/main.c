@@ -10,7 +10,7 @@
 /****************************************************************************/
 
 #include "ecrt.h"
-
+#include "slaves.h"
 /****************************************************************************/
 
 // Application parameters
@@ -39,48 +39,26 @@ static unsigned int user_alarms = 0;
 // process data
 static uint8_t *domain1_pd = NULL;
 
-#define AnaInSlavePos 0, 0
+#define AnaInSlavePos1 0, 0
+#define AnaInSlavePos2 0, 1
 
 #define LIBIX_VP 0x000001ee, 0x0000000e /* LIBIX_VP = VENDOR PRODUCT */
 
 // offsets for PDO entries
-static unsigned int off_ana_in = -1;
-static unsigned int off_ana_out = -1;
+
+static unsigned int off_ana_in[2]={-1};
+static unsigned int off_ana_out[2]={-1};
 
 const static ec_pdo_entry_reg_t domain1_regs[] = {
-    {AnaInSlavePos,  LIBIX_VP, 0x1a00, 0x02, &off_ana_out},
-    {AnaInSlavePos,  LIBIX_VP, 0x1600, 0x02, &off_ana_in},
+    {AnaInSlavePos1,  LIBIX_VP, 0x1a00, 0x02, &off_ana_out[0]},
+    {AnaInSlavePos2,  LIBIX_VP, 0x1600, 0x02, &off_ana_in[0]},
+    {AnaInSlavePos1,  LIBIX_VP, 0x1a00, 0x02, &off_ana_out[1]},
+    {AnaInSlavePos2,  LIBIX_VP, 0x1600, 0x02, &off_ana_in[1]},
     {}
 };
 
 static unsigned int counter = 0;
 static unsigned int blink = 0;
-
-/*****************************************************************************/
-
-/* Master 0, Slave 0, "LIBIX ORDER"
- * Vendor ID:       0x000001ee
- * Product code:    0x0000000e
- * Revision number: 0x00000012
- */
-
-ec_pdo_entry_info_t slave_0_pdo_entries[] = {
-    {0x1600, 0x02, 8}, /* RXPDO1 LIBIX */
-    {0x1600, 0x01, 32}, /* RXPDO2 LIBIX */
-    {0x1a00, 0x02, 32}, /* TXPDO1 LIBIX */
-    {0x1a00, 0x01, 16}, /* TXPDO2 LIBIX */
-};
-
-ec_pdo_info_t slave_0_pdos[] = {
-    {0x1600, 2, slave_0_pdo_entries + 0}, /* LIBIX RX PDO */
-    {0x1a00, 2, slave_0_pdo_entries + 2}, /* LIBIX TX PDO */
-};
-
-ec_sync_info_t slave_0_syncs[] = {
-    {0, EC_DIR_INPUT, 1, slave_0_pdos + 0, EC_WD_DISABLE},
-    {1, EC_DIR_OUTPUT, 1, slave_0_pdos + 1, EC_WD_DISABLE},
-    {0xff}
-};
 
 /*****************************************************************************/
 
@@ -100,8 +78,6 @@ void check_domain1_state(void)
 
 void cyclic_task()
 {
-    int i;
-
     // receive process data
     ecrt_master_receive(master);
     ecrt_domain_process(domain1);
@@ -114,7 +90,11 @@ void cyclic_task()
         // calculate new process data
         blink = !blink;
     }
-    EC_WRITE_U8(domain1_pd + off_ana_out , counter);
+    EC_WRITE_U8(domain1_pd + off_ana_out[0] , counter);
+    EC_WRITE_U8(domain1_pd + off_ana_out[1] , counter);
+    printf("READ FROM SLAVES %d %d\n",
+		EC_READ_U8(domain1_pd + off_ana_in[0] ),
+    		EC_READ_U8(domain1_pd + off_ana_in[1] ) );
     // send process data
     ecrt_domain_queue(domain1);
     ecrt_master_send(master);
@@ -131,7 +111,8 @@ void signal_handler(int signum)
 
 int main(int argc, char **argv)
 {
-    ec_slave_config_t *sc;
+    ec_slave_config_t *sc1;
+    ec_slave_config_t *sc2;
     struct sigaction sa;
     struct itimerval tv;
     
@@ -143,14 +124,24 @@ int main(int argc, char **argv)
     if (!domain1)
         return -1;
 
-    if (!(sc = ecrt_master_slave_config(
-                    master, AnaInSlavePos, LIBIX_VP))) {
+    if (!(sc1 = ecrt_master_slave_config(
+                    master, AnaInSlavePos1, LIBIX_VP))) {
+        fprintf(stderr, "Failed to get slave configuration.\n");
+        return -1;
+    }
+    if (!(sc2 = ecrt_master_slave_config(
+                    master, AnaInSlavePos2, LIBIX_VP))) {
         fprintf(stderr, "Failed to get slave configuration.\n");
         return -1;
     }
 
     printf("Configuring PDOs...\n");
-    if (ecrt_slave_config_pdos(sc, EC_END, slave_0_syncs)) {
+    if (ecrt_slave_config_pdos(sc1, EC_END, slave_0_syncs)) {
+        fprintf(stderr, "Failed to configure PDOs.\n");
+        return -1;
+    }
+
+    if (ecrt_slave_config_pdos(sc2, EC_END, slave_1_syncs)) {
         fprintf(stderr, "Failed to configure PDOs.\n");
         return -1;
     }
@@ -186,9 +177,9 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    printf("Offsets in=%d out=%d\n",
-	off_ana_in,
-	off_ana_out);
+    printf("Offsets in=%d,%d out=%d,%d\n",
+	off_ana_in[0], off_ana_in[1],
+	off_ana_out[0], off_ana_out[1]);
 
     printf("Started.\n");
     while (1) {
