@@ -11,12 +11,7 @@
 #include "ec_com.h"
 
 #define  WORKING_CNT_SIZE 2
-
-void ecs_tx_packet(e_slave * ecs,uint8_t *d)
-{
-	raw_ecs_tx_packet(ecs);
-	 __set_fsm_state(ecs, ecs_rx_packet);
-}
+extern int dbg_index(e_slave *);
 
 void ecs_process_next_dgram(e_slave * ecs,uint8_t *d)
 {
@@ -25,7 +20,9 @@ void ecs_process_next_dgram(e_slave * ecs,uint8_t *d)
 		ecs->dgram_processed += WORKING_CNT_SIZE + sizeof(ec_dgram) + __ec_dgram_dlength(d);
 		return __set_fsm_state(ecs, ecs_process_packet);
 	}
-	 __set_fsm_state(ecs, ecs_tx_packet);
+	/* pass packet back to next slave */
+	tx_packet(ecs->pkt_head, ecs->pkt_size,  ecs->intr[TX_INT_INDEX]);
+	 __set_fsm_state(ecs, NULL); /* move to next interface in ec_poll */
 }
 
 int  ec_nr_dgrams(uint8_t *raw_pkt)
@@ -51,12 +48,8 @@ void ecs_process_packet(e_slave * ecs, uint8_t *dgram_ec)
 	__set_fsm_state(ecs, ec_cmd_nop);
 	
 	switch (__ec_dgram_command(dgram_ec)) {
-	case EC_CMD_NOP:
-		puts("Command NOP");
-		break;
-
 	case EC_CMD_APRD:
-		puts("Auto Increment Read");
+		__set_fsm_state(ecs,ec_cmd_aprd);
 		break;
 
 	case EC_CMD_APWR:
@@ -64,7 +57,7 @@ void ecs_process_packet(e_slave * ecs, uint8_t *dgram_ec)
 		break;
 
 	case EC_CMD_APRW:
-		puts("Auto Increment Read Write");
+		__set_fsm_state(ecs, ec_cmd_aprw);
 		break;
 
 	case EC_CMD_FPRD:
@@ -76,7 +69,7 @@ void ecs_process_packet(e_slave * ecs, uint8_t *dgram_ec)
 		break;
 
 	case EC_CMD_FPRW:
-		puts("Configured Address Read Write");
+		__set_fsm_state(ecs, ec_cmd_fprw);
 		break;
 
 	case EC_CMD_BRD:
@@ -84,11 +77,11 @@ void ecs_process_packet(e_slave * ecs, uint8_t *dgram_ec)
 		break;
 
 	case EC_CMD_BWR:
-		__set_fsm_state(ecs, ec_cmd_brw);
+		__set_fsm_state(ecs, ec_cmd_bwr);
 		break;
 
 	case EC_CMD_BRW:
-		puts("Broadcast Read Write");
+		__set_fsm_state(ecs, ec_cmd_brw);
 		break;
 
 	case EC_CMD_LRD:
@@ -96,7 +89,7 @@ void ecs_process_packet(e_slave * ecs, uint8_t *dgram_ec)
 		break;
 
 	case EC_CMD_LWR:
-		puts("Logical Memory Write Read");
+		__set_fsm_state(ecs, ec_cmd_lwr);
 		break;
 
 	case EC_CMD_LRW:
@@ -104,35 +97,16 @@ void ecs_process_packet(e_slave * ecs, uint8_t *dgram_ec)
 		break;
 
 	case EC_CMD_ARMW:
-		puts("Auto Increment Read Multiple Write");
+		__set_fsm_state(ecs, ec_cmd_armw);
 		break;
 
 	case EC_CMD_FRMW:
-		puts("Configured Read Multiple Write");
+		__set_fsm_state(ecs, ec_cmd_frmw);
 		break;
 	default:
 		puts("unknown command");
 	}
 	ecs->fsm->state(ecs, dgram_ec);
-}
-
-void ecs_run(e_slave *ecs)
-{
-	while (1) {
-		ecs->fsm->state(ecs, ecs->dgram_processed);
-	}
-}
-
-void ecs_rx_packet(e_slave *ecs,uint8_t *d)
-{
-	do{
-		raw_ecs_rx_packet(ecs);
-	} while (!__ec_is_ethercat(ecs->pkt_head));
-
-	// grab first ecat dgram
-	ecs->dgram_processed =  __ecat_frameheader(ecs->pkt_head) + sizeof(ec_frame_header);
-	ecs->dgrams_cnt = ec_nr_dgrams(ecs->pkt_head);
-	__set_fsm_state(ecs, ecs_process_packet);
 }
 
 int main(int argc, char *argv[])
@@ -158,9 +132,7 @@ int main(int argc, char *argv[])
 	ecs.fsm = &fsm_slave;
 	ecs.dgram_processed = &ecs.pkt_head[0];
 	ecs.dgrams_cnt = 0;
-	__set_fsm_state(&ecs, ecs_rx_packet);
-
-	ecs_run(&ecs);
+	ec_capture(&ecs);
 	return 0;
 }
 

@@ -55,13 +55,14 @@ typedef struct {
 
 typedef struct __e_slave__ {
 	
-	uint8_t pkt_head[1492];
+	uint8_t *pkt_head;
 	uint8_t *dgram_processed; /* current ethercat dgram processed */
 	uint8_t dgrams_cnt;
 	int pkt_size;
 	int trigger_latch;
 	int interfaces_nr;
 	ec_interface* intr[EC_MAX_PORTS];
+//	ec_interface* current_intr;
 	struct fsm_slave *fsm;	/* finite state machine */
 	fsm_coe  coe;
 	fsm_mbox mbox;
@@ -75,15 +76,23 @@ void ecs_run(e_slave *);
 #define ETHERCAT_TYPE 		0x88a4
 
 void ec_cmd_apwr(e_slave * slave, uint8_t *ecdgram);
+void ec_cmd_armw(e_slave * slave, uint8_t *ecdgram);
+void ec_cmd_aprw(e_slave * slave, uint8_t *ecdgram);
+void ec_cmd_aprd(e_slave * slave, uint8_t *ecdgram);
 void ec_cmd_fprd(e_slave * slave, uint8_t *ecdgram);
+void ec_cmd_frmw(e_slave * slave, uint8_t *ecdgram);
 void ec_cmd_fpwr(e_slave * slave, uint8_t *ecdgram);
+void ec_cmd_fprw(e_slave * slave, uint8_t *ecdgram);
 void ec_cmd_brw(e_slave * slave,  uint8_t *ecdgram);
+void ec_cmd_bwr(e_slave * slave,  uint8_t *ecdgram);
 void ec_cmd_brd(e_slave * slave,  uint8_t *ecdgram);
 void ec_cmd_nop(e_slave * slave,  uint8_t *ecdgram);
 void ec_cmd_lrd(e_slave * slave,  uint8_t *ecdgram);
 void ec_cmd_lrw(e_slave * slave,  uint8_t *ecdgram);
+void ec_cmd_lwr(e_slave * slave,  uint8_t *ecdgram);
 
 void ecs_process_next_dgram(e_slave * slave,  uint8_t *ecdgram);
+int  ec_nr_dgrams(uint8_t *raw_pkt);
 
 /* d points at start of datagram.  */
 static inline uint8_t *__ec_dgram_data(uint8_t *d)
@@ -116,6 +125,13 @@ static inline uint16_t __ec_dgram_adp(uint8_t * d)
 {
 	ec_dgram *datagram = (ec_dgram *)d;
 	return (datagram->adp);
+}
+
+/* d points at start of datagram.  */
+static inline void __ec_dgram_set_adp(uint8_t *d,uint16_t adp)
+{
+	ec_dgram *datagram = (ec_dgram *)d;
+	datagram->adp = adp;
 }
 
 /* d points at start of datagram.  */
@@ -162,6 +178,13 @@ static inline void __ec_inc_wkc__(uint8_t *d)
 	wkc1 = *wkc;
 	wkc1++;
 	*wkc = wkc1;
+}
+
+static inline uint16_t __ec_wkc(uint8_t *d)
+{
+	uint16_t size =  __ec_dgram_dlength(d);
+	uint16_t *wkc = (uint16_t *)&d[size + sizeof(ec_dgram)];
+	return *wkc;
 }
 
 /* h points to mac address */

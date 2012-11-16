@@ -4,6 +4,9 @@
 struct __ec_interface__;
 struct __e_slave__;
 
+#define RX_INT_INDEX	0	/* port in the master side */
+#define TX_INT_INDEX	1	/* port in the next side  */
+
 int ec_is_nic_link_up(struct __e_slave__ *, int eth);
 int ec_is_nic_loop_closed( struct __e_slave__ *, int eth);
 int ec_is_nic_signal_detected(struct __e_slave__ *, int eth);

@@ -3,18 +3,6 @@
 #include "ecs_slave.h"
 #include "ethercattype.h"
 
-#define RX_INT_INDEX	0
-#define TX_INT_INDEX	1
-
-ec_interface *ec_tx_interface(e_slave * ecv)
-{
-	return ecv->intr[TX_INT_INDEX];
-}
-
-ec_interface *ec_rx_interface(e_slave * ecv)
-{
-	return ecv->intr[RX_INT_INDEX];
-}
 
 int ec_is_nic_link_up(e_slave *esv, int eth)
 {
@@ -119,14 +107,37 @@ int ecs_get_intr_conf(ec_interface * intr)
 	}
 	intr->index = intr->ifr.ifr_ifindex;
 	ec_printf("LOCAL MAC %s\n", intr->macaddr);
+/*
+	strcpy(intr->ifr.ifr_name, intr->name);
+        intr->ifr.ifr_flags = 0;
+  
+        if (ioctl(intr->sock, SIOCGIFFLAGS, &intr->ifr) < 0 ){
+		perror("SIOCGIFFLAGS");
+		return -1;
+	}
+ 
+        intr->ifr.ifr_flags = intr->ifr.ifr_flags || IFF_PROMISC || IFF_BROADCAST;
+	if ( ioctl(intr->sock, SIOCGIFFLAGS, &intr->ifr) < 0  ){
+		perror("SIOCGIFFLAGS");
+		return -1;
+	}
+*/
 	return 0;
 }
 
 int ecs_sock(ec_interface * intr)
 {
+	struct ifreq ifr;
 	intr->sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
 	if (intr->sock < 0) {
 		perror("socket failed:");
+		return -1;
+	}
+	memset(&ifr,0,sizeof(ifr));
+	strcpy(ifr.ifr_name, intr->name);
+	if (setsockopt(intr->sock, SOL_SOCKET, 
+			SO_BINDTODEVICE, &ifr, sizeof(ifr)) < 0){
+		perror("failed to bind socket to interface\n");
 		return -1;
 	}
 	return 0;
@@ -139,16 +150,21 @@ int ecs_net_init(int argc, char *argv[], e_slave * esv)
 
 	esv->interfaces_nr = 0;
 	for (i = 0, k = 1; k < argc; k++, i++) {
-		esv->intr[i] = malloc(sizeof(*esv->intr[i]));
+		esv->intr[i] = malloc(sizeof(ec_interface));
 		strncpy(esv->intr[i]->name,
 			argv[k], sizeof(esv->intr[i]->name));
 		if (ecs_sock(esv->intr[i]))
 			return -1;
 		if (ecs_get_intr_conf(esv->intr[i]))
 			return -1;
-		esv->interfaces_nr++;
-		ec_printf("LINK %s\n",
+		printf("LINK %d %s  %s\n", i, esv->intr[i]->name,
 			  ec_is_nic_link_up(esv, i) ? "UP" : "DOWN");
+		if (!ec_is_nic_link_up(esv, i)) {
+			free(esv->intr[i]);
+			esv->intr[i] = 0;
+			break;
+		}
+		esv->interfaces_nr++;	
 	}
 	if (esv->interfaces_nr == 1) {
 		/* closed loop */

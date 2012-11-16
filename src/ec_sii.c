@@ -368,7 +368,7 @@ void init_strings(category_strings * str, category_header * hdr)
 	hdr->size = sizeof(*str) / 2;
 
 	if (sizeof(*str) % 2){
-		printf("%s ilegal size %d %d\n",
+		printf("%s ilegal size %zd %zd\n",
 			__FUNCTION__,
 			sizeof(*str),
 			STRINGS_SIZE);

@@ -11,8 +11,8 @@
 #include "ec_regs.h"
 #include "ec_sii.h"
 
-/** Configured Address Read */
-void ec_cmd_fprd(e_slave *ecs,uint8_t *dgram_ec)
+/** Configured Address Read Write */
+void ec_cmd_fprw(e_slave *ecs,uint8_t *dgram_ec)
 {
 	uint16_t ado, adp;
 	uint16_t datalen = __ec_dgram_dlength(dgram_ec);
@@ -36,9 +36,16 @@ void ec_cmd_fprd(e_slave *ecs,uint8_t *dgram_ec)
 		goto FPRD_OUT;
 	}
 	__ec_inc_wkc__(dgram_ec);
-	ec_raw_get_ado(ecs, ado, data, datalen);
-	if (ado == ECT_REG_EEPSTAT){
+	__ec_inc_wkc__(dgram_ec);
+	__ec_inc_wkc__(dgram_ec);
+	{
+	uint8_t val[datalen];
+	ec_raw_get_ado(ecs, ado, (uint8_t *)&val, datalen);
+	if (ado == ECT_REG_EEPSTAT)
 		ec_sii_rw(data, datalen);
+	 else
+		ec_raw_set_ado(ecs, ado, data, datalen);
+	memcpy(data, val, datalen);
 	}
 FPRD_OUT:
         __set_fsm_state(ecs, ecs_process_next_dgram);

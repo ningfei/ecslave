@@ -32,7 +32,7 @@ void ec_init_regs(e_slave* esv)
 	ec_registers[ECT_BASE_FMMUS] = 0x2;	/* base fmmu count 1byte */
 	ec_registers[ECT_BASE_SYNCM] = 0x2;	/* base sync count 1byte */
 	ec_registers[ECT_REG_PORTDES] = 0x000F;	/* octet 1      0x000F one port. mii */
-	ec_registers[ECT_REG_STADR] = 0x07;
+	ec_registers[ECT_REG_STADR] = 0x00;
 
 	/* octet 2 0b00000001   fmmu bit operation
 	 *              0b00000100      dc
