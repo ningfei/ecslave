@@ -10,13 +10,15 @@
 void ec_cmd_lrw(e_slave * ecs,uint8_t *dgram_ec)
 {
 	uint16_t datalen = __ec_dgram_dlength(dgram_ec);
-	uint8_t *data = __ec_dgram_data(dgram_ec);
-	uint32_t offset = __ec_dgram_laddr(dgram_ec);
+	uint8_t *data	 = __ec_dgram_data(dgram_ec);
+	uint32_t offset  = __ec_dgram_laddr(dgram_ec);
 	uint8_t temp[datalen];
+	int loff;
 
-	if ( !get_process_data(temp, offset, datalen) ) {
-		set_process_data(data, offset, datalen);
-		memcpy(data, temp, datalen);
+	loff = logical_offset(ecs, offset);
+	if (!get_process_data(temp, offset, datalen)) {
+		set_process_data(data + loff, offset, datalen);
+		memcpy(data + loff, temp, datalen);
 	}
 #ifdef __MAKE_DEBUG__
 	ec_dump_string(data, datalen);

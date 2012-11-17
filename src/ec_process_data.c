@@ -4,6 +4,7 @@
 #include "ec_process_data.h"
 #include "ecs_slave.h"
 #include "ec_sii.h"
+#include "ec_regs.h"
 
 typedef struct {
 	uint8_t* data;
@@ -42,4 +43,9 @@ int get_process_data(uint8_t * data, uint16_t offset, uint16_t datalen)
 	}
 	memcpy(data, &pd.data[offset], datalen);
 	return 0;
+}
+
+int logical_offset(e_slave *ecs, int offset)
+{
+	return ec_station_address() * pd.size + offset;
 }

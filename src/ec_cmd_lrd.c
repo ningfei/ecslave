@@ -12,10 +12,12 @@ void ec_cmd_lrd(e_slave * ecs,uint8_t *dgram_ec)
 	uint16_t datalen = __ec_dgram_dlength(dgram_ec);
 	uint8_t *data = __ec_dgram_data(dgram_ec);
 	uint32_t offset = __ec_dgram_laddr(dgram_ec);
+	uint32_t loff;
 
-	get_process_data(data, offset, datalen);
+	loff  = logical_offset(ecs, offset);
+	get_process_data(data + loff, offset, datalen);
 #ifdef __MAKE_DEBUG__
-	ec_dump_string(data, datalen);
+	ec_dump_string(data + loff, datalen);
 #endif
 	__ec_inc_wkc__(dgram_ec);
      __set_fsm_state(ecs, ecs_process_next_dgram);
