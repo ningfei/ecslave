@@ -25,27 +25,38 @@ int init_process_data(e_slave *ecs)
 	return 0;
 }
 
+/*
+ * process data 
+*/
 int set_process_data(uint8_t *data, uint16_t offset, uint16_t datalen)
 {
-	if (offset + datalen > pd.size) {
-		printf("%s ilegal pd access\n",__FUNCTION__);
-		return -1;
-	}
-	memcpy(&pd.data[offset], data, datalen);
+	memcpy(&pd.data[offset % pd.size], data, datalen);
 	return 0;
 }
 
-int get_process_data(uint8_t * data, uint16_t offset, uint16_t datalen)
+int get_process_data(uint8_t *data, uint16_t offset, uint16_t datalen)
 {
-	if (offset + datalen > pd.size) {
-		printf("%s ilegal pd access\n",__FUNCTION__);
-		return -1;
-	}
-	memcpy(data, &pd.data[offset], datalen);
+	memcpy(data, &pd.data[offset % pd.size], datalen);
 	return 0;
 }
 
-int logical_offset(e_slave *ecs, int offset)
+void normalize_sizes(e_slave *ecs, uint32_t *offset,uint16_t *datalen)
 {
-	return ec_station_address() * pd.size + offset;
+	int off  = (ec_station_address() -1) * pd.size + *offset;
+	if (off < 0) {
+		printf("%s off=%d  offset=%d  stafr=%hu\n",
+			__func__, off, *offset, ec_station_address());
+		return;
+	}
+	printf("%s off=%d offset=%d statr=%d datalen=%hu\n",
+			__func__, 
+			off, 
+			*offset, 
+			ec_station_address(),
+			*datalen);
+	*offset = (uint32_t)off;
+	*datalen = *datalen % pd.size;
+	if (*datalen == 0){
+		*datalen = pd.size;
+	}
 }

@@ -89,8 +89,6 @@ static void pkt_process(u_char *user, const struct pcap_pkthdr *h,
 	if (is_outgoing_pkt(ecs, d)){
 		return;
 	}
-	ec_printf("%s:%d size=%d\n",
-		__FUNCTION__,__LINE__, h->len);
 	ecs->pkt_head = d;
 	ecs->pkt_size = h->len;
 	// grab first ecat dgram

@@ -110,6 +110,17 @@ typedef struct {
 		+ __SIZEOF__( STRING2) + __SIZEOF__( STRING1) + __SIZEOF__( STRING0) \
 		+ ((NR_STRINGS +1) * sizeof(uint8_t)))
 
+typedef struct {
+	uint32_t logical_start_address;
+	uint16_t length;
+	uint8_t  logical_start_bit:3;
+	uint8_t  reserved1:5;
+	uint8_t  logical_end_bit:3;
+	uint8_t  reserved2:5;
+	uint16_t physical_start_address;
+	uint8_t  physical_start_bit:3;
+	uint8_t  reserved:5;
+} fmmu_entity;
 
 // table 25
 typedef struct {

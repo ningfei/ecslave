@@ -104,7 +104,7 @@ void ecs_process_packet(e_slave * ecs, uint8_t *dgram_ec)
 		__set_fsm_state(ecs, ec_cmd_frmw);
 		break;
 	default:
-		puts("unknown command");
+		printf("unknown command %d\n",__ec_dgram_command(dgram_ec));
 	}
 	ecs->fsm->state(ecs, dgram_ec);
 }

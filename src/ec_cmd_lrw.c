@@ -13,21 +13,16 @@ void ec_cmd_lrw(e_slave * ecs,uint8_t *dgram_ec)
 	uint8_t *data	 = __ec_dgram_data(dgram_ec);
 	uint32_t offset  = __ec_dgram_laddr(dgram_ec);
 	uint8_t temp[datalen];
-	int loff;
 
-	loff = logical_offset(ecs, offset);
+	normalize_sizes(ecs, &offset, &datalen);
 	if (!get_process_data(temp, offset, datalen)) {
-		set_process_data(data + loff, offset, datalen);
-		memcpy(data + loff, temp, datalen);
+		if (!set_process_data(data + offset, offset, datalen) )
+			memcpy(data + offset, temp, datalen);
 	}
-#ifdef __MAKE_DEBUG__
-	ec_dump_string(data, datalen);
-#endif
        // If LRW is used, output FMMUs increment the working counter by 2,
         // while input FMMUs increment it by 1.
 	__ec_inc_wkc__(dgram_ec);
 	__ec_inc_wkc__(dgram_ec);
 	__ec_inc_wkc__(dgram_ec);
-
-     __set_fsm_state(ecs, ecs_process_next_dgram);
+     	__set_fsm_state(ecs, ecs_process_next_dgram);
 }
