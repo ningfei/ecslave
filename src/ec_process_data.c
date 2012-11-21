@@ -48,7 +48,7 @@ void normalize_sizes(e_slave *ecs, uint32_t *offset,uint16_t *datalen)
 			__func__, off, *offset, ec_station_address());
 		return;
 	}
-	printf("%s off=%d offset=%d statr=%d datalen=%hu\n",
+	ec_printf("%s off=%d offset=%d statr=%d datalen=%hu\n",
 			__func__, 
 			off, 
 			*offset, 
