@@ -51,8 +51,8 @@ static unsigned int off_ana_out[2]={-1};
 
 const static ec_pdo_entry_reg_t domain1_regs[] = {
     {AnaInSlavePos1,  LIBIX_VP, 0x1a00, 0x02, &off_ana_out[0]},
-    {AnaInSlavePos2,  LIBIX_VP, 0x1600, 0x02, &off_ana_in[0]},
-    {AnaInSlavePos1,  LIBIX_VP, 0x1a00, 0x02, &off_ana_out[1]},
+    {AnaInSlavePos1,  LIBIX_VP, 0x1600, 0x02, &off_ana_in[0]},
+    {AnaInSlavePos2,  LIBIX_VP, 0x1a00, 0x02, &off_ana_out[1]},
     {AnaInSlavePos2,  LIBIX_VP, 0x1600, 0x02, &off_ana_in[1]},
     {}
 };
@@ -92,7 +92,7 @@ void cyclic_task()
     }
     EC_WRITE_U8(domain1_pd + off_ana_out[0] , counter);
     EC_WRITE_U8(domain1_pd + off_ana_out[1] , counter);
-    printf("READ FROM SLAVES %d %d\n",
+    printf("READ FROM SLAVES 0x%x 0x%x\n",
 		EC_READ_U8(domain1_pd + off_ana_in[0] ),
     		EC_READ_U8(domain1_pd + off_ana_in[1] ) );
     // send process data
