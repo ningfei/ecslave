@@ -24,7 +24,7 @@ src/ec_mbox.c \
 src/ec_process_data.c \
 src/ec_debug.c
 
-ec_slave_CFLAGS  = -Wall -Werror -O0
+ec_slave_CFLAGS  = -Wall -Werror -O0 -pthread
 if HAVE_DEBUG
 ec_slave_CFLAGS += -D__MAKE_DEBUG__
 endif
