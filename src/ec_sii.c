@@ -1,8 +1,5 @@
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-
+#include "std.h"
 #include "ethercattype.h"
 #include "fsm_slave.h"
 #include "ecs_slave.h"
@@ -110,17 +107,6 @@ typedef struct {
 		+ __SIZEOF__( STRING2) + __SIZEOF__( STRING1) + __SIZEOF__( STRING0) \
 		+ ((NR_STRINGS +1) * sizeof(uint8_t)))
 
-typedef struct {
-	uint32_t logical_start_address;
-	uint16_t length;
-	uint8_t  logical_start_bit:3;
-	uint8_t  reserved1:5;
-	uint8_t  logical_end_bit:3;
-	uint8_t  reserved2:5;
-	uint16_t physical_start_address;
-	uint8_t  physical_start_bit:3;
-	uint8_t  reserved:5;
-} fmmu_entity;
 
 // table 25
 typedef struct {
@@ -280,7 +266,7 @@ void init_general(category_general * general,category_header * hdr)
 
 	if (sizeof(*general) %2){
 		ec_printf("%s illegal size\n",__FUNCTION__);
-		exit(0);
+		return;
 	}
 
 	hdr->type = CAT_TYPE_GENERAL;
@@ -310,7 +296,7 @@ void init_syncm(category_syncm *syncm,int index,category_header * hdr)
 	hdr->size = ( sizeof(category_syncm)) / 2;
 	if (sizeof(*syncm) %2){
 		ec_printf("ilegal size\n");
-		exit(0);
+		return;
 	}
 	hdr->type = CAT_TYPE_SYNCM;
 
@@ -359,7 +345,7 @@ void init_fmmu(category_fmmu *fmmu,category_header *hdr)
 	hdr->size = sizeof(category_fmmu) / 2;
 	if (sizeof(*fmmu) %2){
 		ec_printf("ilegal size\n");
-		exit(0);
+		return;
 	}
 
 	hdr->type = CAT_TYPE_FMMU;
@@ -379,11 +365,11 @@ void init_strings(category_strings * str, category_header * hdr)
 	hdr->size = sizeof(*str) / 2;
 
 	if (sizeof(*str) % 2){
-		printf("%s ilegal size %zd %zd\n",
+		ec_printf("%s ilegal size %zd %zd\n",
 			__FUNCTION__,
 			sizeof(*str),
 			STRINGS_SIZE);
-		exit(0);
+		return;
 	}
 
 	str->nr_strings = NR_STRINGS;

@@ -1,16 +1,14 @@
-#include <stdio.h>
-#include <arpa/inet.h>
-#include <string.h>
-#include <net/ethernet.h>
-#include <time.h>
-
+#include "std.h"
 #include "ethercattype.h"
 #include "ecs_slave.h"
 #include "ec_net.h"
 #include "ec_mbox.h"
 #include "ec_sii.h"
 
+#ifndef __KERNEL__
 #define NSEC_PER_SEC (1000000000L)
+#endif
+
 #define FREQUENCY 1000
 #define CLOCK_TO_USE CLOCK_REALTIME
 #define PERIOD_NS (NSEC_PER_SEC / FREQUENCY)
@@ -105,7 +103,7 @@ void ec_raw_set_ado(e_slave *ecs, int reg, uint8_t * data, int datalen)
 		return ec_mbox(ecs, reg, data, datalen);
 	}
 	if (reg < ECT_REG_TYPE) {
-		printf("%s insane ado\n",__FUNCTION__);
+		ec_printf("%s insane ado\n",__FUNCTION__);
 		return;
 	}
 	memcpy(&ec_registers[reg], data, datalen);
@@ -123,7 +121,7 @@ void ec_raw_get_ado(e_slave *ecs, int reg, uint8_t * data, int datalen)
 		return ec_mbox(ecs, reg, data, datalen);
 	}
 	if (reg < ECT_REG_TYPE) {
-		printf("%s insane ado 0x%x\n",__FUNCTION__,reg);
+		ec_printf("%s insane ado 0x%x\n",__FUNCTION__,reg);
 		return;
 	}
 	if (reg == ECT_REG_DCSYSTIME){
@@ -131,8 +129,9 @@ void ec_raw_get_ado(e_slave *ecs, int reg, uint8_t * data, int datalen)
 	    struct timespec tm;
 	    uint64_t t;
 	    uint8_t* p = (uint8_t *)&t;
-	   
-	    clock_gettime(CLOCK_TO_USE, &tm);
+	    extern int do_clock_gettime(int, struct timespec *);
+
+	    do_clock_gettime(CLOCK_TO_USE, &tm);
 	    t = TIMESPEC2NS(tm);
 	    if (datalen == 4)
 		p = (uint8_t*)&tm.tv_nsec;

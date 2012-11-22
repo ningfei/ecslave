@@ -1,10 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <asm/types.h>
-#include <stdlib.h>
-#include <arpa/inet.h>
-#include <string.h>
-
+#include "std.h"
 #include "ethercattype.h"
 #include "fsm_slave.h"
 #include "ecs_slave.h"
@@ -32,7 +26,7 @@ void ec_cmd_fprw(e_slave *ecs,uint8_t *dgram_ec)
 	       __FUNCTION__,ado, datalen);
 
 	if (datalen == 0) {
-		printf("insane no length\n");
+		ec_printf("insane no length\n");
 		goto FPRD_OUT;
 	}
 	__ec_inc_wkc__(dgram_ec);

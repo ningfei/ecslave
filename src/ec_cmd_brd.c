@@ -1,10 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <asm/types.h>
-#include <stdlib.h>
-#include <arpa/inet.h>
-#include <string.h>
-
+#include "std.h"
 #include "ethercattype.h"
 #include "fsm_slave.h"
 #include "ec_regs.h"

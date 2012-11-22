@@ -1,7 +1,4 @@
-#include <string.h>
-#include <stdio.h>
-#include <stdint.h>
-
+#include "std.h"
 #include "ecs_slave.h"
 #include "ec_coe.h"
 #include "ec_mbox.h"

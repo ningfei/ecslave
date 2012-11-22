@@ -1,44 +1,20 @@
 #ifndef __ECS_SLAVE_H__
 #define __ECS_SLAVE_H__
 
-#include <unistd.h>
-#include <stdio.h>
-#include <errno.h>
-#include <string.h>
-#include <arpa/inet.h>
-#include <asm/types.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <stdio.h>
-#include <net/if.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
-#include <netpacket/packet.h>
-#include <net/ethernet.h>
-#include <netinet/ip.h>
-#include <fcntl.h>
-#include <sys/time.h>
-
-#include <net/if_arp.h>
-#include <arpa/inet.h>
-#include <string.h>
-#include "ethercattype.h"
-#include <net/ethernet.h>
-#include <arpa/inet.h>
-
-#define EC_MAX_PORTS 2
 
 struct __e_slave__;
 struct fsm_slave;
 
 typedef struct __ec_interface__ {
 	int index;
+#ifndef __KERNEL__
 	struct sockaddr_in m_addr;
 	struct ifreq ifr;
+	struct ether_header mac;
+#endif
 	char name[16];
 	char ip[32];
 	char macaddr[32];
-	struct ether_header mac;
 	int sock;
 	int subnet_mask;
 	int link_up;
