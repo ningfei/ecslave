@@ -6,16 +6,6 @@
 #include "ec_regs.h"
 #include "ec_process_data.h"
 
-void ec_dump_string(uint8_t *c,int len)
-{
-	int i ;
-
-	for  (i = 0 ; i < len ; i++){
-		printf("%02X ", c[i]);
-	}
-	puts("");
-}
-
 /** Logical Read Write */
 void ec_cmd_lrw(e_slave * ecs,uint8_t *dgram_ec)
 {

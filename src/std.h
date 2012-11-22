@@ -8,7 +8,22 @@ typedef unsigned int        uint32_t;
 typedef signed long long int int64_t;
 typedef unsigned long long int uint64_t;
 
+#define EC_MAX_PORTS 2
+
 #ifdef __KERNEL__
+
+#include <linux/if_ether.h>
+#include <linux/fs.h>
+#include <linux/version.h>
+#include <linux/module.h>
+
+struct ether_header
+{
+  u_int8_t  ether_dhost[ETH_ALEN];	/* destination eth addr	*/
+  u_int8_t  ether_shost[ETH_ALEN];	/* source ether addr	*/
+  u_int16_t ether_type;		        /* packet type ID field	*/
+} __attribute__ ((__packed__));
+
 
 #else
 
@@ -43,6 +58,6 @@ typedef unsigned long long int uint64_t;
 #include <net/ethernet.h>
 #include <arpa/inet.h>
 
-#define EC_MAX_PORTS 2
 
 #endif
+

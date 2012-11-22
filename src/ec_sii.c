@@ -266,7 +266,7 @@ void init_general(category_general * general,category_header * hdr)
 
 	if (sizeof(*general) %2){
 		ec_printf("%s illegal size\n",__FUNCTION__);
-		exit(0);
+		return;
 	}
 
 	hdr->type = CAT_TYPE_GENERAL;
@@ -296,7 +296,7 @@ void init_syncm(category_syncm *syncm,int index,category_header * hdr)
 	hdr->size = ( sizeof(category_syncm)) / 2;
 	if (sizeof(*syncm) %2){
 		ec_printf("ilegal size\n");
-		exit(0);
+		return;
 	}
 	hdr->type = CAT_TYPE_SYNCM;
 
@@ -345,7 +345,7 @@ void init_fmmu(category_fmmu *fmmu,category_header *hdr)
 	hdr->size = sizeof(category_fmmu) / 2;
 	if (sizeof(*fmmu) %2){
 		ec_printf("ilegal size\n");
-		exit(0);
+		return;
 	}
 
 	hdr->type = CAT_TYPE_FMMU;
@@ -365,11 +365,11 @@ void init_strings(category_strings * str, category_header * hdr)
 	hdr->size = sizeof(*str) / 2;
 
 	if (sizeof(*str) % 2){
-		printf("%s ilegal size %zd %zd\n",
+		ec_printf("%s ilegal size %zd %zd\n",
 			__FUNCTION__,
 			sizeof(*str),
 			STRINGS_SIZE);
-		exit(0);
+		return;
 	}
 
 	str->nr_strings = NR_STRINGS;
@@ -418,44 +418,6 @@ void init_pdo(pdo_entry * pdo,
 	pdo->index = index;
 	pdo->name_idx = name_idx;
 	pdo->subindex = subindex;
-}
-
-void init_hdr_dbg()
-{
-	int cat_off =0;
-	ec_printf("sz = category pdo = %u\n",sizeof(category_pdo));
-
-	ec_printf("%s sizes sii %u str=%d gen=%d "
-			"tx=%d rx=%d fm=%d sync=%d end=%u\n",	__FUNCTION__,
-			sizeof(categories.sii),
-			categories.strings_hdr.size,
-			categories.general_hdr.size,
-			categories.txpdo_hdr.size,
-			categories.rxpdo_hdr.size,
-			categories.fmmu_hdr.size,
-			categories.syncm_hdr0.size,
-			categories.endhdr.size);
-
-	cat_off = (uint8_t *)&categories.general_hdr - (uint8_t *) &categories.sii;
-	ec_printf("%s offset =%d\n",__FUNCTION__,cat_off/2);
-
-	cat_off = (uint8_t *)&categories.txpdo_hdr - (uint8_t *) &categories.sii;
-	ec_printf("%s offset =%d\n",__FUNCTION__,cat_off/2);
-
-	cat_off = (uint8_t *)&categories.rxpdo_hdr - (uint8_t *) &categories.sii;
-	ec_printf("%s offset =%d\n",__FUNCTION__,cat_off/2);
-
-	cat_off = (uint8_t *)&categories.fmmu_hdr - (uint8_t *) &categories.sii;
-	ec_printf("%s offset =%d\n",__FUNCTION__,cat_off/2);
-
-	cat_off = (uint8_t *)&categories.syncm_hdr0 - (uint8_t *) &categories.sii;
-	ec_printf("%s offset =%d\n",__FUNCTION__,cat_off/2);
-
-	cat_off = (uint8_t *)&categories.syncm_hdr1 - (uint8_t *) &categories.sii;
-	ec_printf("%s offset =%d\n",__FUNCTION__,cat_off/2);
-
-	cat_off = (uint8_t *)&categories.endhdr - (uint8_t *) &categories.sii;
-	ec_printf("%s offset =%d\n",__FUNCTION__,cat_off/2);
 }
 
 void init_si_info(ec_sii_t *sii)
@@ -513,7 +475,6 @@ void init_sii(void)
 
 	init_pdo(&categories.txpdo.pdo[0], 0x1a00, 0X02, TX_PDO1_NAME_IDX + 1, 0, 32, 0);
 	init_pdo(&categories.txpdo.pdo[1], 0x1a00, 0X01, TX_PDO2_NAME_IDX + 1, 0, 16, 0);
-	init_hdr_dbg();
 }
 
 void (*sii_command)(int offset, int datalen, uint8_t * data) = 0;

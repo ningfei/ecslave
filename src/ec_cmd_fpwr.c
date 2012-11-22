@@ -23,7 +23,7 @@ void ec_cmd_fpwr(e_slave *ecs,uint8_t *dgram_ec)
 	       ec_station_address(),
 	       datalen);
 	if (datalen == 0) {
-		printf("insane no length\n");
+		ec_printf("insane no length\n");
 		goto FPRD_OUT;
 	}
 	if (adp != ec_station_address())

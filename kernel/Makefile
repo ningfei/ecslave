@@ -16,8 +16,6 @@ OBJS  = \
 ../src/ec_cmd_lwr.o \
 ../src/ec_sii.o \
 ../src/ec_regs.o \
-../src/ec_com.o \
-../src/ec_net.o \
 ../src/ec_coe.o \
 ../src/ec_mbox.o \
 ../src/ec_process_data.o \

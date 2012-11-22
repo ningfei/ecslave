@@ -7,12 +7,14 @@ struct fsm_slave;
 
 typedef struct __ec_interface__ {
 	int index;
+#ifndef __KERNEL__
 	struct sockaddr_in m_addr;
 	struct ifreq ifr;
+	struct ether_header mac;
+#endif
 	char name[16];
 	char ip[32];
 	char macaddr[32];
-	struct ether_header mac;
 	int sock;
 	int subnet_mask;
 	int link_up;
@@ -36,7 +38,6 @@ typedef struct __e_slave__ {
 	int trigger_latch;
 	int interfaces_nr;
 	ec_interface* intr[EC_MAX_PORTS];
-//	ec_interface* current_intr;
 	struct fsm_slave *fsm;	/* finite state machine */
 	fsm_coe  coe;
 	fsm_mbox mbox;
