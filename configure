@@ -565,7 +565,8 @@ PACKAGE_STRING='ec_slave 0.1'
 PACKAGE_BUGREPORT='raziebe@gmail.com'
 PACKAGE_URL=''
 
-ac_unique_file="src/"
+ac_unique_file="stack/"
+ac_unique_file="user/"
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stdio.h>
@@ -2115,6 +2116,7 @@ ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
 
 
 

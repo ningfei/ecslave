@@ -1,6 +1,7 @@
 AC_PREREQ([2.65])
 AC_INIT([ec_slave], [0.1], [raziebe@gmail.com])
-AC_CONFIG_SRCDIR([src/])
+AC_CONFIG_SRCDIR([stack/])
+AC_CONFIG_SRCDIR([user/])
 AC_CONFIG_FILES([Makefile])
 AM_INIT_AUTOMAKE(ec_slave, 2.0)
 # Checks for programs.
