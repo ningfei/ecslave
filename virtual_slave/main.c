@@ -16,6 +16,8 @@
 // Application parameters
 #define FREQUENCY 100
 #define PRIORITY 1
+#define NSEC_PER_SEC (1000000000L)
+#define PERIOD_NS (NSEC_PER_SEC / FREQUENCY)
 
 // Optional features
 #define CONFIGURE_PDOS  1
@@ -176,10 +178,10 @@ int main(int argc, char **argv)
         fprintf(stderr, "Failed to start timer: %s\n", strerror(errno));
         return 1;
     }
-
     printf("Offsets in=%d,%d out=%d,%d\n",
 	off_ana_in[0], off_ana_in[1],
 	off_ana_out[0], off_ana_out[1]);
+    ecrt_slave_config_dc(sc, 0x0700, PERIOD_NS, 4400000, 0, 0); 
 
     printf("Started.\n");
     while (1) {

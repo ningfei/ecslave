@@ -21,6 +21,7 @@ stack/ec_mbox.c \
 stack/ec_cmd.c \
 stack/ec_process_data.c \
 user/ec_slave.c \
+user/ecat_timer.c \
 user/ec_net.c \
 user/ec_com.c \
 user/ec_debug.c

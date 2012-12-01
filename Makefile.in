@@ -60,8 +60,8 @@ am_ec_slave_OBJECTS = ec_slave-ec_cmd_apwr.$(OBJEXT) \
 	ec_slave-ec_regs.$(OBJEXT) ec_slave-ec_coe.$(OBJEXT) \
 	ec_slave-ec_mbox.$(OBJEXT) ec_slave-ec_cmd.$(OBJEXT) \
 	ec_slave-ec_process_data.$(OBJEXT) ec_slave-ec_slave.$(OBJEXT) \
-	ec_slave-ec_net.$(OBJEXT) ec_slave-ec_com.$(OBJEXT) \
-	ec_slave-ec_debug.$(OBJEXT)
+	ec_slave-ecat_timer.$(OBJEXT) ec_slave-ec_net.$(OBJEXT) \
+	ec_slave-ec_com.$(OBJEXT) ec_slave-ec_debug.$(OBJEXT)
 ec_slave_OBJECTS = $(am_ec_slave_OBJECTS)
 ec_slave_DEPENDENCIES =
 ec_slave_LINK = $(CCLD) $(ec_slave_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
@@ -201,6 +201,7 @@ stack/ec_mbox.c \
 stack/ec_cmd.c \
 stack/ec_process_data.c \
 user/ec_slave.c \
+user/ecat_timer.c \
 user/ec_net.c \
 user/ec_com.c \
 user/ec_debug.c
@@ -317,6 +318,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ec_slave-ec_regs.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ec_slave-ec_sii.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ec_slave-ec_slave.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ec_slave-ecat_timer.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -625,6 +627,20 @@ ec_slave-ec_slave.obj: user/ec_slave.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='user/ec_slave.c' object='ec_slave-ec_slave.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ec_slave_CFLAGS) $(CFLAGS) -c -o ec_slave-ec_slave.obj `if test -f 'user/ec_slave.c'; then $(CYGPATH_W) 'user/ec_slave.c'; else $(CYGPATH_W) '$(srcdir)/user/ec_slave.c'; fi`
+
+ec_slave-ecat_timer.o: user/ecat_timer.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ec_slave_CFLAGS) $(CFLAGS) -MT ec_slave-ecat_timer.o -MD -MP -MF $(DEPDIR)/ec_slave-ecat_timer.Tpo -c -o ec_slave-ecat_timer.o `test -f 'user/ecat_timer.c' || echo '$(srcdir)/'`user/ecat_timer.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/ec_slave-ecat_timer.Tpo $(DEPDIR)/ec_slave-ecat_timer.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='user/ecat_timer.c' object='ec_slave-ecat_timer.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ec_slave_CFLAGS) $(CFLAGS) -c -o ec_slave-ecat_timer.o `test -f 'user/ecat_timer.c' || echo '$(srcdir)/'`user/ecat_timer.c
+
+ec_slave-ecat_timer.obj: user/ecat_timer.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ec_slave_CFLAGS) $(CFLAGS) -MT ec_slave-ecat_timer.obj -MD -MP -MF $(DEPDIR)/ec_slave-ecat_timer.Tpo -c -o ec_slave-ecat_timer.obj `if test -f 'user/ecat_timer.c'; then $(CYGPATH_W) 'user/ecat_timer.c'; else $(CYGPATH_W) '$(srcdir)/user/ecat_timer.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/ec_slave-ecat_timer.Tpo $(DEPDIR)/ec_slave-ecat_timer.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='user/ecat_timer.c' object='ec_slave-ecat_timer.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ec_slave_CFLAGS) $(CFLAGS) -c -o ec_slave-ecat_timer.obj `if test -f 'user/ecat_timer.c'; then $(CYGPATH_W) 'user/ecat_timer.c'; else $(CYGPATH_W) '$(srcdir)/user/ecat_timer.c'; fi`
 
 ec_slave-ec_net.o: user/ec_net.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ec_slave_CFLAGS) $(CFLAGS) -MT ec_slave-ec_net.o -MD -MP -MF $(DEPDIR)/ec_slave-ec_net.Tpo -c -o ec_slave-ec_net.o `test -f 'user/ec_net.c' || echo '$(srcdir)/'`user/ec_net.c

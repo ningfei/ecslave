@@ -27,6 +27,7 @@ typedef struct __ecat_slave__ {
 	int pkt_size;
 	int debug_level;
 	int interfaces_nr;
+ 	struct ecat_event sync0;
 	struct ec_device* intr[EC_MAX_PORTS];
 	int pdoe_sizes[TOT_PDOS]; /* description array of pdos sizes */
 	struct fsm_slave *fsm;	/* finite state machine */

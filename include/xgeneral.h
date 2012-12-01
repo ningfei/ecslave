@@ -6,6 +6,7 @@
 #include <linux/fs.h>
 #include <linux/version.h>
 #include <linux/module.h>
+#include <linux/list.h>
 
 struct ether_header
 {
@@ -20,6 +21,8 @@ static inline int clock_gettime(int dummy __attribute__((unused)), struct timesp
 	getnstimeofday(sp);
 	return 0;
 }
+
+#define LIST_ENTRY(a) struct list_head 
 
 #else
 
@@ -53,6 +56,7 @@ static inline int clock_gettime(int dummy __attribute__((unused)), struct timesp
 #include <net/ethernet.h>
 #include <arpa/inet.h>
 #include <semaphore.h>
+#include <sys/queue.h>
 
 #define xmalloc(size)	malloc(size)
 #define NSEC_PER_SEC (1000000000L)
@@ -60,5 +64,6 @@ static inline int clock_gettime(int dummy __attribute__((unused)), struct timesp
 struct semaphore { 
 	sem_t sem;
 };
+
 #endif
 
