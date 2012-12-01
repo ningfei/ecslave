@@ -1,6 +1,7 @@
 #ifndef __ECS_SLAVE_H__
 #define __ECS_SLAVE_H__
 
+#include "ecat_timer.h"
 
 struct __ecat_slave__;
 struct fsm_slave;
