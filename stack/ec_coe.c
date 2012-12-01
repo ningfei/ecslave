@@ -5,7 +5,7 @@
 #include "ec_regs.h"
 #include "ec_coe.h"
 
-void od_list_response(e_slave *ecs, uint8_t* data,int datalen)
+void od_list_response(ecat_slave *ecs, uint8_t* data,int datalen)
 {
 	int i;
 
@@ -30,7 +30,7 @@ void od_list_response(e_slave *ecs, uint8_t* data,int datalen)
 
 
 // table 45
-void obj_desc_response(e_slave* ecs, uint8_t *data, int datalen)
+void obj_desc_response(ecat_slave* ecs, uint8_t *data, int datalen)
 {
 	typedef struct {
 		uint16_t index;	
@@ -68,7 +68,7 @@ void obj_desc_response(e_slave* ecs, uint8_t *data, int datalen)
 }
 
 // table 44
-void obj_desc_request(e_slave *ecs, uint8_t *data, int datalen)
+void obj_desc_request(ecat_slave *ecs, uint8_t *data, int datalen)
 {
 	typedef struct {
 		uint16_t  index;
@@ -81,7 +81,7 @@ void obj_desc_request(e_slave *ecs, uint8_t *data, int datalen)
 	mbox_set_state(ecs, obj_desc_response);
 }
 
-void entry_desc_response(e_slave* ecs, uint8_t *data, int datalen)
+void entry_desc_response(ecat_slave* ecs, uint8_t *data, int datalen)
 {	// table 47
 	typedef struct {
 		uint16_t index;	
@@ -122,7 +122,7 @@ void entry_desc_response(e_slave* ecs, uint8_t *data, int datalen)
 }
 
 // table 46
-void entry_desc_request(e_slave* ecs,uint8_t *data, int datalen)
+void entry_desc_request(ecat_slave* ecs,uint8_t *data, int datalen)
 {
 	typedef struct {
 		uint16_t index;	
@@ -138,7 +138,7 @@ void entry_desc_request(e_slave* ecs,uint8_t *data, int datalen)
 	mbox_set_state(ecs, entry_desc_response);
 }
 
-void od_list_request(e_slave* ecs, uint8_t * data, int datalen)
+void od_list_request(ecat_slave* ecs, uint8_t * data, int datalen)
 {
 	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
 	coe_sdo_service_data *srvdata =__coe_sdo_service_data(data);
@@ -149,7 +149,7 @@ void od_list_request(e_slave* ecs, uint8_t * data, int datalen)
 	mbox_set_state(ecs, od_list_response);
 }
 
-void coe_sdo_info(e_slave* ecs, uint8_t * data, int datalen)
+void coe_sdo_info(ecat_slave* ecs, uint8_t * data, int datalen)
 {
 	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
 
@@ -175,7 +175,7 @@ void coe_sdo_info(e_slave* ecs, uint8_t * data, int datalen)
 	}
 }
 
-void coe_parser(e_slave* ecs, int reg, uint8_t * data, int datalen)
+void coe_parser(ecat_slave* ecs, int reg, uint8_t * data, int datalen)
 {
 	coe_header *hdr = __coe_header(data);
 

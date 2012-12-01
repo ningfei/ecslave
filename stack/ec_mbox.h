@@ -53,10 +53,10 @@ static inline mbox_header *__mbox_hdr(uint8_t* data)
 }
 
 
-void mbox_set_state(e_slave*,
-	void (*state)(e_slave*, uint8_t*,int ));
+void mbox_set_state(ecat_slave*,
+	void (*state)(ecat_slave*, uint8_t*,int ));
 
 void ec_mbox_syncm(int reg, uint8_t* data, int datalen);
-void ec_mbox(e_slave* ecs, int reg, uint8_t * data, int datalen);
+void ec_mbox(ecat_slave* ecs, int reg, uint8_t * data, int datalen);
 
 #endif

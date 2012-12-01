@@ -26,7 +26,7 @@
 #include "ec_cmd.h"
 
 
-e_slave *eslave = 0;
+ecat_slave *eslave = 0;
 
 static int returning_pkt(struct sk_buff *skb)
 {
@@ -82,7 +82,7 @@ static struct packet_type ecat_packet __read_mostly = {
         .func = ecat_rcv,
 };
 
-int ecat_proto_init(e_slave * ecs)
+int ecat_proto_init(ecat_slave * ecs)
 {
 	eslave = ecs;
 	dev_add_pack(&ecat_packet);

@@ -14,7 +14,7 @@
 #include "ecat_protocol.h"
 
 static struct fsm_slave fsm_slave;
-static e_slave ecs;
+static ecat_slave ecs;
 static char *txmac = 0;
 static char *rxmac = 0;
 static int debug_level = 0;

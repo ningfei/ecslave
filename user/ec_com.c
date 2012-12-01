@@ -14,13 +14,13 @@
 static pcap_t *tx_handle = 0;
 static pcap_t *rx_handle = 0;
 
-int dbg_index(e_slave *ecs)
+int dbg_index(ecat_slave *ecs)
 {
 	uint8_t *p =   __ecat_frameheader(ecs->pkt_head) + sizeof(ec_frame_header);
 	return __ec_dgram_pkt_index(p);
 }
 
-uint16_t ec_dbg_wkc(e_slave *ecs)
+uint16_t ec_dbg_wkc(ecat_slave *ecs)
 {
 	uint8_t *p =   __ecat_frameheader(ecs->pkt_head) + sizeof(ec_frame_header);
 	return __ec_wkc(p);
@@ -61,7 +61,7 @@ void ec_tx_pkt(uint8_t* buf, int size, struct ec_device *intr)
 }
 
 /* we may catch out own transmitted packet */
-static int is_outgoing_pkt(e_slave *ecs, uint8_t *d)
+static int is_outgoing_pkt(ecat_slave *ecs, uint8_t *d)
 {
 	if (!memcmp(__ec_get_shost(d),
 		ecs->intr[RX_INT_INDEX]->mac.ether_shost,
@@ -79,7 +79,7 @@ static int is_outgoing_pkt(e_slave *ecs, uint8_t *d)
 static void ec_pkt_filter(u_char *user, const struct pcap_pkthdr *h,
                                    const u_char *bytes)
 {
-	e_slave *ecs = (e_slave *)user;
+	ecat_slave *ecs = (ecat_slave *)user;
 	uint8_t *d = (uint8_t *)bytes;
 
 	if (!__ec_is_ethercat(d)){
@@ -95,7 +95,7 @@ static void ec_pkt_filter(u_char *user, const struct pcap_pkthdr *h,
 void passing_pkt(u_char *user, const struct pcap_pkthdr *h,
                                    const u_char *bytes)
 {
-	e_slave *ecs = (e_slave *)user;
+	ecat_slave *ecs = (ecat_slave *)user;
 	uint8_t *d = (uint8_t *)bytes;
 
 	if (!__ec_is_ethercat(d)){
@@ -115,7 +115,7 @@ void *pkt_passing_thread(void *ecs)
 	}
 }
 
-int ec_capture(e_slave *ecs)
+int ec_capture(ecat_slave *ecs)
 {
 	pthread_t t;
  	char errbuf[PCAP_ERRBUF_SIZE];          /* error buffer */

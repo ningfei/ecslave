@@ -4,7 +4,7 @@
 #include "ecs_slave.h"
 #include "ec_net.h"
 
-int ec_is_nic_link_up(e_slave *esv,struct ec_device *intr)
+int ec_is_nic_link_up(ecat_slave *esv,struct ec_device *intr)
 {
 	int linkup = 0;
 	char intname[256];
@@ -119,7 +119,7 @@ int ecs_sock(struct ec_device * intr)
 	return 0;
 }
 
-int ecs_net_init(int argc, char *argv[], e_slave * esv)
+int ecs_net_init(int argc, char *argv[], ecat_slave * esv)
 {
 	int i;
 	int k;

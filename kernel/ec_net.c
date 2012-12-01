@@ -54,7 +54,7 @@ struct net_device *ec_find_dev_by_mac(const uint8_t *mac)
  * scan network device list, find the interfaces by mac and 
  * grab them.
 */
-int ec_net_init(e_slave * ecs, char *rxmac, char *txmac)
+int ec_net_init(ecat_slave * ecs, char *rxmac, char *txmac)
 {
 	struct net_device *netdev;
 	struct ec_device *device;
@@ -114,7 +114,7 @@ void ec_tx_pkt(	uint8_t *buf __attribute__ ((unused)),
 	txdev->processed_skb = 0;
 }
 
-int ec_is_nic_link_up(e_slave * ecs, struct ec_device *intr)
+int ec_is_nic_link_up(ecat_slave * ecs, struct ec_device *intr)
 {
 	return intr->dev->ethtool_ops->get_link(intr->dev);
 }

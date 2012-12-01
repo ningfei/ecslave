@@ -10,7 +10,7 @@
 #include "ec_regs.h"
 
  /** Auto Increment Read Write. by ring position */
-void ec_cmd_aprw(e_slave *ecs, uint8_t *dgram_ec)
+void ec_cmd_aprw(ecat_slave *ecs, uint8_t *dgram_ec)
 {
 	uint16_t adp;
 	uint16_t ado;

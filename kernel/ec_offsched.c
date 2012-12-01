@@ -12,7 +12,7 @@ static dev_t device_number;
 static struct cdev cdev;
 static int offline_cpuid = 1;
 static int offsched_on = 0;
-e_slave *eslave = 0;
+ecat_slave *eslave = 0;
 extern void register_offsched(void (*callback) (void), int cpuid);
 extern void unregister_offsched(int cpuid);
 
@@ -70,7 +70,7 @@ void ec_offsched_cleanup(void)
 	cdev_del(&cdev);
 }
 
-int ec_offsched_init(e_slave * ecs)
+int ec_offsched_init(ecat_slave * ecs)
 {
 	int ret;
 	int base_minor = 0;

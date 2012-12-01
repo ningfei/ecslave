@@ -18,7 +18,7 @@ typedef enum {
 #define MBOX_COE_TYPE 0x03
 #define NR_SDOS 2
 
-void coe_parser(e_slave *ecs, int reg, uint8_t * data, int datalen);
+void coe_parser(ecat_slave *ecs, int reg, uint8_t * data, int datalen);
 
 // table 42
 typedef struct {

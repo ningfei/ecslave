@@ -6,7 +6,7 @@
 #include "ec_sii.h"
 
 /** Configured Address Write */
-void ec_cmd_fpwr(e_slave *ecs,uint8_t *dgram_ec)
+void ec_cmd_fpwr(ecat_slave *ecs,uint8_t *dgram_ec)
 {
 	uint16_t ado = 0;
 	uint16_t adp = 0;

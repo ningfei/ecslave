@@ -6,7 +6,7 @@
 #include "ec_sii.h"
 
 /** Configured Address Read Write */
-void ec_cmd_fprw(e_slave *ecs,uint8_t *dgram_ec)
+void ec_cmd_fprw(ecat_slave *ecs,uint8_t *dgram_ec)
 {
 	uint16_t ado, adp;
 	uint16_t datalen = __ec_dgram_dlength(dgram_ec);

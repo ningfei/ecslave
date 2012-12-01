@@ -4,7 +4,7 @@
 #include "ecs_slave.h"
 #include "ec_regs.h"
 
-void ec_cmd_bwr(e_slave * ecs,uint8_t *dgram_ec)
+void ec_cmd_bwr(ecat_slave * ecs,uint8_t *dgram_ec)
 {
 	uint16_t ado;
 	uint8_t *data = __ec_dgram_data(dgram_ec);

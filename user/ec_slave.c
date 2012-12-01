@@ -11,7 +11,7 @@
 int main(int argc, char *argv[])
 {
 	struct fsm_slave fsm_slave;
-	e_slave ecs;
+	ecat_slave ecs;
 
 	if (argc < 2) {
 		/*

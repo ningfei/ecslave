@@ -9,7 +9,7 @@
 
 static uint8_t ec_registers[ECT_REG_DCCYCLE1 + SDOS_ADDR_SPACE] = { 0 };
 
-void ec_init_regs(e_slave* esv)
+void ec_init_regs(ecat_slave* esv)
 {
 	int i = 0;
 	uint16_t *dl;
@@ -88,7 +88,7 @@ int16_t ec_station_address(void)
 	return ec_registers[ECT_REG_STADR];
 }
 
-void ec_set_ado(e_slave *ecs, int reg, uint8_t * data, int datalen)
+void ec_set_ado(ecat_slave *ecs, int reg, uint8_t * data, int datalen)
 {
 	if (reg > ECT_REG_DCCYCLE1) {
 		return ec_mbox(ecs, reg, data, datalen);
@@ -103,7 +103,7 @@ void ec_set_ado(e_slave *ecs, int reg, uint8_t * data, int datalen)
 	}
 }
 
-void ec_get_ado(e_slave *ecs, int reg, uint8_t * data, int datalen)
+void ec_get_ado(ecat_slave *ecs, int reg, uint8_t * data, int datalen)
 {
 	if (reg > ECT_REG_DCCYCLE1) {
 		return ec_mbox(ecs, reg, data, datalen);

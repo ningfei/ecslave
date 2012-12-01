@@ -5,7 +5,7 @@
 #include "ec_regs.h"
 
 /* Broadcat Read Write */
-void ec_cmd_brw(e_slave * ecs,uint8_t *dgram_ec)
+void ec_cmd_brw(ecat_slave * ecs,uint8_t *dgram_ec)
 {
 	uint16_t ado;
 	uint8_t *data = __ec_dgram_data(dgram_ec);

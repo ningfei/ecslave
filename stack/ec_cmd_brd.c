@@ -3,7 +3,7 @@
 #include "fsm_slave.h"
 #include "ec_regs.h"
 
-void ec_cmd_brd(e_slave *ecs, uint8_t *dgram_ec)
+void ec_cmd_brd(ecat_slave *ecs, uint8_t *dgram_ec)
 {
 	uint16_t ado;
 	uint16_t adp;
@@ -24,7 +24,7 @@ void ec_cmd_brd(e_slave *ecs, uint8_t *dgram_ec)
 	__set_fsm_state(ecs, ecs_process_next_dgram);
 }
 
-void ec_cmd_nop(e_slave * ecs,uint8_t* dgram_ec)
+void ec_cmd_nop(ecat_slave * ecs,uint8_t* dgram_ec)
 {
 	__set_fsm_state(ecs, ecs_process_next_dgram);
 }

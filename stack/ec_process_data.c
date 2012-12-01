@@ -12,7 +12,7 @@ typedef struct {
 
 static process_data pd;
 
-int init_process_data(e_slave *ecs)
+int init_process_data(ecat_slave *ecs)
 {
 	pd.size = ec_sii_pdoes_sizes(ecs);
 	if (pd.size <= 0 ){
@@ -39,7 +39,7 @@ int get_process_data(uint8_t *data, uint16_t offset, uint16_t datalen)
 	return 0;
 }
 
-void normalize_sizes(e_slave *ecs, uint32_t *offset,uint16_t *datalen)
+void normalize_sizes(ecat_slave *ecs, uint32_t *offset,uint16_t *datalen)
 {
 	int off  = (ec_station_address() -1) * pd.size + *offset;
 	if (off < 0) {

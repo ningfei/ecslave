@@ -11,7 +11,7 @@
 
 #define  WORKING_CNT_SIZE 2
 
-void ecs_process_next_dgram(e_slave * ecs,uint8_t *d)
+void ecs_process_next_dgram(ecat_slave * ecs,uint8_t *d)
 {
 	if (--ecs->dgrams_cnt) {
 		/* move to next packet */
@@ -46,7 +46,7 @@ int  ec_nr_dgrams(uint8_t *raw_pkt)
 	return i;
 }
 
-void ecs_process_cmd(e_slave * ecs, uint8_t *dgram_ec)
+void ecs_process_cmd(ecat_slave * ecs, uint8_t *dgram_ec)
 {
 	__set_fsm_state(ecs, ec_cmd_nop);
 	
@@ -112,7 +112,7 @@ void ecs_process_cmd(e_slave * ecs, uint8_t *dgram_ec)
 	ecs->fsm->state(ecs, dgram_ec);
 }
 
-void ec_process_datagrams(e_slave *ecs,int len, uint8_t *dgram_ec)
+void ec_process_datagrams(ecat_slave *ecs,int len, uint8_t *dgram_ec)
 {
 	ecs->pkt_head = dgram_ec;
 	ecs->pkt_size = len;

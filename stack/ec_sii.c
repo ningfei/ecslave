@@ -441,7 +441,7 @@ void init_si_info(ec_sii_t *sii)
 }
 
 /* slave information interface */
-void init_sii(e_slave *esc)
+void init_sii(ecat_slave *esc)
 {
 	int pdoe_idx = 0;
 
@@ -533,7 +533,7 @@ int ec_sii_start_read(uint8_t * data, int datalen)
 	return 0;
 }
 
-int ec_sii_pdoes_sizes(e_slave *ecs)
+int ec_sii_pdoes_sizes(ecat_slave *ecs)
 {
 	int i = 0;
 	int size_bits = 0;

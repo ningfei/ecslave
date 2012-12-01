@@ -2,11 +2,11 @@
 #define __ECS_SLAVE_H__
 
 
-struct __e_slave__;
+struct __ecat_slave__;
 struct fsm_slave;
 
 typedef struct {
-	void (*state)(struct __e_slave__ *,uint8_t *,int);
+	void (*state)(struct __ecat_slave__ *,uint8_t *,int);
 } fsm_mbox;
 
 typedef struct {
@@ -20,7 +20,7 @@ typedef struct {
 
 struct ec_device;
 
-typedef struct __e_slave__ {
+typedef struct __ecat_slave__ {
 	uint8_t *pkt_head;
 	uint8_t *dgram_processed; /* current ethercat dgram processed */
 	uint8_t dgrams_cnt;
@@ -34,31 +34,31 @@ typedef struct __e_slave__ {
 	fsm_mbox mbox;
 	uint8_t index;			/* used by etherlab debug api */
 	struct semaphore device_sem;	/* used by etherlab */
-} e_slave;
+} ecat_slave;
 
-typedef struct __e_slave__ ecat_node_t;
+typedef struct __ecat_slave__ ecat_node_t;
 
-int  ecs_net_init(int ,char *argv[], e_slave *);
-int  ecs_init(e_slave *);
-void ecs_run(e_slave *);
+int  ecs_net_init(int ,char *argv[], ecat_slave *);
+int  ecs_init(ecat_slave *);
+void ecs_run(ecat_slave *);
 
-void ec_cmd_apwr(e_slave * slave, uint8_t *ecdgram);
-void ec_cmd_armw(e_slave * slave, uint8_t *ecdgram);
-void ec_cmd_aprw(e_slave * slave, uint8_t *ecdgram);
-void ec_cmd_aprd(e_slave * slave, uint8_t *ecdgram);
-void ec_cmd_fprd(e_slave * slave, uint8_t *ecdgram);
-void ec_cmd_frmw(e_slave * slave, uint8_t *ecdgram);
-void ec_cmd_fpwr(e_slave * slave, uint8_t *ecdgram);
-void ec_cmd_fprw(e_slave * slave, uint8_t *ecdgram);
-void ec_cmd_brw(e_slave * slave,  uint8_t *ecdgram);
-void ec_cmd_bwr(e_slave * slave,  uint8_t *ecdgram);
-void ec_cmd_brd(e_slave * slave,  uint8_t *ecdgram);
-void ec_cmd_nop(e_slave * slave,  uint8_t *ecdgram);
-void ec_cmd_lrd(e_slave * slave,  uint8_t *ecdgram);
-void ec_cmd_lrw(e_slave * slave,  uint8_t *ecdgram);
-void ec_cmd_lwr(e_slave * slave,  uint8_t *ecdgram);
+void ec_cmd_apwr(ecat_slave * slave, uint8_t *ecdgram);
+void ec_cmd_armw(ecat_slave * slave, uint8_t *ecdgram);
+void ec_cmd_aprw(ecat_slave * slave, uint8_t *ecdgram);
+void ec_cmd_aprd(ecat_slave * slave, uint8_t *ecdgram);
+void ec_cmd_fprd(ecat_slave * slave, uint8_t *ecdgram);
+void ec_cmd_frmw(ecat_slave * slave, uint8_t *ecdgram);
+void ec_cmd_fpwr(ecat_slave * slave, uint8_t *ecdgram);
+void ec_cmd_fprw(ecat_slave * slave, uint8_t *ecdgram);
+void ec_cmd_brw(ecat_slave * slave,  uint8_t *ecdgram);
+void ec_cmd_bwr(ecat_slave * slave,  uint8_t *ecdgram);
+void ec_cmd_brd(ecat_slave * slave,  uint8_t *ecdgram);
+void ec_cmd_nop(ecat_slave * slave,  uint8_t *ecdgram);
+void ec_cmd_lrd(ecat_slave * slave,  uint8_t *ecdgram);
+void ec_cmd_lrw(ecat_slave * slave,  uint8_t *ecdgram);
+void ec_cmd_lwr(ecat_slave * slave,  uint8_t *ecdgram);
 
-void ecs_process_next_dgram(e_slave * slave,  uint8_t *ecdgram);
+void ecs_process_next_dgram(ecat_slave * slave,  uint8_t *ecdgram);
 int  ec_nr_dgrams(uint8_t *raw_pkt);
 
 /* d points at start of datagram.  */

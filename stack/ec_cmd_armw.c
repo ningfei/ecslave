@@ -10,7 +10,7 @@
 #include "ec_regs.h"
 
  /** Auto Increment read multiple write */
-void ec_cmd_armw(e_slave *ecs, uint8_t *dgram_ec)
+void ec_cmd_armw(ecat_slave *ecs, uint8_t *dgram_ec)
 {
 	uint16_t adp;
 	uint16_t ado;
