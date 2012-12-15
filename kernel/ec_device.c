@@ -43,7 +43,9 @@ void ec_device_detach(ec_device_t * device
 			    /**< EtherCAT device */
     )
 {
-
+	INIT_LIST_HEAD(&device->events);
+	INIT_LIST_HEAD(&device->rx_time.list);
+	spin_lock_init(&device->events_sync);
 	device->dev = NULL;
 	ec_device_clear_stats(device);
 }
@@ -69,9 +71,7 @@ void ec_device_clear_stats(ec_device_t * device
 void ec_device_send(struct ec_device *device, struct sk_buff *skb)
 {
 	int ret;
-
-	/* copy device's mac . better for debugging */
-	memcpy(eth_hdr(skb)->h_source, device->dev->dev_addr,ETH_ALEN);
+	
 	ret =  device->dev->netdev_ops->ndo_start_xmit(skb, device->dev);
 	if (ret == NETDEV_TX_OK) {
 		device->tx_count++;
@@ -79,3 +79,23 @@ void ec_device_send(struct ec_device *device, struct sk_buff *skb)
 	}
 	device->tx_errors++;
 }
+
+/*****************************************************************************/
+void ecat_add_event_to_device(struct ec_device *device, 
+		struct ecat_event* ev,
+		void (*action)(void *), 
+		void *private)
+{
+	unsigned long flags;
+
+	if (!list_empty(&ev->list)) {
+		printk("%s double assignment\n",__func__);
+		return;
+	}
+	ev->action = action;
+	ev->private = private;
+	spin_lock_irqsave(&device->events_sync, flags);
+        list_add_tail(&ev->list, &device->events);
+	spin_unlock_irqrestore(&device->events_sync, flags);
+}
+

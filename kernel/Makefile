@@ -1,9 +1,11 @@
 TARGET= ecslave
-OBJS  = ec_slave.o \
-ec_net.o \
-ecat_protocol.o \
-ec_debug.o \
-ec_device.o \
+OBJS  = \
+../kernel/ec_slave.o \
+../kernel/ec_net.o \
+../kernel/ecat_protocol.o \
+../kernel/ec_debug.o \
+../kernel/ecat_timer.o \
+../kernel/ec_device.o \
 ../stack/ec_cmd_apwr.o \
 ../stack/ec_cmd_aprd.o \
 ../stack/ec_cmd_aprw.o \
@@ -23,13 +25,14 @@ ec_device.o \
 ../stack/ec_coe.o \
 ../stack/ec_cmd.o \
 ../stack/ec_mbox.o \
-../stack/ec_process_data.o
+../stack/ec_process_data.o \
+../stack/ecat_timer_common.o
 
 CURRENT=`uname -r`
 KDIR = /lib/modules/$(CURRENT)/build/
 
 obj-m  := $(TARGET).o
-ccflags-y += -I$(PWD)/../include/ -I$(PWD)/../stack/ -I$(PWD)/../devices/
+ccflags-y += -I$(PWD)/../include/ -I$(PWD)/../stack/ -I$(PWD)/../devices/ -I$(PWD)/../kernel/
 $(TARGET)-objs := $(OBJS)
 
 default:

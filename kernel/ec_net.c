@@ -77,8 +77,8 @@ int ec_net_init(ecat_slave * ecs, char *rxmac, char *txmac)
 	ec_device_init(device, ecs);
 	ec_device_attach(device, netdev);
 	ecs->intr[RX_INT_INDEX] = device;
-	EC_NODE_INFO(ecs, "Loaded RX listener on device %s",netdev->name);
-
+	EC_NODE_INFO(ecs, "Loaded RX listener on device %s\n",netdev->name);
+	ecs->interfaces_nr = 1;
 	/* closed loop */
 	if (!txmac) {
 		ecs->intr[TX_INT_INDEX] = ecs->intr[RX_INT_INDEX];
@@ -100,7 +100,8 @@ int ec_net_init(ecat_slave * ecs, char *rxmac, char *txmac)
 	ec_device_init(device, ecs);
 	ec_device_attach(device, netdev);
 	ecs->intr[TX_INT_INDEX] = device;
-	EC_NODE_INFO(ecs, "Loaded Tx listener on device %s",netdev->name);
+	ecs->interfaces_nr = 2;
+	EC_NODE_INFO(ecs, "Loaded Tx listener on device %s\n", netdev->name);
 	return 0;
 }
 
@@ -108,10 +109,10 @@ void ec_tx_pkt(	uint8_t *buf __attribute__ ((unused)),
 		int size __attribute__ ((unused)), 
 		struct ec_device *txdev)
 {
-	struct ec_device* rxdev = txdev->ecat_node->intr[RX_INT_INDEX];
-	ec_device_send(rxdev,
-			txdev->processed_skb);
-	txdev->processed_skb = 0;
+	struct ec_device *rxdev = txdev->ecat_node->intr[RX_INT_INDEX];
+
+	ec_device_send(txdev, rxdev->processed_skb);
+	rxdev->processed_skb = 0;
 }
 
 int ec_is_nic_link_up(ecat_slave * ecs, struct ec_device *intr)

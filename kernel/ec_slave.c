@@ -13,6 +13,8 @@
 #include "ec_offsched.h"
 #include "ecat_protocol.h"
 
+extern void ecat_timer_exit(void);
+
 static struct fsm_slave fsm_slave;
 static ecat_slave ecs;
 static char *txmac = 0;
@@ -22,9 +24,7 @@ static int debug_level = 0;
 void ecs_module_cleanup(void)
 {
 	ecat_proto_cleanup();
-#ifdef __OFFLINE_SCHDULER__
-	ec_offsched_cleanup();
-#endif
+	ecat_timer_exit();
 }
 
 int ecs_module_init(void)
@@ -41,15 +41,8 @@ int ecs_module_init(void)
 	ecs.fsm = &fsm_slave;
 	ecs.dgram_processed = 0;
 	ecs.dgrams_cnt = 0;
-#ifdef __OFFLINE_SCHDULER__
-	if (ec_offsched_init(&ecs)) {
-		printk("Failed to initialize offsched\n");
-		return -1;
-	}
-#else
-	/* launch hrtimer */
-#endif
 	ecat_proto_init(&ecs);	
+	ecat_create_timer();
 	return 0;
 }
 
@@ -60,7 +53,7 @@ module_param(txmac, charp, 0);
 MODULE_PARM_DESC(txmac, "Mac address of the transmssion interface");
 
 module_param(rxmac, charp, 0);
-MODULE_PARM_DESC(rxmac, "mac address of the receive interface");
+MODULE_PARM_DESC(rxmac, "Mac address of the receive interface");
 
 module_param(debug_level, uint, 0);
 MODULE_PARM_DESC(debug_level, "Debug level");

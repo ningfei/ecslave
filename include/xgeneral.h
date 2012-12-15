@@ -1,4 +1,10 @@
-#define EC_MAX_PORTS 2
+#ifndef  __XGENERAL_H__ 
+#define  __XGENERAL_H__ 
+
+#define TIMESPEC2NS(T) ((uint64_t) (T).tv_sec * NSEC_PER_SEC + (T).tv_nsec)
+#define RX_INT_INDEX	0	/* port in the master side */
+#define TX_INT_INDEX	1	/* port in the next side  */
+
 
 #ifdef __KERNEL__
 
@@ -7,6 +13,7 @@
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/list.h>
+#include <linux/time.h>
 
 struct ether_header
 {
@@ -16,10 +23,14 @@ struct ether_header
 } __attribute__ ((__packed__));
 
 #define xmalloc(size) 	kmalloc(size, GFP_KERNEL)
-static inline int clock_gettime(int dummy __attribute__((unused)), struct timespec *sp)
+static inline void clock_gettime(int dummy __attribute__((unused)), struct timespec *sp)
 {
 	getnstimeofday(sp);
-	return 0;
+}
+
+static inline int clock_settime(int dummy __attribute__((unused)), struct timespec *sp)
+{
+	return do_settimeofday(sp);
 }
 
 #define LIST_ENTRY(a) struct list_head 
@@ -67,3 +78,4 @@ struct semaphore {
 
 #endif
 
+#endif 

@@ -81,6 +81,8 @@ static void ec_pkt_filter(u_char *user, const struct pcap_pkthdr *h,
 {
 	ecat_slave *ecs = (ecat_slave *)user;
 	uint8_t *d = (uint8_t *)bytes;
+	struct ec_device *intr = ecs->intr[TX_INT_INDEX];
+	struct ecat_event *ev;
 
 	if (!__ec_is_ethercat(d)){
 		return;
@@ -88,6 +90,14 @@ static void ec_pkt_filter(u_char *user, const struct pcap_pkthdr *h,
 	if (is_outgoing_pkt(ecs, d)){
 		return;
 	}
+	pthread_mutex_lock(&intr->events_sync);
+	while (LIST_FIRST(&intr->events) != NULL) {
+	      	ev = LIST_FIRST(&intr->events);
+		ev->action(ev->private);
+		LIST_REMOVE(ev, list);
+		ev->action = 0x00;
+	}
+	pthread_mutex_unlock(&intr->events_sync);
 	ec_process_datagrams(ecs, h->len, d);
 }
 
@@ -97,6 +107,8 @@ void passing_pkt(u_char *user, const struct pcap_pkthdr *h,
 {
 	ecat_slave *ecs = (ecat_slave *)user;
 	uint8_t *d = (uint8_t *)bytes;
+	struct ec_device *intr = ecs->intr[RX_INT_INDEX];
+	struct ecat_event *ev;
 
 	if (!__ec_is_ethercat(d)){
 		return;
@@ -104,6 +116,15 @@ void passing_pkt(u_char *user, const struct pcap_pkthdr *h,
 	if (is_outgoing_pkt(ecs, d)){
 		return;
 	}
+
+	pthread_mutex_lock(&intr->events_sync);
+	while (LIST_FIRST(&intr->events) != NULL) {
+	      	ev = LIST_FIRST(&intr->events);
+		ev->action(ev->private);
+		LIST_REMOVE(ev, list);
+		ev->action = 0x00;
+	}
+	pthread_mutex_unlock(&intr->events_sync);
 	ec_tx_pkt(d ,h->len , ecs->intr[RX_INT_INDEX]);
 }
 

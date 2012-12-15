@@ -4,29 +4,38 @@
 #include "ecs_slave.h"
 #include "ec_net.h"
 
+#include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <net/if.h>
+
+#include <linux/sockios.h>
+#include <linux/ethtool.h>
+
+/* use the ethtool way to determine whether link is up*/
 int ec_is_nic_link_up(ecat_slave *esv,struct ec_device *intr)
 {
-	int linkup = 0;
-	char intname[256];
-	char buf[16];
-	int fd;
-	
-	if (!intr){
-		return 0;
-	}
+    int sock;
+    struct ifreq ifr;
+    struct ethtool_value edata;
+    int rc;
 
-	sprintf(intname, "/sys/class/net/%s/operstate", intr->name);
-	fd = open(intname, O_RDONLY);
-	if (fd < 0)
-		return 0;
-	if (read(fd, buf, sizeof(buf)) < 0) {
-		goto LINKUP_EXIT;
-	}
-	if (memcmp(buf, "up", 2) == 0)
-		linkup = 1;
-LINKUP_EXIT:
-	close(fd);
-	return linkup;
+    sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
+    if (sock < 0) {
+    	return 0;
+    }
+    strncpy(ifr.ifr_name, intr->name, sizeof(ifr.ifr_name));
+    ifr.ifr_data = (void *)&edata;
+
+    edata.cmd = ETHTOOL_GLINK;
+
+    rc = ioctl(sock, SIOCETHTOOL, &ifr);
+    close(sock);
+    if (rc < 0) {
+        return 0;
+    }
+
+    return  edata.data  ? 1 : 0;
 }
 
 int ecs_get_intr_conf(struct ec_device * intr)
@@ -60,7 +69,7 @@ int ecs_get_intr_conf(struct ec_device * intr)
 		/* no mask. put all zeros */
 		memset(&sin_mask, 0, sizeof(struct sockaddr));
 		ec_printf("LOCAL SUBNET MASK 0.0.0.0\n");
-	} else {
+	} else{
 		memcpy(&sin_mask, &ifr.ifr_netmask,
 		       sizeof(struct sockaddr));
 		ec_printf("LOCAL SUBNET MASK %s\n",
@@ -141,6 +150,7 @@ int ecs_net_init(int argc, char *argv[], ecat_slave * esv)
 			esv->intr[i] = 0;
 			break;
 		}
+		ec_init_device(intr);
 		esv->interfaces_nr++;	
 	}
 	if (esv->interfaces_nr == 1) {

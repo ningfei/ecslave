@@ -27,6 +27,7 @@ int main(int argc, char *argv[])
 	}
 	ec_init_regs(&ecs);
 	init_sii(&ecs);
+	ecat_create_timer();
 	if (init_process_data(&ecs) < 0){
 		printf ("%s illegal pdo configuration\n",argv[0]);
 		return -1;

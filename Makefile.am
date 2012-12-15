@@ -19,11 +19,13 @@ stack/ec_regs.c \
 stack/ec_coe.c \
 stack/ec_mbox.c \
 stack/ec_cmd.c \
+stack/ecat_timer_common.c \
 stack/ec_process_data.c \
 user/ec_slave.c \
 user/ecat_timer.c \
 user/ec_net.c \
 user/ec_com.c \
+user/ec_device.c \
 user/ec_debug.c
 
 ec_slave_CFLAGS  = -Wall -Werror -O0 -Iinclude/ -Iuser/ -Istack/ -pthread

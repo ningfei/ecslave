@@ -4,9 +4,6 @@
 struct ec_device;
 struct __ecat_slave__;
 
-#define RX_INT_INDEX	0	/* port in the master side */
-#define TX_INT_INDEX	1	/* port in the next side  */
-
 int ec_is_nic_link_up(struct __ecat_slave__ *,struct ec_device *);
 struct __ec_interface__ * ec_tx_interface(struct __ecat_slave__ *);
 struct __ec_interface__ * ec_rx_interface(struct __ecat_slave__ *);

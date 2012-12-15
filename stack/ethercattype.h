@@ -367,11 +367,11 @@ enum
     ECT_REG_DLSTAT      = 0x0110,
     ECT_REG_ALCTL       = 0x0120,
     ECT_REG_ALSTAT      = 0x0130,
-	ECT_REG_ALSTATCODE	= 0x0134,
+    ECT_REG_ALSTATCODE	= 0x0134,
     ECT_REG_PDICTL      = 0x0140,
     ECT_REG_IRQMASK     = 0x0200,
     ECT_REG_RXERR       = 0x0300,
-	ECT_REG_EEPCFG		= 0x0500,
+    ECT_REG_EEPCFG	= 0x0500,
     ECT_REG_EEPCTL      = 0x0502,
     ECT_REG_EEPSTAT     = 0x0502,
     ECT_REG_EEPADR      = 0x0504,
@@ -388,21 +388,21 @@ enum
     ECT_REG_SM1STAT     = ECT_REG_SM1 + 0x05,
     ECT_REG_SM1ACT      = ECT_REG_SM1 + 0x06,
     ECT_REG_SM1CONTR    = ECT_REG_SM1 + 0x07,
-    ECT_REG_DCTIME0     = 0x0900,
-    ECT_REG_DCTIME1     = 0x0904,
-    ECT_REG_DCTIME2     = 0x0908,
-    ECT_REG_DCTIME3     = 0x090C,
-    ECT_REG_DCSYSTIME   = 0x0910,
-    ECT_REG_DCSOF       = 0x0918,
-    ECT_REG_DCSYSOFFSET = 0x0920,
+    ECT_REG_RX_TIME_PORT0 = 0x0900, /* receive time of packet on port 0 */
+    ECT_REG_RX_TIME_PORT1 = 0x0904, /* receive time of packet on port 1*/
+    ECT_REG_RX_TIME_PORT2 = 0x0908,
+    ECT_REG_RX_TIME_PORT3 = 0x090C,
+    ECT_REG_DCSYSTIME   = 0x0910, /* the system time */
+    ECT_REG_DCSOF       = 0x0918, 
+    ECT_REG_DCSYSOFFSET = 0x0920, /* offset from 910 */
     ECT_REG_DCSYSDELAY  = 0x0928,
-    ECT_REG_DCSYSDIFF   = 0x092C,
+    ECT_REG_DCSYSDRIFT   = 0x092C, /* drift register */
     ECT_REG_DCSPEEDCNT  = 0x0930,
     ECT_REG_DCTIMEFILT  = 0x0934,
-    ECT_REG_DCCUC       = 0x0980,
-    ECT_REG_DCSYNCACT   = 0x0981,
-    ECT_REG_DCSTART0    = 0x0990,
-    ECT_REG_DCCYCLE0    = 0x09A0,
+    ECT_REG_DCCUC       = 0x0980, /* cycle unit control -> */
+    ECT_REG_DCSYNCACT   = 0x0981, /* ActiveActive */
+    ECT_REG_SYNC0START  = 0x0990, /* sync0 start time */
+    ECT_REG_SYNC0CYCLE  = 0x09A0, /* sync0 cycle time */
     ECT_REG_DCCYCLE1    = 0x09A4
 };
 

@@ -38,6 +38,9 @@ struct ec_device
     ecat_node_t *ecat_node; /**< EtherCAT master/slave */
     struct net_device *dev; /**< pointer to the assigned net_device */
     struct sk_buff *processed_skb;
+    struct list_head events;
+    spinlock_t events_sync;
+    struct ecat_event rx_time;
     // Frame statistics
     u64 tx_count; /**< Number of frames sent. */
     u64 last_tx_count; /**< Number of frames sent of last statistics cycle. */
