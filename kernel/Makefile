@@ -42,6 +42,6 @@ default:
 $(TARGET).o: $(OBJS)
 	$(LD) $(LD_RFLAG) -r -o $@ $(OBJS)
 clean:
-	-rm -rf *.o .*.o.cmd .*.ko.cmd *.[ch]~ Modules.symvers *.order *.*.ko *.ko *.mod.c .*.c  Module.symvers .tmp_versions/
+	-rm -rf  ../stack/*.o  *.o .*.o.cmd .*.ko.cmd *.[ch]~ Modules.symvers *.order *.*.ko *.ko *.mod.c .*.c  Module.symvers .tmp_versions/
 indent:
 	indent -kr -i8 *.[ch]
