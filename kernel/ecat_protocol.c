@@ -24,6 +24,7 @@
 #include "ec_net.h"
 #include "ec_device.h"
 #include "ec_cmd.h"
+#include "ecat_netproto.h"
 
 #define ECAT_FORWARD_PKT	1
 #define ECAT_PROCESS_PKT	0
@@ -108,15 +109,16 @@ static struct packet_type ecat_packet __read_mostly = {
 
 /*********************** packet type  here **************************/
 
-
 int ecat_proto_init(ecat_slave * ecs)
 {
 	eslave = ecs;
 	dev_add_pack(&ecat_packet);
+	ecat_netproto_init();
 	return 0;
 }
 
 void ecat_proto_cleanup(void)
 {
 	dev_remove_pack(&ecat_packet);
+	ecat_netproto_exit();
 }
