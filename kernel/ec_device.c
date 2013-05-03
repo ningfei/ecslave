@@ -93,7 +93,7 @@ void ecat_add_event_to_device(struct ec_device *device,
 		return;
 	}
 	ev->action = action;
-	ev->private = private;
+	ev->__private = private;
 	spin_lock_irqsave(&device->events_sync, flags);
         list_add_tail(&ev->list, &device->events);
 	spin_unlock_irqrestore(&device->events_sync, flags);

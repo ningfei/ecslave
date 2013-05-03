@@ -15,18 +15,9 @@ void ec_cmd_fprd(ecat_slave *ecs,uint8_t *dgram_ec)
 	ado = __ec_dgram_ado(dgram_ec);
 	adp = __ec_dgram_adp(dgram_ec);
 	if (adp != ec_station_address()) {
-		ec_printf("%s Index=%x not me adp=%x,%x \n",
-			__FUNCTION__,
-			__ec_dgram_pkt_index(dgram_ec),
-			adp,
-			ec_station_address());
 		goto FPRD_OUT;
 	}
-	ec_printf("%s ado=0x%x data len=%d\n",
-	       __FUNCTION__,ado, datalen);
-
 	if (datalen == 0) {
-		ec_printf("insane no length\n");
 		goto FPRD_OUT;
 	}
 	__ec_inc_wkc__(dgram_ec);

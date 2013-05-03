@@ -28,10 +28,6 @@ void ec_cmd_aprw(ecat_slave *ecs, uint8_t *dgram_ec)
 	ec_get_ado(ecs, ado, &val[0], datalen);
 	ec_set_ado(ecs, ado, data, datalen);
 	memcpy(data, &val, datalen);
-	ec_printf("%s ADO 0x%x WRITE 0x %x %x\n",
-	       __FUNCTION__,
-	       ado,
-	       val[0], val[1]);
 	}
 	__ec_inc_wkc__(dgram_ec);
 	__ec_inc_wkc__(dgram_ec);

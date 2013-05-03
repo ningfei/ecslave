@@ -12,13 +12,18 @@
 #define DC_32	0b0100
 #define DC_SIZE	4
 
-static uint8_t ecat_regs[ECT_REG_DCCYCLE1 + SDOS_ADDR_SPACE] = { 0 };
+static uint8_t* ecat_regs;
 
-void ec_init_regs(ecat_slave* esv)
+int ec_init_regs(ecat_slave* esv)
 {
 	int i = 0;
 	uint16_t *dl;
-
+	
+	ecat_regs = xmalloc(ECT_REG_DCCYCLE1);
+	if (!ecat_regs) {
+		return -1;
+	}
+	memset(ecat_regs,0, ECT_REG_DCCYCLE1);
 	ecat_regs[ECT_REG_ALSTAT] = EC_STATE_PRE_OP;
 
 	ecat_regs[ECT_REG_TYPE] = 0;	/* base type 1byte fsm_slave_scan.c line 296 */
@@ -52,6 +57,7 @@ void ec_init_regs(ecat_slave* esv)
 		} 
 		*dl |= (1 << (8 + i * 2));
 	}
+	return 0;
 }
 
 /*
@@ -84,9 +90,9 @@ uint32_t ecat_cyclic_interval_ns(void)
 	return *(uint32_t *)&ecat_regs[ECT_REG_SYNC0CYCLE];
 }
 
-uint64_t ecat_get_dcstart(int port)
+uint32_t ecat_get_dcstart(int port)
 {
-	return  *(uint64_t *)&ecat_regs[ECT_REG_SYNC0START + port];
+	return  *(uint32_t *)&ecat_regs[ECT_REG_SYNC0START + port];
 }
 
 void ecat_set_dcstart(int port, uint8_t* data, int datalen)
@@ -170,13 +176,6 @@ void ec_set_ado(ecat_slave *ecs, int reg, uint8_t * data, int datalen)
 	}
 	ecat_process_write_ados(ecs, reg, reg + datalen, data);
 	memcpy(&ecat_regs[reg], data, datalen);
-#ifndef __KERNEL__
-	if (reg != 0x910 && reg != 0x502 ) {
-		printf("W(%x) = %u,%x\n", reg,
-			*(uint32_t *)&ecat_regs[reg],
-			*(uint32_t *)&ecat_regs[reg]);
-	}
-#endif
 }
 
 void ecat_process_read_ados(int reg1,int reg2)
@@ -201,21 +200,15 @@ void ec_get_ado(ecat_slave *ecs, int reg, uint8_t * data, int datalen)
 		return ec_mbox(ecs, reg, data, datalen);
 	}
 	if (reg < ECT_REG_TYPE) {
-		ec_printf("%s insane ado 0x%x\n",__FUNCTION__,reg);
 		return;
 	}
 	if (reg >= ECT_REG_SM0 && reg <= ECT_REG_SM3) {
 		/* ethelan expects here a mail box*/
 		return	ec_sii_syncm(reg,  data, datalen);
 	}
+//	ec_printstr("get ado");
+//	ec_print(reg);
 	ecat_process_read_ados(reg,reg + datalen);
 	memcpy(data, &ecat_regs[reg], datalen);
-#ifndef __KERNEL__
-	if (reg != ECT_REG_ALSTAT && reg != 0x910 && reg != 0x502) {
-		printf("R(%x) = %u,%x\n", reg,
-			*(uint32_t *)&ecat_regs[reg],
-			*(uint32_t *)&ecat_regs[reg]);
-	}
-#endif
 }
 

@@ -8,6 +8,7 @@
 #include "ec_com.h"
 #include "ec_net.h"
 #include "ec_cmd.h"
+#include <Arduino.h>
 
 #define  WORKING_CNT_SIZE 2
 
@@ -41,7 +42,7 @@ int  ec_nr_dgrams(uint8_t *raw_pkt)
 		dgram += sizeof(ec_dgram) + WORKING_CNT_SIZE + __ec_dgram_dlength(dgram); 		
 	}
 	if (frame_size < 0){
-		ec_printf("aieeee %d %d\n",frame_size,f);
+		return 0;
 	}
 	return i;
 }
