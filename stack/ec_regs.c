@@ -18,6 +18,10 @@ int ec_init_regs(ecat_slave* esv)
 {
 	int i = 0;
 	uint16_t dl = 0;
+	
+	i  = ecat_pool_init() ;
+	if (i < 0)
+		return i;
 
 	ecat_set_reg(ECT_REG_ALSTAT, EC_STATE_PRE_OP);
 

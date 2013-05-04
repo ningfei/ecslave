@@ -1,17 +1,58 @@
 #include "xgeneral.h"
 
-static uint8_t ecat_regs1[200];
-static uint8_t ecat_regs2[200];
-static uint8_t ecat_regs3[200];
-static uint8_t ecat_regs4[200];
-static uint8_t ecat_regs5[200];
-static uint8_t ecat_regs6[200];
-static uint8_t ecat_regs7[200];
-static uint8_t ecat_regs8[200];
-static uint8_t ecat_regs9[200];
-static uint8_t ecat_regs10[200];
-static uint8_t ecat_regs11[200];
-static uint8_t ecat_regs12[200];
+static uint8_t* ecat_regs1 = 0;
+static uint8_t* ecat_regs2 = 0;
+static uint8_t* ecat_regs3 = 0;
+static uint8_t* ecat_regs4 = 0;
+static uint8_t* ecat_regs5 = 0 ;
+static uint8_t* ecat_regs6 = 0;
+static uint8_t* ecat_regs7 = 0;
+static uint8_t* ecat_regs8 = 0;
+static uint8_t* ecat_regs9 = 0;
+static uint8_t* ecat_regs10 = 0;
+static uint8_t* ecat_regs11 = 0;
+static uint8_t* ecat_regs12 = 0;
+
+
+int ecat_pool_init()
+{
+	ecat_regs1 = malloc(200);
+	if (!ecat_regs1)
+		return -1;
+	ecat_regs2 = malloc(200);
+	if (!ecat_regs2)
+		return -2;
+	ecat_regs3 = malloc(200);
+	if (!ecat_regs3)
+		return -3;
+	ecat_regs4 = malloc(200);
+	if (!ecat_regs4)
+		return -4;
+	ecat_regs5 = malloc(200);
+	if (!ecat_regs4)
+		return -4;
+	ecat_regs6 = 0;
+	if (!ecat_regs4)
+		return -4;
+	ecat_regs7 = 0;
+	if (!ecat_regs4)
+		return -4;
+	ecat_regs8 = 0;
+	if (!ecat_regs4)
+		return -4;
+	ecat_regs9 = 0;
+	if (!ecat_regs4)
+		return -4;
+	ecat_regs10 = 0;
+	if (!ecat_regs4)
+		return -4;
+	ecat_regs11 = 0;
+	if (!ecat_regs4)
+		return -4;
+	ecat_regs12 = 0;
+	if (!ecat_regs4)
+		return -4;
+}
 
 /*
  * since obvious bug here is data shared between two arrays,

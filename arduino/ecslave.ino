@@ -17,17 +17,22 @@ void ecat_rcv(ecat_slave  *ecs);
 
 void setup()
 {
+	int ret;
         Serial.begin(9600);
-        Serial.println("Starting setup"); 
+        Serial.println("Arduino Ethercat slave"); 
  
 	ecs.fsm = 0; /* act as flag */
-	if (ecs_net_init(0 , 0, &ecs) < 0) {
-		Serial.println("Error init network");
+	ret = ecs_net_init(0 , 0, &ecs);
+	if (ret < 0) {
+		Serial.print("Error init network");
+		Serial.println(ret);
 		return;
 	}
-
-	if (ec_init_regs(&ecs) < 0){
+	
+	ret  = ec_init_regs(&ecs) ;
+	if (ret < 0){
 		Serial.println("Error init registers");
+		Serial.println(ret);
 		return;
 	}
 
