@@ -5,7 +5,13 @@
 #define RX_INT_INDEX	0	/* port in the master side */
 #define TX_INT_INDEX	1	/* port in the next side  */
 
-
+/*
+#ifdef __x86_64__
+	typedef long INT;
+#else
+	typedef int INT;
+#endif
+*/
 #ifdef __KERNEL__
 
 #include <linux/if_ether.h>
@@ -14,6 +20,7 @@
 #include <linux/module.h>
 #include <linux/list.h>
 #include <linux/time.h>
+
 
 struct ether_header {
   u_int8_t  ether_dhost[ETH_ALEN];	/* destination eth addr	*/

@@ -19,13 +19,17 @@ void setup()
 {
         Serial.begin(9600);
         Serial.println("Starting setup"); 
- 	
+ 
+	ecs.fsm = 0; /* act as flag */
 	if (ecs_net_init(0 , 0, &ecs) < 0) {
 		Serial.println("Error init network");
 		return;
 	}
 
-	ec_init_regs(&ecs);
+	if (ec_init_regs(&ecs) < 0){
+		Serial.println("Error init registers");
+		return;
+	}
 
 	init_sii(&ecs);
 
@@ -42,5 +46,6 @@ void setup()
 
 void loop()
 {
-	ecat_rcv(&ecs);
+	if (ecs.fsm)
+		ecat_rcv(&ecs);
 }

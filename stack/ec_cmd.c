@@ -8,7 +8,7 @@
 #include "ec_com.h"
 #include "ec_net.h"
 #include "ec_cmd.h"
-#include <Arduino.h>
+
 
 #define  WORKING_CNT_SIZE 2
 
@@ -107,8 +107,8 @@ void ecs_process_cmd(ecat_slave * ecs, uint8_t *dgram_ec)
 	case EC_CMD_FRMW:
 		__set_fsm_state(ecs, ec_cmd_frmw);
 		break;
-	default:
-		ec_printf("unknown command %d\n",__ec_dgram_command(dgram_ec));
+	//default:
+		//ec_printf("unknown command %d\n",__ec_dgram_command(dgram_ec));
 	}
 	ecs->fsm->state(ecs, dgram_ec);
 }

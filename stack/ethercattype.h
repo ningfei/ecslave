@@ -408,12 +408,12 @@ enum
 
 static uint8_t sdos_addr_space[200];
 
-static inline int __sdo_start(void)
+static inline long __sdo_start(void)
 {
-	return (int) &sdos_addr_space[0];
+	return (long)&sdos_addr_space[0];
 }
 
-static inline int __sdo_high(void)
+static inline long __sdo_high(void)
 {
 	return __sdo_start() + sizeof(sdos_addr_space);
 }

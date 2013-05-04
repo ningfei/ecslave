@@ -84,7 +84,7 @@ void ecat_rcv(ecat_slave  *ecs)
 		return;
 	}
 	if (eth_hdr(buf)->ether_type !=  htons(ETH_P_ECAT)){
-        	Serial.print("!eCAT");
+  //      	Serial.print("!eCAT");
 		return;
 	}
 	ec_process_datagrams(ecs, len, buf);
