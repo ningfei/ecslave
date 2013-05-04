@@ -16,7 +16,6 @@ stack/ec_cmd_lrd.c \
 stack/ec_cmd_lwr.c \
 stack/ec_sii.c \
 stack/ec_regs.c \
-stack/ec_regs_pool.c \
 stack/ec_coe.c \
 stack/ec_mbox.c \
 stack/ec_cmd.c \

@@ -57,9 +57,9 @@ am_ec_slave_OBJECTS = ec_slave-ec_cmd_apwr.$(OBJEXT) \
 	ec_slave-ec_cmd_fpwr.$(OBJEXT) ec_slave-ec_cmd_frmw.$(OBJEXT) \
 	ec_slave-ec_cmd_lrw.$(OBJEXT) ec_slave-ec_cmd_lrd.$(OBJEXT) \
 	ec_slave-ec_cmd_lwr.$(OBJEXT) ec_slave-ec_sii.$(OBJEXT) \
-	ec_slave-ec_regs.$(OBJEXT) ec_slave-ec_regs_pool.$(OBJEXT) \
-	ec_slave-ec_coe.$(OBJEXT) ec_slave-ec_mbox.$(OBJEXT) \
-	ec_slave-ec_cmd.$(OBJEXT) ec_slave-ecat_timer_common.$(OBJEXT) \
+	ec_slave-ec_regs.$(OBJEXT) ec_slave-ec_coe.$(OBJEXT) \
+	ec_slave-ec_mbox.$(OBJEXT) ec_slave-ec_cmd.$(OBJEXT) \
+	ec_slave-ecat_timer_common.$(OBJEXT) \
 	ec_slave-ec_process_data.$(OBJEXT) ec_slave-ec_slave.$(OBJEXT) \
 	ec_slave-ecat_timer.$(OBJEXT) ec_slave-ec_net.$(OBJEXT) \
 	ec_slave-ec_com.$(OBJEXT) ec_slave-ec_device.$(OBJEXT) \
@@ -194,7 +194,6 @@ stack/ec_cmd_lrd.c \
 stack/ec_cmd_lwr.c \
 stack/ec_sii.c \
 stack/ec_regs.c \
-stack/ec_regs_pool.c \
 stack/ec_coe.c \
 stack/ec_mbox.c \
 stack/ec_cmd.c \
@@ -318,7 +317,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ec_slave-ec_net.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ec_slave-ec_process_data.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ec_slave-ec_regs.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ec_slave-ec_regs_pool.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ec_slave-ec_sii.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ec_slave-ec_slave.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ec_slave-ecat_timer.Po@am__quote@
@@ -561,20 +559,6 @@ ec_slave-ec_regs.obj: stack/ec_regs.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='stack/ec_regs.c' object='ec_slave-ec_regs.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ec_slave_CFLAGS) $(CFLAGS) -c -o ec_slave-ec_regs.obj `if test -f 'stack/ec_regs.c'; then $(CYGPATH_W) 'stack/ec_regs.c'; else $(CYGPATH_W) '$(srcdir)/stack/ec_regs.c'; fi`
-
-ec_slave-ec_regs_pool.o: stack/ec_regs_pool.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ec_slave_CFLAGS) $(CFLAGS) -MT ec_slave-ec_regs_pool.o -MD -MP -MF $(DEPDIR)/ec_slave-ec_regs_pool.Tpo -c -o ec_slave-ec_regs_pool.o `test -f 'stack/ec_regs_pool.c' || echo '$(srcdir)/'`stack/ec_regs_pool.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/ec_slave-ec_regs_pool.Tpo $(DEPDIR)/ec_slave-ec_regs_pool.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='stack/ec_regs_pool.c' object='ec_slave-ec_regs_pool.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ec_slave_CFLAGS) $(CFLAGS) -c -o ec_slave-ec_regs_pool.o `test -f 'stack/ec_regs_pool.c' || echo '$(srcdir)/'`stack/ec_regs_pool.c
-
-ec_slave-ec_regs_pool.obj: stack/ec_regs_pool.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ec_slave_CFLAGS) $(CFLAGS) -MT ec_slave-ec_regs_pool.obj -MD -MP -MF $(DEPDIR)/ec_slave-ec_regs_pool.Tpo -c -o ec_slave-ec_regs_pool.obj `if test -f 'stack/ec_regs_pool.c'; then $(CYGPATH_W) 'stack/ec_regs_pool.c'; else $(CYGPATH_W) '$(srcdir)/stack/ec_regs_pool.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/ec_slave-ec_regs_pool.Tpo $(DEPDIR)/ec_slave-ec_regs_pool.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='stack/ec_regs_pool.c' object='ec_slave-ec_regs_pool.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ec_slave_CFLAGS) $(CFLAGS) -c -o ec_slave-ec_regs_pool.obj `if test -f 'stack/ec_regs_pool.c'; then $(CYGPATH_W) 'stack/ec_regs_pool.c'; else $(CYGPATH_W) '$(srcdir)/stack/ec_regs_pool.c'; fi`
 
 ec_slave-ec_coe.o: stack/ec_coe.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ec_slave_CFLAGS) $(CFLAGS) -MT ec_slave-ec_coe.o -MD -MP -MF $(DEPDIR)/ec_slave-ec_coe.Tpo -c -o ec_slave-ec_coe.o `test -f 'stack/ec_coe.c' || echo '$(srcdir)/'`stack/ec_coe.c
