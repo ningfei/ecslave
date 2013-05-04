@@ -1,4 +1,3 @@
-
 #include "xgeneral.h"
 #include "ethercattype.h"
 #include "ecs_slave.h"
@@ -8,7 +7,6 @@
 #include "ecat_timer.h"
 #include "ec_device.h"
 #include "ec_regs.h"
-#include "ec_regs_pool.h"
 
 #define DC_32	0b0100
 #define DC_SIZE	4

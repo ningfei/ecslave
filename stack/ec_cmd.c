@@ -29,11 +29,9 @@ void ecs_process_next_dgram(ecat_slave * ecs,uint8_t *d)
 int  ec_nr_dgrams(uint8_t *raw_pkt)
 {
 	int i = 0;
-	int f;
 	int frame_size = __ec_frame_size(raw_pkt);
 	uint8_t* dgram  = __ecat_frameheader(raw_pkt) +  sizeof(ec_frame_header);
 		
-	f = frame_size;
 	for (;frame_size > 0;i++){
 		frame_size -= 
 			(sizeof(ec_dgram) + 
