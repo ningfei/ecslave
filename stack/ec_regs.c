@@ -16,7 +16,7 @@ struct ecat_regs {
 	uint8_t base;
 	uint8_t revision;
 	uint8_t portdes;
-	uint8_t alstat;
+	uint16_t alstat;
 	uint8_t dlstat;
 	uint8_t station_address;
 	uint8_t alias;
@@ -160,7 +160,7 @@ void ecat_process_write_ados(int reg,uint8_t *data, int len)
 			break;
 
     		case ECT_REG_STADR:
-				data[i] = registers.station_address;
+				registers.station_address = data[i];
 			break;
 
 	    	case ECT_REG_ALIAS:
@@ -188,7 +188,8 @@ void ecat_process_write_ados(int reg,uint8_t *data, int len)
 			break;		
 
   	  	case ECT_REG_ALSTAT://      = 0x0130,
-				registers.alstat = data[i];
+				memcpy(&registers.alstat, &data[i],
+					sizeof(registers.alstat));
 			break;		
 
     		case ECT_REG_ALSTATCODE://	= 0x0134,
@@ -353,7 +354,7 @@ void ecat_process_read_ados(int reg,uint8_t *data, int len)
 			break;
 
     		default:
-				data[i] = 0;
+				//data[i] = 0;
 			break;
 
     		case ECT_REG_STADR:
@@ -385,7 +386,9 @@ void ecat_process_read_ados(int reg,uint8_t *data, int len)
 			break;		
 
   	  	case ECT_REG_ALSTAT://      = 0x0130,
-				data[i] = registers.alstat;
+				memcpy(&data[i], &registers.alstat,
+					sizeof(registers.alstat));
+				reg_size = sizeof(registers.alstat);
 			break;		
 
     		case ECT_REG_ALSTATCODE://	= 0x0134,
