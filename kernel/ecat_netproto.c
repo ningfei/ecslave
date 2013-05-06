@@ -35,13 +35,52 @@
 #include <linux/uaccess.h>
 #include <asm/system.h>
 
+#include "xgeneral.h"
+#include "globals.h"
+#include "ethercattype.h"
+#include "ecs_slave.h"
+#include "ec_offsched.h"
+#include "ec_net.h"
+#include "ec_device.h"
+#include "ec_cmd.h"
+#include "ecat_netproto.h"
+
 
 /*********************** net proto  start **************************/
 #define PF_ETHERCAT PF_ECONET
 
-struct ecat_sock{
-	int num;
+struct ecat_sock {
+	struct ec_slave*  ecslave;
+	struct ecat_event timer_event; /* registers and event on the timer */
+	struct ecat_event port_event;
+	struct semaphore  recv_sem;
+	struct sk_buff*   skb;
+	char  *userbuf;
 };
+
+static void sock_port_action(long *private)
+{
+	struct sk_buff* skb;
+	struct ecat_sock *ecatsock =(struct ecat_sock *)private;
+	struct ec_slave *ecslave = (ecat_slave *)ecatsock->ecslave;
+	struct ec_device *device = ecslave->intr[RX_INTR_INDEX];
+
+	skb = device->process_skb;
+	if (skb) {
+		skb_get(skb);
+		/* we save last skb. */
+		ecatsock->skb = skb;
+		up(&ecatsock->recv_sem);
+	}
+}
+
+/*
+ * this is a call back from the timer.
+*/
+static void sock_timer_action(long *private)
+{
+	struct ecat_sock *ecatsock = (struct ecat_sock *)private;
+}
 
 static inline struct ecat_sock *ecat_sk(const struct sock *sk)
 {
@@ -117,7 +156,7 @@ static int ecat_create(struct net *net, struct socket *sock, int protocol,
 	sock_reset_flag(sk, SOCK_ZAPPED);
 	sk->sk_family = PF_ETHERCAT;
 	ecatsock->num = protocol;
-
+	sem_init(&ecatsock->recv_sem, 0);
 	ecat_insert_socket(&ecat_sklist, sk);
 	return 0;
 out:
@@ -158,19 +197,60 @@ out_unlock:
 static int ecat_ioctl(struct socket *sock, unsigned int cmd,
 			unsigned long arg)
 {
+	switch (cmd)
+	{
+	case	GET_PROCDATA_SIZE:
+		break;
+	
+	}
 	return -1;
 }
 
 static int ecat_sendmsg(struct kiocb *iocb, struct socket *sock,
 			  struct msghdr *msg, size_t len)
 {
-	return 0;
+	int err;
+	int copied;
+	struct ecat_sock *ecatsock = ecat_sk(sk);
+
+	if (ecatsock->userdata == NULL)
+		return -EINVAL;
+	copied = (len < process_data_size) ? len : process_data_size;
+	err = memcpy_fromiovec(ecatsock->userbuf, msg->msg_iov, copied);
+	if (err) {
+		return -EINVAL;
+	}
+	return copied;
 }
 
 static int ecat_recvmsg(struct kiocb *iocb, struct socket *sock,
 			  struct msghdr *msg, size_t len, int flags)
 {
-	return 0;
+	struct sock *sk = sock->sk;
+	struct sk_buff *skb = NULL;
+	size_t copied;
+	struct ecat_sock *ecatsock = ecat_sk(sk);
+	int err;
+
+	down_interruptible(&ecatsock->recv_sem);
+	skb = ecatsock->skb;
+	if (!skb) {
+		return -EFAULT;
+	}
+	ecatsock->skb = NULL;
+	copied = skb->len - sizeof(struct ethercat_);
+	if (copied > len) {
+		copied = len;
+		msg->msg_flags |= MSG_TRUNC;
+	}
+	pd = process_data(skb->data);
+	err = memcpy_toiovec(msg->msg_iov, skb->data, copied);
+	skb_put(skb);
+	if (err) {
+		return -ENOMEM;
+	}
+	sk->sk_stamp = skb->tstamp;
+	return copied;
 }
 
 static const struct proto_ops ecat_ops = {
@@ -182,7 +262,7 @@ static const struct proto_ops ecat_ops = {
 	.socketpair =	sock_no_socketpair,
 	.accept =	sock_no_accept,
 	.getname =	sock_no_getname,
-	.poll =		datagram_poll,
+	.poll =		sock_no_poll,
 	.ioctl =	ecat_ioctl,
 	.listen =	sock_no_listen,
 	.shutdown =	sock_no_shutdown,
