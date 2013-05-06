@@ -179,10 +179,8 @@ void coe_parser(ecat_slave* ecs, int reg, uint8_t * data, int datalen)
 {
 	coe_header *hdr = __coe_header(data);
 
-	if (reg > __sdo_high()){
-		ec_printf("%s no such address %d\n",
-			__FUNCTION__,
-			reg);
+	
+	if (reg > __sdo_high()){		
 		return;
 	}
 	switch (hdr->coe_service) 

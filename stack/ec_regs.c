@@ -190,7 +190,8 @@ void ecat_process_write_ados(int reg,uint8_t *data, int len)
   	  	case ECT_REG_ALSTAT://      = 0x0130,
 				memcpy(&registers.alstat, &data[i],
 					sizeof(registers.alstat));
-			break;		
+				reg_size = sizeof(registers.alstat);
+			break;
 
     		case ECT_REG_ALSTATCODE://	= 0x0134,
 				registers.alstacode = data[i];
@@ -300,7 +301,6 @@ void ecat_process_write_ados(int reg,uint8_t *data, int len)
 
 void ec_set_ado(ecat_slave *ecs, int reg, uint8_t * data, int datalen)
 {
-
 	if (reg > ECT_REG_DCCYCLE1) {
 		return ec_mbox(ecs, reg, data, datalen);
 	}
@@ -308,6 +308,10 @@ void ec_set_ado(ecat_slave *ecs, int reg, uint8_t * data, int datalen)
 		return;
 	}
 	ecat_process_write_ados(reg, data,  datalen);
+	if (reg == ECT_REG_ALCTL){
+		memcpy(&registers.alstat, data,
+			sizeof(registers.alstat));
+        }
 }
 
 void ecat_process_read_ados(int reg,uint8_t *data, int len)

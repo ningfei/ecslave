@@ -42,11 +42,9 @@ void setup()
 		Serial.println("illegal pdo configuration\n");
 		return;
 	}
-
 	ecs.fsm = &fsm_slave;
 	ecs.dgram_processed = 0;
 	ecs.dgrams_cnt = 0;
-        Serial.println("Ending setup"); 
 }
 
 void loop()

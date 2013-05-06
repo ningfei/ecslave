@@ -16,14 +16,8 @@ void ec_cmd_fpwr(ecat_slave *ecs,uint8_t *dgram_ec)
 	ado = __ec_dgram_ado(dgram_ec);
 	adp = __ec_dgram_adp(dgram_ec);
 
-	ec_printf("%s ado=0x%x adp=0x%x "
-			"station addr=0x%x datalen=%d\n",
-	       __FUNCTION__, 
-	       ado,adp,
-	       ec_station_address(),
-	       datalen);
 	if (datalen == 0) {
-		ec_printf("insane no length\n");
+		ec_printstr("insane no length\n");
 		goto FPRD_OUT;
 	}
 	if (adp != ec_station_address())
