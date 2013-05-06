@@ -9,6 +9,7 @@
 #include "ec_net.h"
 #include "ec_cmd.h"
 
+
 #define  WORKING_CNT_SIZE 2
 
 void ecs_process_next_dgram(ecat_slave * ecs,uint8_t *d)
@@ -28,11 +29,9 @@ void ecs_process_next_dgram(ecat_slave * ecs,uint8_t *d)
 int  ec_nr_dgrams(uint8_t *raw_pkt)
 {
 	int i = 0;
-	int f;
 	int frame_size = __ec_frame_size(raw_pkt);
 	uint8_t* dgram  = __ecat_frameheader(raw_pkt) +  sizeof(ec_frame_header);
 		
-	f = frame_size;
 	for (;frame_size > 0;i++){
 		frame_size -= 
 			(sizeof(ec_dgram) + 
@@ -41,7 +40,7 @@ int  ec_nr_dgrams(uint8_t *raw_pkt)
 		dgram += sizeof(ec_dgram) + WORKING_CNT_SIZE + __ec_dgram_dlength(dgram); 		
 	}
 	if (frame_size < 0){
-		ec_printf("aieeee %d %d\n",frame_size,f);
+		return 0;
 	}
 	return i;
 }
@@ -106,8 +105,8 @@ void ecs_process_cmd(ecat_slave * ecs, uint8_t *dgram_ec)
 	case EC_CMD_FRMW:
 		__set_fsm_state(ecs, ec_cmd_frmw);
 		break;
-	default:
-		ec_printf("unknown command %d\n",__ec_dgram_command(dgram_ec));
+	//default:
+		//ec_printf("unknown command %d\n",__ec_dgram_command(dgram_ec));
 	}
 	ecs->fsm->state(ecs, dgram_ec);
 }

@@ -50,7 +50,7 @@ static void ecat_process_port_events(struct ec_device *device)
 	
 // better list_splice here. will do that later
 	list_for_each_entry_safe(ev, temp, &device->events, list){
-		ev->action(ev->private);
+		ev->action(ev->__private);
 		spin_lock_irqsave(&device->events_sync, flags);
 		list_del_init(&ev->list);
 		spin_unlock_irqrestore(&device->events_sync, flags);

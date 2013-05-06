@@ -93,7 +93,7 @@ static void ec_pkt_filter(u_char *user, const struct pcap_pkthdr *h,
 	pthread_mutex_lock(&intr->events_sync);
 	while (LIST_FIRST(&intr->events) != NULL) {
 	      	ev = LIST_FIRST(&intr->events);
-		ev->action(ev->private);
+		ev->action(ev->__private);
 		LIST_REMOVE(ev, list);
 		ev->action = 0x00;
 	}
@@ -120,7 +120,7 @@ void passing_pkt(u_char *user, const struct pcap_pkthdr *h,
 	pthread_mutex_lock(&intr->events_sync);
 	while (LIST_FIRST(&intr->events) != NULL) {
 	      	ev = LIST_FIRST(&intr->events);
-		ev->action(ev->private);
+		ev->action(ev->__private);
 		LIST_REMOVE(ev, list);
 		ev->action = 0x00;
 	}

@@ -41,7 +41,7 @@ void *ecat_timer(void *dummy __attribute__ ((unused)) )
 		pthread_mutex_lock(&timer_sync);
 		while (LIST_FIRST(&ecat_events) != NULL) {
 		      	ev = LIST_FIRST(&ecat_events);
-			ev->action(ev->private);
+			ev->action(ev->__private);
 			LIST_REMOVE(ev, list);
 			ev->action = 0; /* for debug purpose*/
 		}
@@ -58,7 +58,7 @@ void *ecat_timer(void *dummy __attribute__ ((unused)) )
 void  ecat_schedule_timed_event(void *private,struct ecat_event *event, void (*action)(void *))
 {
 	event->action = action;
-	event->private = private;
+	event->__private = private;
 	pthread_mutex_lock(&timer_sync);
         LIST_INSERT_HEAD(&ecat_events, event, list);
 	pthread_mutex_unlock(&timer_sync);

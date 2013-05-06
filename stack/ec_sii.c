@@ -25,7 +25,6 @@
 #define NR_SYNCM	2
 #define	SYNMC_SIZE	1024
 
-
 typedef struct {
 	uint16_t pdi_control; // 0x000
 	uint16_t pdi_configuration; // 0x001
@@ -64,10 +63,10 @@ typedef struct {
 #define RX_PDO1_NAME_IDX	8
 #define RX_PDO2_NAME_IDX	9
 
-#define GROUP_STRING "LIBIX GROUP"
+#define GROUP_STRING "Raz Ben Jehuda"
 #define IMAGE_STRING "LIBIX IMAGE"
 #define ORDER_STRING "LIBIX ORDER"
-#define NAME_STRING "LIBIX LINUX VIRTUAL DRIVE"
+#define NAME_STRING "ARDUINO OPEN SOURCE DRIVE"
 #define RXPDO_CAT_STRING "LIBIX RX PDO"
 #define TXPDO_CAT_STRING "LIBIX TX PDO"
 #define TX_PDO1_NAME "TXPDO1 LIBIX"
@@ -138,7 +137,7 @@ typedef struct {
 	uint8_t syncm_type;
 } category_syncm;
 
-typedef struct __attribute__ ((packed)) {
+typedef struct __attribute__packed__ {
 	uint8_t fmmu0;
 	uint8_t fmmu1;
 } category_fmmu;
@@ -158,11 +157,11 @@ typedef struct {
 	uint8_t flags;
 	uint16_t current_on_bus;
 	uint16_t pad_byte1;
-	uint16_t physical_port __attribute((packed));
+	uint16_t physical_port __attribute__packed__;
 	uint8_t pad_byte2[14];
 } category_general;
 
-typedef struct  __attribute__ ((packed))  __category_strings__{
+typedef struct  __attribute__packed__  __category_strings__{
 	uint8_t nr_strings;
 
 	uint8_t str0_len;
@@ -205,30 +204,30 @@ typedef struct {
 } category_header;
 
 typedef struct {
-	ec_sii_t sii __attribute__ ((packed));
+	ec_sii_t sii __attribute__packed__;
 
-	category_header strings_hdr __attribute__ ((packed));
+	category_header strings_hdr __attribute__packed__;
 	category_strings strings;
 
-	category_header general_hdr __attribute__ ((packed));
-	category_general general __attribute__ ((packed));
+	category_header general_hdr __attribute__packed__;
+	category_general general __attribute__packed__;
 
-	category_header fmmu_hdr __attribute__ ((packed));
+	category_header fmmu_hdr __attribute__packed__;
 	category_fmmu fmmu;
 
-	category_header syncm_hdr0 __attribute__ ((packed));
-	category_syncm syncm0  __attribute__ ((packed));
+	category_header syncm_hdr0 __attribute__packed__;
+	category_syncm syncm0  __attribute__packed__;
 
-	category_header syncm_hdr1 __attribute__ ((packed));
-	category_syncm syncm1  __attribute__ ((packed));
+	category_header syncm_hdr1 __attribute__packed__;
+	category_syncm syncm1  __attribute__packed__;
 
-	category_header txpdo_hdr __attribute__ ((packed));
-	category_pdo txpdo  __attribute__ ((packed));
+	category_header txpdo_hdr __attribute__packed__;
+	category_pdo txpdo  __attribute__packed__;
 
-	category_header rxpdo_hdr __attribute__ ((packed));
-	category_pdo rxpdo  __attribute__ ((packed));
+	category_header rxpdo_hdr __attribute__packed__;
+	category_pdo rxpdo  __attribute__packed__;
 
-	category_header endhdr __attribute__ ((packed));
+	category_header endhdr __attribute__packed__;
 
 } sii_categories;
 

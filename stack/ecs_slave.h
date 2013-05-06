@@ -3,6 +3,10 @@
 
 #include "ecat_timer.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct __ecat_slave__;
 struct fsm_slave;
 
@@ -107,7 +111,7 @@ static inline void __ec_dgram_set_adp(uint8_t *d,uint16_t adp)
 static inline uint32_t __ec_dgram_laddr(uint8_t * d)
 {
 	ec_dgram *datagram = (ec_dgram *)d;
-	return ((uint32_t) datagram->adp | (uint32_t) (datagram->ado << 16));
+	return ((uint32_t) datagram->adp | (uint32_t) (((uint32_t)datagram->ado) << 16));
 }
 
 /* d points at start of datagram.  */
@@ -168,5 +172,9 @@ static inline uint16_t __ec_frame_size(uint8_t * d)
 	ec_frame_header *ec_frame = (ec_frame_header *) __ecat_frameheader(d);
 	return (ec_frame->elength & 0x07FF); /* old compilers do not like binary numbers*/
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -5,7 +5,13 @@
 #define RX_INT_INDEX	0	/* port in the master side */
 #define TX_INT_INDEX	1	/* port in the next side  */
 
-
+/*
+#ifdef __x86_64__
+	typedef long INT;
+#else
+	typedef int INT;
+#endif
+*/
 #ifdef __KERNEL__
 
 #include <linux/if_ether.h>
@@ -15,8 +21,8 @@
 #include <linux/list.h>
 #include <linux/time.h>
 
-struct ether_header
-{
+
+struct ether_header {
   u_int8_t  ether_dhost[ETH_ALEN];	/* destination eth addr	*/
   u_int8_t  ether_shost[ETH_ALEN];	/* source ether addr	*/
   u_int16_t ether_type;		        /* packet type ID field	*/
@@ -34,8 +40,41 @@ static inline int clock_settime(int dummy __attribute__((unused)), struct timesp
 }
 
 #define LIST_ENTRY(a) struct list_head 
+#define __attribute__packed__  __attribute__ ((packed))
 
-#else
+#endif
+
+#ifdef ARDUINO
+
+#include <Arduino.h>
+#include "list.h"
+#include "ec_util.h"
+
+#define LIST_ENTRY(a) struct list_head 
+#define ETH_ALEN  6
+#define  __attribute__packed__
+#define ec_printf(a,...)
+
+struct semaphore{
+};
+
+typedef unsigned char uint8_t;
+typedef unsigned int uint16_t;
+typedef unsigned long int uint32_t ;
+
+typedef signed char int8_t;
+typedef int int16_t; /* integer in arduino is 16bit */
+typedef long int int32_t ;
+
+struct ether_header {
+  uint8_t  ether_dhost[ETH_ALEN];      /* destination eth addr */
+  uint8_t  ether_shost[ETH_ALEN];      /* source ether addr    */
+  uint16_t ether_type;                 /* packet type ID field */
+};
+
+#endif
+
+#if defined ( __linux__ ) && !defined(__KERNEL__)
 
 #include <time.h>
 #include <stdio.h>
@@ -71,6 +110,7 @@ static inline int clock_settime(int dummy __attribute__((unused)), struct timesp
 
 #define xmalloc(size)	malloc(size)
 #define NSEC_PER_SEC (1000000000L)
+#define __attribute__packed__  __attribute__ ((packed))
 
 struct semaphore { 
 	sem_t sem;

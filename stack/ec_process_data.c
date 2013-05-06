@@ -19,8 +19,9 @@ int init_process_data(ecat_slave *ecs)
 		return -1;
 	}	
 	pd.data = xmalloc(pd.size);
+	if (pd.data == 0)
+		return -1;
 	memset(pd.data, 'x', pd.size);
-	ec_printf("Process data size = %d\n",pd.size);
 	return 0;
 }
 

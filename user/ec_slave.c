@@ -22,6 +22,7 @@ int main(int argc, char *argv[])
 		printf("%s < rx interface> < tx interface>\n", argv[0]);
 		return 0;
 	}
+	printf("Silly print to bypass pcap bug\n");
   	if (ecs_net_init(argc, argv, &ecs) < 0){
 		return -1;
 	}

@@ -27,7 +27,7 @@ enum hrtimer_restart ecat_timer(struct hrtimer *timer)
 	hrtimer_add_expires_ns(&ecat_hrtimer, ecat_delay_ns);
 	list_for_each_safe(temp, temp2, &ecat_events){
 		ev = list_entry(temp, struct ecat_event, list);
-		ev->action(ev->private);
+		ev->action(ev->__private);
 		list_del_init(&ev->list);
 	}
 	return HRTIMER_RESTART;
@@ -36,7 +36,7 @@ enum hrtimer_restart ecat_timer(struct hrtimer *timer)
 void ecat_schedule_timed_event(void *private,struct ecat_event *ev, void (*action)(void *))
 {
 	ev->action = action;
-	ev->private = private;
+	ev->__private = private;
 
 	spin_lock_bh(&timer_sync);
         list_add_tail(&ecat_events, &ev->list);

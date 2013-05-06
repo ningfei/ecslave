@@ -20,7 +20,7 @@ void ecat_add_event_to_device(struct ec_device *ec,
 		return;
 	}
 	ev->action = action;
-	ev->private = private;
+	ev->__private = private;
 	pthread_mutex_lock(&ec->events_sync);
         LIST_INSERT_HEAD(&ec->events, ev, list);
 	pthread_mutex_unlock(&ec->events_sync);

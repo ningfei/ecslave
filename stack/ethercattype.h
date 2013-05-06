@@ -406,16 +406,16 @@ enum
     ECT_REG_DCCYCLE1    = 0x09A4
 };
 
-#define SDOS_ADDR_SPACE	4096
-
-static inline long __sdo_high(void)
-{
-	return ECT_REG_DCCYCLE1 + SDOS_ADDR_SPACE;
-}
+static uint8_t sdos_addr_space[200];
 
 static inline long __sdo_start(void)
 {
-	return ECT_REG_DCCYCLE1 + 1;
+	return (long)&sdos_addr_space[0];
+}
+
+static inline long __sdo_high(void)
+{
+	return __sdo_start() + sizeof(sdos_addr_space);
 }
 
 /** standard SDO Sync Manager Communication Type */
@@ -457,7 +457,9 @@ enum {
 #ifdef __MAKE_DEBUG__
 	#define ec_printf	printf
 #else
+#ifndef ARDUINO
 	void ec_printf(const char *str, ...);
+#endif
 #endif
 
 #endif /* _EC_TYPE_H */
