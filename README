@@ -4,7 +4,7 @@
 ecslave comes in three flavors:
 1.  linux user space 
 2.  linux kernel drive.
-3.  stack for arduino Arduino 
+3.  stack for arduino.
 
 The user space is meant to be used as a tool for debugging 
 the ethercat stack. The kernel module is aimed to provide a 
