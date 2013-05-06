@@ -1,10 +1,15 @@
 
-Silly Ethercat Slave
+	Light Ethercat Slave
 
-ecslave comes in two versions, user space and kernel space.
+ecslave comes in three flavors:
+1.  linux user space 
+2.  linux kernel drive.
+3.  stack for arduino Arduino 
+
 The user space is meant to be used as a tool for debugging 
 the ethercat stack. The kernel module is aimed to provide a 
-low latency respnosiveness. 
+low latency respnosiveness. Arduino is part of a larget suite 
+aimed to create cheap robot kits ( ~100$, controller with a single drive).
 
 	User space design
 
