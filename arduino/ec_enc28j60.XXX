@@ -16,14 +16,11 @@
 // in your local area network. You can not have the same numbers in
 // two devices:
 static uint8_t mymac[6] = { 0x54, 0x55, 0x58, 0x10, 0x00, 0x24 };
-static uint8_t myip[4] = { 192, 168, 1, 15 };
 
-// how did I get the mac addr? Translate the first 3 numbers into ascii is: TUX
-
-#define BUFFER_SIZE 200
-unsigned char _buf[BUFFER_SIZE + 1];
-unsigned char *buf = (unsigned char*)&_buf[0];
 EtherShield es = EtherShield();
+
+#define BUFFER_SIZE 228
+unsigned char *buf = 0;
 
 void __ethernetSetup()
 {
@@ -66,10 +63,14 @@ void __ethernetSetup()
 	es.ES_enc28j60PhyWrite(PHLCON, 0x476);
 	delay(100);
 
-	//init the ethernet/ip layer:
-	es.ES_init_ip_arp_udp_tcp(mymac, myip, 80);
-
-        Serial.println("Ethernet setup");       
+	buf = (unsigned char *)malloc(BUFFER_SIZE +1);
+	if (!buf){
+        	Serial.println("Ethernet setup Error");
+	}
+	else {
+        	Serial.println("Ethernet setup");
+		memset(buf, 0, BUFFER_SIZE);
+	}
 }
 
 extern "C" void ethernetSetup()
@@ -79,12 +80,17 @@ extern "C" void ethernetSetup()
 
 void ecat_rcv(ecat_slave  *ecs)
 {
-	int len = es.ES_enc28j60PacketReceive(BUFFER_SIZE, buf);
+	uint16_t len;
+
+	memset(buf, 0 , BUFFER_SIZE);
+	len = es.ES_enc28j60PacketReceive(BUFFER_SIZE, buf);
+	if (len > 60)
+		Serial.println(len);
 	if (len <= 0) {
 		return;
 	}
 	if (eth_hdr(buf)->ether_type !=  htons(ETH_P_ECAT)){
-  //      	Serial.print("!eCAT");
+	//	Serial.println(len);
 		return;
 	}
 	ec_process_datagrams(ecs, len, buf);
