@@ -17,7 +17,7 @@
 
 
 static byte mac[6] = { 0x54, 0x55, 0x58, 0x10, 0x00, 0x24 };
-#define BUFFER_SIZE 300
+#define BUFFER_SIZE 800
 uint8_t buf[BUFFER_SIZE];
 SOCKET s;
 
