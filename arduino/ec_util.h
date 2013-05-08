@@ -10,7 +10,7 @@ uint16_t htons(uint16_t port);
 uint32_t ecat_local_time();
 void     ecat_wake_timer();
 void    ecat_set_rx_time(void *dummy);
-#define xmalloc(size)	malloc(size)
+void	*xmalloc(int size);
 
 #ifdef __cplusplus
 }

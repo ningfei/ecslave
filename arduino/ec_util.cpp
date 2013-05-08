@@ -1,4 +1,7 @@
 #include "xgeneral.h"
+#include <Arduino.h>
+extern "C"
+{
 
 uint16_t htons(uint16_t t)
 {
@@ -27,3 +30,10 @@ struct ether_header *eth_hdr(uint8_t *buf)
 	return (struct ether_header *)buf;
 }
 
+void *xmalloc(int size)
+{
+	Serial.println(size);
+	return malloc(size);
+}
+
+}
