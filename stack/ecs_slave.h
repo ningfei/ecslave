@@ -15,8 +15,8 @@ typedef struct {
 } fsm_mbox;
 
 typedef struct {
-	uint16_t obj_index;
-	uint8_t obj_subindex;
+	uint16_t obj_index __attribute__packed__;
+	uint8_t obj_subindex __attribute__packed__;
 } fsm_coe __attribute__packed__ ; 
 
 #define EC_MAX_PORTS 		4

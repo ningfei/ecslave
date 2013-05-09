@@ -3,10 +3,10 @@
 
 typedef struct __mbox_header__ {
 
-	uint16_t len;
-	uint16_t address;
-	uint8_t channel:6, prio:2;
-	uint8_t type:4, cnt:3, reserved:1;
+	uint16_t len __attribute__packed__;
+	uint16_t address __attribute__packed__;
+	uint8_t channel:6, prio:2  __attribute__packed__;
+	uint8_t type:4, cnt:3, reserved:1 __attribute__packed__;
 } mbox_header  __attribute__packed__;
 
 typedef enum {
@@ -27,8 +27,8 @@ typedef struct  __coe_header__ {
 
 typedef struct __coe_sdo_info_header__ {
 	uint8_t opcode:7,incomplete:1;
-	uint8_t reserved;
-	uint16_t frag_list;
+	uint8_t reserved __attribute__packed__;
+	uint16_t frag_list __attribute__packed__ ;
 	uint8_t sdo_info_service_data[1]  __attribute__packed__;
 }coe_sdo_info_header  __attribute__packed__;
 

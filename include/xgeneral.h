@@ -52,7 +52,7 @@ static inline int clock_settime(int dummy __attribute__((unused)), struct timesp
 
 #define LIST_ENTRY(a) struct list_head 
 #define ETH_ALEN  6
-#define  __attribute__packed__
+#define  __attribute__packed__ __attribute__ ((__packed__))
 #define ec_printf(a,...)
 
 struct semaphore{

@@ -13,7 +13,7 @@ void od_list_response(ecat_slave *ecs, uint8_t* data,int datalen)
 	coe_header *coehdr = __coe_header(data);
 	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
 	coe_sdo_service_data *srvdata =__coe_sdo_service_data(data);
-	int *sdo_data = (int *) (&srvdata->list_type); /* each sdo is 8 bytes */	
+	uint16_t *sdo_data = (uint16_t *) (&srvdata->list_type); /* each sdo is 8 bytes */	
 
 	mbxhdr->type =  MBOX_COE_TYPE;
 	mbxhdr->len = 8 + NR_SDOS * 4;
@@ -24,7 +24,7 @@ void od_list_response(ecat_slave *ecs, uint8_t* data,int datalen)
 	sdoinfo->opcode = 0x02; // table 43
 	for (i = 0  ; i < NR_SDOS; i++) { 
 		/* starting from 0x1888 create NR SDOS */
-		sdo_data[i] = 0x1888 + i; 	
+		sdo_data[i] = 0x1858 + i;
 	}
 }
 
@@ -33,21 +33,20 @@ void od_list_response(ecat_slave *ecs, uint8_t* data,int datalen)
 void obj_desc_response(ecat_slave* ecs, uint8_t *data, int datalen)
 {
 	typedef struct {
-		uint16_t index;	
-		uint16_t data_type;
-		uint8_t  max_subindex;
-		uint8_t  object_code;
+		uint16_t index __attribute__packed__ ;
+		uint16_t data_type __attribute__packed__;
+		uint8_t  max_subindex __attribute__packed__;
+		uint8_t  object_code __attribute__packed__;
 		char     name[1];
-	}sdo_info_service_data;
+	}sdo_info_service_data  __attribute__packed__;
 
 	coe_header *coehdr = __coe_header(data);
 	mbox_header *mbxhdr = __mbox_hdr(data);
 	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
-	sdo_info_service_data *obj_desc = 
+	sdo_info_service_data *obj_desc =
 		(sdo_info_service_data *)&sdoinfo->sdo_info_service_data[0];
 
 	mbxhdr->type =  MBOX_COE_TYPE;
-
 	coehdr->number = 0;
 	coehdr->reserved = 0;
 	coehdr->coe_service = COE_SDO_INFO;
@@ -62,20 +61,20 @@ void obj_desc_response(ecat_slave* ecs, uint8_t *data, int datalen)
 	obj_desc->object_code = 7;
 
 	sprintf(obj_desc->name,"LINUX DRIVE SDO 0x%X",obj_desc->index);
-	mbxhdr->len = sizeof(*sdoinfo) + 
-		sizeof(*coehdr) + 
-		sizeof(*obj_desc) + strlen(obj_desc->name);
+	mbxhdr->len = sizeof(*sdoinfo) +
+		sizeof(*coehdr) +
+		sizeof(*obj_desc) + strlen(obj_desc->name) - 1;
 }
 
 // table 44
 void obj_desc_request(ecat_slave *ecs, uint8_t *data, int datalen)
 {
 	typedef struct {
-		uint16_t  index;
-	}sdo_info_service_data;
+		uint16_t  index  __attribute__packed__; 
+	}sdo_info_service_data  __attribute__packed__;
 
 	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
-	sdo_info_service_data *obj_desc = 
+	sdo_info_service_data *obj_desc =
 		(sdo_info_service_data *)&sdoinfo->sdo_info_service_data[0];
 	ecs->coe.obj_index = obj_desc->index;
 	mbox_set_state(ecs, obj_desc_response);
@@ -113,21 +112,22 @@ void entry_desc_response(ecat_slave* ecs, uint8_t *data, int datalen)
 	entry_desc->object_access = 0x0FFF;
 	entry_desc->index	  = ecs->coe.obj_index;
 	entry_desc->subindex 	  = ecs->coe.obj_subindex; 
-	sprintf(entry_desc->name,"LINUX SDO ENTRY 0x%x:0x%X",
-		entry_desc->index,
-		entry_desc->subindex);
+	sprintf(entry_desc->name,"SDO ENTRY 0x%x:0x%X",
+			ecs->coe.obj_index,
+			ecs->coe.obj_subindex);
+
 	mbxhdr->len = 	sizeof(*sdoinfo) + 
 			sizeof(*coehdr) + 
-			sizeof(*entry_desc) + strlen(entry_desc->name);
+			sizeof(*entry_desc) + strlen(entry_desc->name) -1;
 }
 
 // table 46
 void entry_desc_request(ecat_slave* ecs,uint8_t *data, int datalen)
 {
 	typedef struct {
-		uint16_t index;	
-		uint8_t  subindex;
-		uint8_t  valueinfo;
+		uint16_t index  __attribute__packed__;	
+		uint8_t  subindex __attribute__packed__;
+		uint8_t  valueinfo  __attribute__packed__;
 	}sdo_entry_info_data;
 
 	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
@@ -140,7 +140,7 @@ void entry_desc_request(ecat_slave* ecs,uint8_t *data, int datalen)
 
 void od_list_request(ecat_slave* ecs, uint8_t * data, int datalen)
 {
-	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
+	coe_sdo_info_header *sdoinfo = __sdo_info_hdr(data);
 	coe_sdo_service_data *srvdata =__coe_sdo_service_data(data);
 
 	srvdata->list_type = 0x1;

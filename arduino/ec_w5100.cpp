@@ -43,10 +43,9 @@ void ecat_rcv(ecat_slave  *ecs)
 	ecat = (uint8_t *)&buf[2];
 
 	if (eth_hdr(ecat)->ether_type !=  htons(ETH_P_ECAT)){
-		Serial.println(len);
 		return;
 	}
-	ec_process_datagrams(ecs, len -2, ecat);
+	ec_process_datagrams(ecs, len - 2, ecat);
 }
 
 extern "C" void ec_tx_pkt(uint8_t *buf, int sz, struct ec_device *txdev)

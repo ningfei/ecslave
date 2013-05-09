@@ -232,14 +232,14 @@ typedef struct {
 } sii_categories;
 
 sii_categories categories;
-int last_word_offset = -1;
+int16_t last_word_offset = -1;
 
 void write_category_hdr(int off,int datalen, uint8_t *data)
 {
 	ec_printf("%s off%d \n",__FUNCTION__,off);
 }
 
-void read_category_hdr(int off,int datalen, uint8_t *data)
+void read_category_hdr(int16_t off,int datalen, uint8_t *data)
 {
 	int offset = off*2;
 	uint8_t* cat_off = (uint8_t *)&categories;
@@ -482,13 +482,13 @@ void init_sii(ecat_slave *esc)
 	esc->pdoe_sizes[pdoe_idx++]  = 16;
 }
 
-void (*sii_command)(int offset, int datalen, uint8_t * data) = 0;
+void (*sii_command)(int16_t offset, int datalen, uint8_t * data) = 0;
 
 void ec_sii_rw(uint8_t * data, int datalen)
 {
 	if (sii_command){
-			ec_printf("%s datalen =%d\n",__FUNCTION__,datalen);
-			sii_command(last_word_offset, datalen - 6, (uint8_t *)&data[6]);
+		ec_printf("%s datalen =%d\n",__FUNCTION__,datalen);
+		sii_command(last_word_offset, datalen - 6, (uint8_t *)&data[6]);
 	} else{
 		ec_printf("%s no command\n",__FUNCTION__);
 	}
@@ -498,7 +498,7 @@ void ec_sii_rw(uint8_t * data, int datalen)
 
 int ec_sii_start_read(uint8_t * data, int datalen)
 {
-	int word_offset;
+	int16_t word_offset;
 
 	ec_printf("%s received data len %d\n",
 			__FUNCTION__, datalen);
@@ -508,7 +508,7 @@ int ec_sii_start_read(uint8_t * data, int datalen)
 		       __FUNCTION__	, data[0], data[1]);
 		return 1;
 	}
-	word_offset = *(uint16_t *) & data[2];
+	word_offset = *(int16_t *) & data[2];
 	ec_printf("%s request %d operation on offset %d\n",
 			__FUNCTION__, data[1], word_offset);
 
