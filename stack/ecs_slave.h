@@ -17,7 +17,7 @@ typedef struct {
 typedef struct {
 	uint16_t obj_index;
 	uint8_t obj_subindex;
-} fsm_coe; 
+} fsm_coe __attribute__packed__ ; 
 
 #define EC_MAX_PORTS 		4
 #define TOT_PDOS		4 	/* change when change pdo entries number */

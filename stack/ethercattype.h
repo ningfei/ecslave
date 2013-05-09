@@ -415,7 +415,7 @@ static inline long __sdo_high(void)
 
 static inline long __sdo_start(void)
 {
-        return ECT_REG_DCCYCLE1 + 1;
+        return ECT_REG_DCCYCLE1;
 }       
 
 /** standard SDO Sync Manager Communication Type */

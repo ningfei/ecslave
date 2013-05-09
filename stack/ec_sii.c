@@ -21,9 +21,9 @@
 #define CAT_TYPE_DC	  0x003C
 #define CAT_TYPE_END	  0xFFFF
 
-#define MBOX_SIZE	8
+#define MBOX_SIZE	30
 #define NR_SYNCM	2
-#define	SYNMC_SIZE	200
+#define	SYNMC_SIZE	128
 
 typedef struct {
 	uint16_t pdi_control; // 0x000

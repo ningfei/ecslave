@@ -13,7 +13,7 @@ void od_list_response(ecat_slave *ecs, uint8_t* data,int datalen)
 	coe_header *coehdr = __coe_header(data);
 	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
 	coe_sdo_service_data *srvdata =__coe_sdo_service_data(data);
-	uint32_t *sdo_data = (uint32_t *) (&srvdata->list_type); /* each sdo is 8 bytes */	
+	int *sdo_data = (int *) (&srvdata->list_type); /* each sdo is 8 bytes */	
 
 	mbxhdr->type =  MBOX_COE_TYPE;
 	mbxhdr->len = 8 + NR_SDOS * 4;
@@ -113,7 +113,7 @@ void entry_desc_response(ecat_slave* ecs, uint8_t *data, int datalen)
 	entry_desc->object_access = 0x0FFF;
 	entry_desc->index	  = ecs->coe.obj_index;
 	entry_desc->subindex 	  = ecs->coe.obj_subindex; 
-	sprintf(entry_desc->name,"LINUX SDO ENTRY 0x%4X:0x%X",
+	sprintf(entry_desc->name,"LINUX SDO ENTRY 0x%x:0x%X",
 		entry_desc->index,
 		entry_desc->subindex);
 	mbxhdr->len = 	sizeof(*sdoinfo) + 
@@ -179,7 +179,6 @@ void coe_parser(ecat_slave* ecs, int reg, uint8_t * data, int datalen)
 {
 	coe_header *hdr = __coe_header(data);
 
-	
 	if (reg > __sdo_high()){		
 		return;
 	}

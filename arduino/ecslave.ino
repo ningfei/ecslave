@@ -28,7 +28,6 @@ void setup()
 		Serial.println(ret);
 		return;
 	}
-	
 	ret  = ec_init_regs(&ecs) ;
 	if (ret < 0){
 		Serial.println("Error init registers");

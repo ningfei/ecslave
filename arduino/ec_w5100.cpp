@@ -17,7 +17,7 @@
 
 
 static byte mac[6] = { 0x54, 0x55, 0x58, 0x10, 0x00, 0x24 };
-#define BUFFER_SIZE 800
+#define BUFFER_SIZE 400
 uint8_t buf[BUFFER_SIZE];
 SOCKET s;
 
@@ -26,8 +26,6 @@ extern "C" int ethernetSetup()
 	W5100.init();
   	W5100.writeSnMR(s, SnMR::MACRAW); 
   	W5100.execCmdSn(s, Sock_OPEN);
-
-	Serial.println("Successfully to set network");
 	return 0;
 }
 
@@ -48,7 +46,7 @@ void ecat_rcv(ecat_slave  *ecs)
 		Serial.println(len);
 		return;
 	}
-	ec_process_datagrams(ecs, len, ecat);
+	ec_process_datagrams(ecs, len -2, ecat);
 }
 
 extern "C" void ec_tx_pkt(uint8_t *buf, int sz, struct ec_device *txdev)
