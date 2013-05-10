@@ -10,10 +10,12 @@ void od_list_response(ecat_slave *ecs, uint8_t* data,int datalen)
 	mbox_header *mbxhdr = __mbox_hdr(data);
 	coe_header *coehdr = __coe_header(data);
 	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
-	coe_sdo_service_data *srvdata =__coe_sdo_service_data(data);
+	coe_sdo_service_data *srvdata = (coe_sdo_service_data *)(data + 6 + 6);
+//	coe_sdo_service_data *srvdata = __coe_sdo_service_data(data);
 
 	mbxhdr->type =  MBOX_COE_TYPE;
-	mbxhdr->len = 8 + NR_SDOS * 2;
+	/* see ec_fsm_coe_dict_response, data pointer is moved 6 bytes  */
+	mbxhdr->len = 8 + NR_SDOS * 2; 
 	coehdr->coe_service = COE_SDO_INFO;
 	sdoinfo->opcode = OD_LIST_RESPONSE;
 	srvdata->list_type = 0x1;
@@ -23,7 +25,7 @@ void od_list_response(ecat_slave *ecs, uint8_t* data,int datalen)
 	sdoinfo->opcode   = 0x02; // table 43
 	srvdata->index[0] = 0x1234;
 	srvdata->index[1] = 0x5678;
-	srvdata->index[2] = 0x9999;
+	srvdata->index[2] = 0x0;;
 }
 
 // table 45
@@ -149,25 +151,33 @@ void od_list_request(ecat_slave* ecs, uint8_t * data, int datalen)
 void coe_sdo_info(ecat_slave* ecs, uint8_t * data, int datalen)
 {
 	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
-
+	
 	switch(sdoinfo->opcode)
 	{
-	case OD_LIST_REQUEST:
+	case OD_LIST_REQUEST: /* the first thing elab asks for */
+		puts("OD_LIST_REQUEST:");
 		od_list_request(ecs, data, datalen);
 		break;
 	case OD_LIST_RESPONSE:
+		puts("OD_LIST_RESPONSE:");
+		od_list_response(ecs, data, datalen);
 		break;
 	case OBJ_DESC_REQUEST:
+		puts("OBJ_DESC_RESPONSE:");
 		obj_desc_request(ecs, data, datalen);
 		break;
 	case OBJ_DESC_RESPONSE:
+		puts("OBJ_DESC_RESPONSE");
 		break;
 	case ENTRY_DESC_REQUEST:
+		puts("ENTRY_DESC_RESPONSE:");
 		entry_desc_request(ecs, data, datalen);
 		break;
 	case ENTRY_DESC_RESPONSE:
+		printf("ENTRY_DESC_RESPONSE");
 		break;
 	case SDO_INFO_ERROR_REQUEST:
+		printf("SDO_INFO_ERROR_REQUEST");
 		break;
 	}
 }
@@ -179,6 +189,7 @@ void coe_parser(ecat_slave* ecs, int reg, uint8_t * data, int datalen)
 	if (reg > __sdo_high()){		
 		return;
 	}
+	printf("%s : %d\n",__func__,hdr->coe_service);
 	switch (hdr->coe_service) 
 	{
 	case COE_EMERGENCY:
