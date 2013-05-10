@@ -11,4 +11,6 @@ void ec_dump_string(uint8_t *c,int len)
 	puts("");
 }
 
+#ifndef __MAKE_DEBUG__
 void ec_printf(const char *str, ...){}
+#endif
