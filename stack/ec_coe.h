@@ -26,14 +26,6 @@ typedef struct {
 	uint16_t index[1] __attribute__packed__;
 }coe_sdo_service_data;
 
-static inline coe_sdo_service_data *__coe_sdo_service_data(uint8_t *data)
-{
-	return (coe_sdo_service_data *)
-		&data[sizeof(mbox_header) + 
-		sizeof(coe_header) + 
-		sizeof(coe_sdo_info_header)];
-}
-
 typedef struct __coe_sdo__ {
 
 	mbox_header mbxhdr;

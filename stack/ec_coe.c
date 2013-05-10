@@ -10,8 +10,9 @@ void od_list_response(ecat_slave *ecs, uint8_t* data,int datalen)
 	mbox_header *mbxhdr = __mbox_hdr(data);
 	coe_header *coehdr = __coe_header(data);
 	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
-	coe_sdo_service_data *srvdata = (coe_sdo_service_data *)(data + 6 + 6);
-//	coe_sdo_service_data *srvdata = __coe_sdo_service_data(data);
+//	coe_sdo_service_data *srvdata = (coe_sdo_service_data *)(data + 6 + 6);
+	coe_sdo_service_data *srvdata =
+		(coe_sdo_service_data *)&sdoinfo->sdo_info_service_data[0];
 
 	mbxhdr->type =  MBOX_COE_TYPE;
 	/* see ec_fsm_coe_dict_response, data pointer is moved 6 bytes  */
@@ -140,7 +141,8 @@ void entry_desc_request(ecat_slave* ecs,uint8_t *data, int datalen)
 void od_list_request(ecat_slave* ecs, uint8_t * data, int datalen)
 {
 	coe_sdo_info_header *sdoinfo = __sdo_info_hdr(data);
-	coe_sdo_service_data *srvdata =__coe_sdo_service_data(data);
+	coe_sdo_service_data *srvdata =
+		(coe_sdo_service_data *)&sdoinfo->sdo_info_service_data[0];
 
 	srvdata->list_type = 0x1;
 	// do the reponse
