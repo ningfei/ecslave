@@ -21,9 +21,6 @@
 #define CAT_TYPE_DC	  0x003C
 #define CAT_TYPE_END	  0xFFFF
 
-#define MBOX_SIZE	30
-#define NR_SYNCM	2
-#define	SYNMC_SIZE	128
 
 typedef struct {
 	uint16_t pdi_control; // 0x000
@@ -428,7 +425,7 @@ void init_si_info(ec_sii_t *sii)
 	sii->revision_number = 0x12;
 	sii->serial_number = 0x45;
 
-	sii->boot_rx_mailbox_offset = __sdo_start() ; 
+	sii->boot_rx_mailbox_offset = __mbox_start() ; 
 	sii->boot_rx_mailbox_size = MBOX_SIZE ; 
 	sii->boot_tx_mailbox_offset = sii->boot_rx_mailbox_offset + MBOX_SIZE;
 	sii->boot_tx_mailbox_size  = MBOX_SIZE; 
