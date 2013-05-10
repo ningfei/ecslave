@@ -157,29 +157,22 @@ void coe_sdo_info(ecat_slave* ecs, uint8_t * data, int datalen)
 	switch(sdoinfo->opcode)
 	{
 	case OD_LIST_REQUEST: /* the first thing elab asks for */
-		puts("OD_LIST_REQUEST:");
 		od_list_request(ecs, data, datalen);
 		break;
 	case OD_LIST_RESPONSE:
-		puts("OD_LIST_RESPONSE:");
 		od_list_response(ecs, data, datalen);
 		break;
 	case OBJ_DESC_REQUEST:
-		puts("OBJ_DESC_RESPONSE:");
 		obj_desc_request(ecs, data, datalen);
 		break;
 	case OBJ_DESC_RESPONSE:
-		puts("OBJ_DESC_RESPONSE");
 		break;
 	case ENTRY_DESC_REQUEST:
-		puts("ENTRY_DESC_RESPONSE:");
 		entry_desc_request(ecs, data, datalen);
 		break;
 	case ENTRY_DESC_RESPONSE:
-		printf("ENTRY_DESC_RESPONSE");
 		break;
 	case SDO_INFO_ERROR_REQUEST:
-		printf("SDO_INFO_ERROR_REQUEST");
 		break;
 	}
 }
@@ -191,7 +184,7 @@ void coe_parser(ecat_slave* ecs, int reg, uint8_t * data, int datalen)
 	if (reg > __sdo_high()){		
 		return;
 	}
-	printf("%s : %d\n",__func__,hdr->coe_service);
+
 	switch (hdr->coe_service) 
 	{
 	case COE_EMERGENCY:
