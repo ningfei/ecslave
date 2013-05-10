@@ -406,17 +406,26 @@ enum
     ECT_REG_DCCYCLE1    = 0x09A4
 };
 
-#define SDOS_ADDR_SPACE 128
 
-static inline long __sdo_high(void)
+#define MBOX_SIZE	30
+#define NR_SYNCM	2
+#define	SYNMC_SIZE	128
+
+static inline int16_t __mbox_start()
 {
-        return ECT_REG_DCCYCLE1 + SDOS_ADDR_SPACE;
+	return 0x1000;
 }
 
-static inline long __sdo_start(void)
+static inline int16_t __sdo_start(void)
 {
-        return ECT_REG_DCCYCLE1;
+        return ECT_REG_DCCYCLE1 + __mbox_start();
 }       
+
+static inline int16_t __sdo_high(void)
+{
+        return __sdo_start() + SYNCM_SIZE;
+}
+
 
 /** standard SDO Sync Manager Communication Type */
 #define ECT_SDO_SMCOMMTYPE		0x1c00
