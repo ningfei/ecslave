@@ -24,7 +24,7 @@ void coe_parser(ecat_slave *ecs, int reg, uint8_t * data, int datalen);
 typedef struct {
 	uint16_t list_type __attribute__packed__;
 	uint16_t index[1] __attribute__packed__;
-}coe_sdo_service_data __attribute__packed__;
+}coe_sdo_service_data;
 
 static inline coe_sdo_service_data *__coe_sdo_service_data(uint8_t *data)
 {

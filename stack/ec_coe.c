@@ -32,10 +32,10 @@ void obj_desc_response(ecat_slave* ecs, uint8_t *data, int datalen)
 	typedef struct {
 		uint16_t index __attribute__packed__ ;
 		uint16_t data_type __attribute__packed__;
-		uint8_t  max_subindex __attribute__packed__;
-		uint8_t  object_code __attribute__packed__;
+		uint8_t  max_subindex ;
+		uint8_t  object_code;
 		char     name[1];
-	}sdo_info_service_data  __attribute__packed__;
+	}sdo_info_service_data;
 
 	coe_header *coehdr = __coe_header(data);
 	mbox_header *mbxhdr = __mbox_hdr(data);
@@ -68,7 +68,7 @@ void obj_desc_request(ecat_slave *ecs, uint8_t *data, int datalen)
 {
 	typedef struct {
 		uint16_t  index  __attribute__packed__; 
-	}sdo_info_service_data  __attribute__packed__;
+	}sdo_info_service_data ;
 
 	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
 	sdo_info_service_data *obj_desc =
@@ -123,8 +123,8 @@ void entry_desc_request(ecat_slave* ecs,uint8_t *data, int datalen)
 {
 	typedef struct {
 		uint16_t index  __attribute__packed__;	
-		uint8_t  subindex __attribute__packed__;
-		uint8_t  valueinfo  __attribute__packed__;
+		uint8_t  subindex;
+		uint8_t  valueinfo;
 	}sdo_entry_info_data;
 
 	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);

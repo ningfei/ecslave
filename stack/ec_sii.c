@@ -234,12 +234,12 @@ typedef struct {
 sii_categories categories;
 int16_t last_word_offset = -1;
 
-void write_category_hdr(int off,int datalen, uint8_t *data)
+void write_category_hdr(int16_t off,int16_t datalen, uint8_t *data)
 {
 	ec_printf("%s off%d \n",__FUNCTION__,off);
 }
 
-void read_category_hdr(int16_t off,int datalen, uint8_t *data)
+void read_category_hdr(int16_t off,int16_t datalen, uint8_t *data)
 {
 	int offset = off * 2;
 	uint8_t* cat_off = (uint8_t *)&categories;
@@ -482,7 +482,7 @@ void init_sii(ecat_slave *esc)
 	esc->pdoe_sizes[pdoe_idx++]  = 16;
 }
 
-void (*sii_command)(int16_t offset, int datalen, uint8_t * data) = 0;
+void (*sii_command)(int16_t offset, int16_t datalen, uint8_t * data) = 0;
 
 void ec_sii_rw(uint8_t * data, int datalen)
 {

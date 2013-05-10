@@ -7,7 +7,7 @@ typedef struct __mbox_header__ {
 	uint16_t address __attribute__packed__;
 	uint8_t channel:6, prio:2  __attribute__packed__;
 	uint8_t type:4, cnt:3, reserved:1 __attribute__packed__;
-} mbox_header  __attribute__packed__;
+} mbox_header;
 
 typedef enum {
 
@@ -23,14 +23,14 @@ typedef enum {
 
 typedef struct  __coe_header__ {
 	uint16_t number:9, reserved:3, coe_service:4;
-} coe_header __attribute__packed__ ;
+} coe_header ;
 
 typedef struct __coe_sdo_info_header__ {
 	uint8_t opcode:7,incomplete:1;
-	uint8_t reserved __attribute__packed__;
+	uint8_t reserved;
 	uint16_t frag_list __attribute__packed__ ;
-	uint8_t sdo_info_service_data[1]  __attribute__packed__;
-}coe_sdo_info_header  __attribute__packed__;
+	uint8_t sdo_info_service_data[1];
+}coe_sdo_info_header ;
 
 static inline coe_header*  __coe_header(uint8_t *data)
 {
