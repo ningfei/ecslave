@@ -301,7 +301,7 @@ void ecat_process_write_ados(int reg,uint8_t *data, int len)
 
 void ec_set_ado(ecat_slave *ecs, int reg, uint8_t * data, int datalen)
 {
-	if (reg > ECT_REG_DCCYCLE1) {
+	if (reg >= __mbox_start()) {
 		return ec_mbox(ecs, reg, data, datalen);
 	}
 	if (reg < ECT_REG_TYPE) {
