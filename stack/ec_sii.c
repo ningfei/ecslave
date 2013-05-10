@@ -241,7 +241,7 @@ void write_category_hdr(int off,int datalen, uint8_t *data)
 
 void read_category_hdr(int16_t off,int datalen, uint8_t *data)
 {
-	int offset = off*2;
+	int offset = off * 2;
 	uint8_t* cat_off = (uint8_t *)&categories;
 
 	ec_printf("%s off %d offset %d data len=%d\n",

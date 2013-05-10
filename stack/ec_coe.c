@@ -7,27 +7,24 @@
 
 void od_list_response(ecat_slave *ecs, uint8_t* data,int datalen)
 {
-	int i;
-
 	mbox_header *mbxhdr = __mbox_hdr(data);
 	coe_header *coehdr = __coe_header(data);
 	coe_sdo_info_header * sdoinfo = __sdo_info_hdr(data);
 	coe_sdo_service_data *srvdata =__coe_sdo_service_data(data);
-	uint16_t *sdo_data = (uint16_t *) (&srvdata->list_type); /* each sdo is 8 bytes */	
 
 	mbxhdr->type =  MBOX_COE_TYPE;
-	mbxhdr->len = 8 + NR_SDOS * 4;
+	mbxhdr->len = 8 + NR_SDOS * 2;
 	coehdr->coe_service = COE_SDO_INFO;
 	sdoinfo->opcode = OD_LIST_RESPONSE;
 	srvdata->list_type = 0x1;
-	// do the reponse
-	sdoinfo->opcode = 0x02; // table 43
-	for (i = 0  ; i < NR_SDOS; i++) { 
-		/* starting from 0x1888 create NR SDOS */
-		sdo_data[i] = 0x1858 + i;
-	}
+	/*
+	 * Do the reponse
+	*/
+	sdoinfo->opcode   = 0x02; // table 43
+	srvdata->index[0] = 0x1234;
+	srvdata->index[1] = 0x5678;
+	srvdata->index[2] = 0x9999;
 }
-
 
 // table 45
 void obj_desc_response(ecat_slave* ecs, uint8_t *data, int datalen)
