@@ -10,6 +10,7 @@
 
 int main(int argc, char *argv[])
 {
+	int i =0;
 	struct fsm_slave fsm_slave;
 	ecat_slave ecs;
 
@@ -22,6 +23,7 @@ int main(int argc, char *argv[])
 		printf("%s < rx interface> < tx interface>\n", argv[0]);
 		return 0;
 	}
+	for (i = 0 ; i < 10; i++)
 	printf("Silly print to bypass pcap bug\n");
   	if (ecs_net_init(argc, argv, &ecs) < 0){
 		return -1;
