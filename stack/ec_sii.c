@@ -39,7 +39,7 @@ typedef struct {
 	uint16_t boot_rx_mailbox_size; // 0x0015
 	uint16_t boot_tx_mailbox_offset; // 0x0016
 	uint16_t boot_tx_mailbox_size; // 0x0017
-	uint16_t std_rx_mailbox_offset; //0x0018
+	uint16_t std_rx_mailbox_offset; //0x0018 /* sync mananer starts here */
 	uint16_t std_rx_mailbox_size; // 0x0019
 	uint16_t std_tx_mailbox_offset; // 0x01a
 	uint16_t std_tx_mailbox_size; // 0x01b
@@ -295,7 +295,7 @@ void init_syncm(category_syncm *syncm,int index,category_header * hdr)
 	}
 	hdr->type = CAT_TYPE_SYNCM;
 
-	syncm->length = SYNMC_SIZE;
+	syncm->length = SYNCM_SIZE;
 	syncm->ctrl_reg = 0b00110010;
 	syncm->status_reg = 0b00001000; /*b1000 - 1-buf written,b0000 1-buf read */
 	syncm->enable_syncm = 0b01;
@@ -321,18 +321,27 @@ void toggle_rw_bit(category_syncm *syncm)
 void ec_sii_syncm(int reg, uint8_t* data, int datalen)
 {
 	category_syncm *syncm;
+	int i = 0;
 
-	switch(reg)
-	{
+	while (datalen) { 
+		switch(reg)
+		{
 		case ECT_REG_SM0:
 			syncm = &categories.syncm0;
 			break;
-		default:
 		case ECT_REG_SM1:
 			syncm = &categories.syncm1;
+			break;
+		default:
+			ec_printf("no sync managet %d exists\n",reg);
+			return;
+		}
+		toggle_rw_bit(syncm);
+		memcpy(data + i, syncm, sizeof(*syncm));
+		reg += sizeof(*syncm);
+		i += sizeof(*syncm);
+		datalen -= sizeof(*syncm);
 	}
-	toggle_rw_bit(syncm);
-	memcpy(data, syncm, datalen);
 }
 
 void init_fmmu(category_fmmu *fmmu,category_header *hdr)
