@@ -113,12 +113,12 @@ int ecat_proto_init(ecat_slave * ecs)
 {
 	eslave = ecs;
 	dev_add_pack(&ecat_packet);
-	ecat_netproto_init();
+//	ecat_netproto_init();
 	return 0;
 }
 
 void ecat_proto_cleanup(void)
 {
 	dev_remove_pack(&ecat_packet);
-	ecat_netproto_exit();
+//	ecat_netproto_exit();
 }

@@ -6,7 +6,6 @@ OBJS  = \
 ../kernel/ec_debug.o \
 ../kernel/ecat_timer.o \
 ../kernel/ec_device.o \
-../kernel/ecat_netproto.o \
 ../stack/ec_cmd_apwr.o \
 ../stack/ec_cmd_aprd.o \
 ../stack/ec_cmd_aprw.o \

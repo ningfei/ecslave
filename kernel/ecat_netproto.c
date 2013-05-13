@@ -63,7 +63,7 @@ static void sock_port_action(long *private)
 	struct sk_buff* skb;
 	struct ecat_sock *ecatsock =(struct ecat_sock *)private;
 	struct ec_slave *ecslave = (ecat_slave *)ecatsock->ecslave;
-	struct ec_device *device = ecslave->intr[RX_INTR_INDEX];
+	struct ec_device *device = ecslave->intr[RX_INT_INDEX];
 
 	skb = device->process_skb;
 	if (skb) {
