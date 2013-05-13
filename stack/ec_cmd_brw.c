@@ -22,7 +22,5 @@ void ec_cmd_brw(ecat_slave * ecs,uint8_t *dgram_ec)
 	__ec_inc_wkc__(dgram_ec);
 	__ec_inc_wkc__(dgram_ec);
 	__ec_inc_wkc__(dgram_ec);
-	ec_printf("ADO 0x%x Val=0x%x\n", (int)ado, (int)val);
-
 	__set_fsm_state(ecs, ecs_process_next_dgram);
 }
