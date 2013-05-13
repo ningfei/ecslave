@@ -422,7 +422,7 @@ static inline int16_t __sdo_high(void)
         return __syncm_start(NR_SYNCM-1) + SYNCM_SIZE;
 }
 
-static inline int16_t __mbox_start()
+static inline int16_t __mbox_start(void)
 {
 	return __syncm_start(0);
 }
