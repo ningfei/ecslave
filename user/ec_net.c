@@ -122,7 +122,8 @@ int ecs_sock(struct ec_device * intr)
 	strcpy(ifr.ifr_name, intr->name);
 	if (setsockopt(intr->sock, SOL_SOCKET, 
 			SO_BINDTODEVICE, &ifr, sizeof(ifr)) < 0){
-		perror("failed to bind socket to interface\n");
+		fprintf(stderr, "failed to bind socket to interface %s (%s)\n",
+				ifr.ifr_name,strerror(errno));		
 		return -1;
 	}
 	return 0;

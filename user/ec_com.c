@@ -102,7 +102,7 @@ static void ec_pkt_filter(u_char *user, const struct pcap_pkthdr *h,
 }
 
 /* handler of traffic that is passing by back to master */
-void passing_pkt(u_char *user, const struct pcap_pkthdr *h,
+void returning_pkt(u_char *user, const struct pcap_pkthdr *h,
                                    const u_char *bytes)
 {
 	ecat_slave *ecs = (ecat_slave *)user;
@@ -128,11 +128,12 @@ void passing_pkt(u_char *user, const struct pcap_pkthdr *h,
 	ec_tx_pkt(d ,h->len , ecs->intr[RX_INT_INDEX]);
 }
 
-void *pkt_passing_thread(void *ecs)
+void * returning_pkt_thread(void *ecs)
 {
 	int num_pkt = 0;
+
 	while(1) {
-		pcap_loop(tx_handle, num_pkt, passing_pkt, (u_char *)ecs);	
+		pcap_loop(tx_handle, num_pkt, returning_pkt, (u_char *)ecs);	
 	}
 }
 
@@ -158,8 +159,9 @@ int ec_capture(ecat_slave *ecs)
 			return -1;
 		}
 		pthread_create(&t, NULL,
-			pkt_passing_thread, ecs);
+			returning_pkt_thread, ecs);
 	}
+
 	while(1) {
 		int num_pkt = 0;
 		pcap_loop(rx_handle, num_pkt, ec_pkt_filter ,(u_char *)ecs);
