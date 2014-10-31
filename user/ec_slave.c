@@ -14,7 +14,7 @@ extern ecat_slave slaves[];
 
 int init(int argc, char *argv[])
 {
-	int i;
+	int i = 0;
 	struct ec_device *intr;
 	ecat_slave * esv;
 	
@@ -25,7 +25,7 @@ int init(int argc, char *argv[])
 	}
 
 	esv  =  &slaves[0];
-	intr = esv->intr[i] = malloc(sizeof(struct ec_device));
+	intr =  esv->intr[RX_INT_INDEX] = malloc(sizeof(struct ec_device));
 	strncpy(intr->name, argv[1], sizeof(intr->name));
 	esv->intr[TX_INT_INDEX] = esv->intr[RX_INT_INDEX];
 	esv->interfaces_nr = 2;
@@ -44,7 +44,7 @@ int init(int argc, char *argv[])
 	printf("LINK %d %s  %s\n", i, intr->name,
 			  ec_is_nic_link_up(esv, intr) ? "UP" : "DOWN");
 	ec_init_device(intr);
-	
+
 	if (init_process_data(esv) < 0){
 		printf ("illegal pdo configuration\n");
 		return -1;
@@ -66,6 +66,7 @@ int init(int argc, char *argv[])
 		memset(esv->intr[1], 0x00,sizeof(struct ec_device));
 		ec_init_device(esv->intr[1]);
 		esv->intr[1]->ecslave = esv;
+		esv->index = i;
 		ec_init_regs(esv);
 		init_sii(esv);
 
@@ -89,6 +90,7 @@ int init(int argc, char *argv[])
 	esv->intr[0]->ecslave = esv;
 	ec_init_regs(esv);
 	init_sii(esv);
+	esv->index = i;
 	esv->fsm = malloc(sizeof(struct fsm_slave));
 	esv->dgram_processed = &esv->pkt_head[0];
 	esv->dgrams_cnt = 0;

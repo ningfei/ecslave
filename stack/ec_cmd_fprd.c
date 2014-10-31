@@ -14,7 +14,7 @@ void ec_cmd_fprd(ecat_slave *ecs,uint8_t *dgram_ec)
 
 	ado = __ec_dgram_ado(dgram_ec);
 	adp = __ec_dgram_adp(dgram_ec);
-	if (adp != ec_station_address()) {
+	if (adp != ec_station_address(ecs)) {
 		goto FPRD_OUT;
 	}
 	if (datalen == 0) {

@@ -26,6 +26,38 @@ typedef struct {
 
 struct ec_device;
 
+struct ecat_regs {
+	uint8_t base;
+	uint8_t revision;
+	uint8_t portdes;
+	uint16_t alstat;
+	uint8_t dlstat;
+	uint8_t station_address;
+	uint8_t alias;
+	uint8_t dlctl;
+	uint8_t dlport;
+	uint8_t dlalias;
+	uint8_t alctl;
+	uint8_t alstacode;
+	uint8_t pdictl;
+	uint8_t itqmask;
+	uint8_t rxerr;
+	uint8_t eepcfg;
+	uint8_t eepctl;
+	uint8_t eepaddr;
+	uint8_t eepdat;
+	uint8_t cycle_unit_ctrl;
+	uint8_t assign_active;
+	uint32_t propagation_delay;
+	uint32_t offset_from_systemtime;
+	uint32_t drift;
+	uint32_t sync0_start;
+	uint32_t sync1_start;
+	uint32_t cycle_ns;
+	uint32_t dcoffset;
+	uint32_t rxtime_port[4];
+};
+
 typedef struct __ecat_slave__ {
 	uint8_t *pkt_head;
 	uint8_t *dgram_processed; /* current ethercat dgram processed */
@@ -40,6 +72,7 @@ typedef struct __ecat_slave__ {
 	fsm_mbox mbox;
 	uint8_t index;			/* used by etherlab debug api */
 	struct semaphore device_sem;	/* used by etherlab */
+	struct ecat_regs registers;
 } ecat_slave;
 
 typedef struct __ecat_slave__ ecat_node_t;

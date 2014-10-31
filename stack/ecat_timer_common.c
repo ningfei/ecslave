@@ -4,7 +4,7 @@
 #include "ecs_slave.h"
 #include "ec_regs.h"
 
-void ecat_calibrate_localtime(uint32_t *systime32)
+void ecat_calibrate_localtime(ecat_slave *esv, uint32_t *systime32)
 {
 	uint32_t dt;
 	uint32_t t;
@@ -17,7 +17,7 @@ void ecat_calibrate_localtime(uint32_t *systime32)
 	t = TIMESPEC2NS(tm); 
 	localtime =  (t & 0xFFFFFFFF);
 
-	dt = (localtime + ecat_systime_offset() - ecat_propagation_delay()) 
+	dt = (localtime + ecat_systime_offset() - ecat_propagation_delay(esv)) 
 			- *systime32;
 	sec  = dt/NSEC_PER_SEC;
 	nsec = dt % NSEC_PER_SEC;	

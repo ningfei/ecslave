@@ -42,17 +42,17 @@ int get_process_data(uint8_t *data, uint16_t offset, uint16_t datalen)
 
 void normalize_sizes(ecat_slave *ecs, uint32_t *offset,uint16_t *datalen)
 {
-	int off  = (ec_station_address() -1) * pd.size + *offset;
+	int off  = (ec_station_address(ecs) -1) * pd.size + *offset;
 	if (off < 0) {
 		ec_printf("%s off=%d  offset=%d  stafr=%hu\n",
-			__func__, off, *offset, ec_station_address());
+			__func__, off, *offset, ec_station_address(ecs));
 		return;
 	}
 	ec_printf("%s off=%d offset=%d statr=%d datalen=%hu\n",
 			__func__, 
 			off, 
 			*offset, 
-			ec_station_address(),
+			ec_station_address(ecs),
 			*datalen);
 	*offset = (uint32_t)off;
 	*datalen = *datalen % pd.size;

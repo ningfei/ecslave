@@ -19,7 +19,7 @@ void ec_cmd_fpwr(ecat_slave *ecs,uint8_t *dgram_ec)
 	if (datalen == 0) {
 		goto FPRD_OUT;
 	}
-	if (adp != ec_station_address())
+	if (adp != ec_station_address(ecs))
 		goto FPRD_OUT;
 	__ec_inc_wkc__(dgram_ec);
 	if (ado == ECT_REG_EEPSTAT){

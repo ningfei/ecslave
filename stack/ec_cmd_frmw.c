@@ -19,8 +19,8 @@ void ec_cmd_frmw(ecat_slave *ecs,uint8_t *dgram_ec)
 		__FUNCTION__,
 		__ec_dgram_pkt_index(dgram_ec),
 		adp,
-		ec_station_address());
-	if (adp != ec_station_address()) {
+		ec_station_address(ecs));
+	if (adp != ec_station_address(ecs)) {
 		if (ado == ECT_REG_EEPSTAT)
 			ec_sii_rw(data, datalen);
 		else

@@ -16,6 +16,8 @@ static pthread_mutex_t timer_sync;
 
 LIST_HEAD(events_head, ecat_event) ecat_events;
 
+extern ecat_slave slaves[];
+
 void *ecat_timer(void *dummy __attribute__ ((unused)) )
 {
 	uint32_t t;
@@ -23,13 +25,14 @@ void *ecat_timer(void *dummy __attribute__ ((unused)) )
 	struct timespec rem = {0};
 	struct ecat_event *ev;
 	uint32_t local_starttime;
+	ecat_slave *ecs = &slaves[0];
 
 	ecat_timer_run = 1;
 	sem_wait(&timersem);
 	/* 
 	 * get starting time delay 
 	*/
-	local_starttime = ecat_get_dcstart(0) + ecat_systime_offset();
+	local_starttime = ecat_get_dcstart(0,ecs) + ecat_systime_offset();
 	tm.tv_nsec = local_starttime % NSEC_PER_SEC;
 	tm.tv_sec = local_starttime/NSEC_PER_SEC;
 
