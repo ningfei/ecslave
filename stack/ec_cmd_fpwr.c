@@ -24,7 +24,7 @@ void ec_cmd_fpwr(ecat_slave *ecs,uint8_t *dgram_ec)
 	__ec_inc_wkc__(dgram_ec);
 	if (ado == ECT_REG_EEPSTAT){
 		// ec_fsm_sii_state_start_reading
-		ec_sii_start_read(data, datalen);
+		ec_sii_start_read(ecs, data, datalen);
 	} else{
 		ec_set_ado(ecs,ado, data, datalen);
 	}

@@ -6,10 +6,10 @@ extern "C" {
 #endif
 
 void init_sii(ecat_slave *);
-void ec_sii_rw(uint8_t * data, int datalen);
-int ec_sii_start_read(uint8_t * data, int datalen);
+void ec_sii_rw(ecat_slave* esv,uint8_t * data, int datalen);
+int ec_sii_start_read(ecat_slave* esv,uint8_t * data, int datalen);
 int ec_sii_pdoes_sizes(ecat_slave *);
-void ec_sii_syncm(int reg, uint8_t* data, int datalen);
+void ec_sii_syncm(ecat_slave *,int reg, uint8_t* data, int datalen);
 
 
 #ifdef __cplusplus

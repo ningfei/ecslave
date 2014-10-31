@@ -66,7 +66,6 @@ static int ec_queue_pkt(int slave_index, void *data,int sz)
 		perror("Failed to send message\n");
 		return -1;
 	}
-	printf("msg sent\n");
 	return 0;
 }
 
@@ -105,11 +104,9 @@ void ec_tx_pkt(uint8_t* buf, int size, struct ec_device *intr)
 	       &intr->mac.ether_shost,
 		sizeof(intr->mac.ether_shost));
 	eh->ether_type = htons(ETHERCAT_TYPE);
-	printf("tx %d %d\n",ecs->index, slaves_nr);
 	if (ecs->index == (slaves_nr - 1)) {
 		ecs = &slaves[0];
 		intr = ecs->intr[TX_INT_INDEX];
-		printf("intr %d\n",intr->sock);
 		// 	transmit back the packet without 
 		//	pushing it back 
 		bytes = sendto(intr->sock,
@@ -122,7 +119,8 @@ void ec_tx_pkt(uint8_t* buf, int size, struct ec_device *intr)
 		return;
 	}
 	// any other slave would queue the packet to the next slave
-	if ( ec_queue_pkt(ecs->index +1, buf ,size ) <  0){
+	if ( ec_queue_pkt(ecs->index + 1, buf ,size ) <  0){
+		perror("failed to q packet:");
 		exit(0);
 	}
 }
@@ -187,7 +185,6 @@ void *ec_local_slave(void *ecslaves)
 
 	while(1) {
 		get_pkt(&m);
-		printf("msg recv %d\n",m.slave_index);
 		ecs = &slaves[m.slave_index];
 		h.len = m.size;
 		ec_pkt_filter((u_char *)ecs, &h, (u_char *)&m.buf[0]);

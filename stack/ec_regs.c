@@ -7,10 +7,10 @@
 #include "ecat_timer.h"
 #include "ec_device.h"
 #include "ec_regs.h"
+#include "ec_categories.h"
 
 #define DC_32	0b0100
 #define DC_SIZE	4
-
 
 
 
@@ -499,7 +499,7 @@ void ec_get_ado(ecat_slave *ecs, int reg, uint8_t * data, int datalen)
 	}
 	if (reg >= ECT_REG_SM0 && reg <= ECT_REG_SM3) {
 		/* ethelab expects here a mail box */
-		return	ec_sii_syncm(reg,  data, datalen);
+		return	ec_sii_syncm(ecs, reg,  data, datalen);
 	}
 	ecat_process_read_ados(ecs, reg, data, datalen);
 }

@@ -36,7 +36,7 @@ void ec_cmd_fprw(ecat_slave *ecs,uint8_t *dgram_ec)
 	uint8_t val[datalen];
 	ec_get_ado(ecs, ado, (uint8_t *)&val, datalen);
 	if (ado == ECT_REG_EEPSTAT)
-		ec_sii_rw(data, datalen);
+		ec_sii_rw(ecs, data, datalen);
 	 else
 		ec_set_ado(ecs, ado, data, datalen);
 	memcpy(data, val, datalen);

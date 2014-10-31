@@ -2,6 +2,7 @@
 #define __ECS_SLAVE_H__
 
 #include "ecat_timer.h"
+#include "ec_categories.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -58,6 +59,13 @@ struct ecat_regs {
 	uint32_t rxtime_port[4];
 };
 
+typedef struct {
+	uint8_t* data;
+	int size;
+}process_data;
+
+struct __sii_categories__;
+
 typedef struct __ecat_slave__ {
 	uint8_t *pkt_head;
 	uint8_t *dgram_processed; /* current ethercat dgram processed */
@@ -65,6 +73,7 @@ typedef struct __ecat_slave__ {
 	int pkt_size;
 	int debug_level;
 	int interfaces_nr;
+	process_data pd;
 	struct ec_device* intr[EC_MAX_PORTS];
 	int pdoe_sizes[TOT_PDOS]; /* description array of pdos sizes */
 	struct fsm_slave *fsm;	/* finite state machine */
@@ -73,6 +82,9 @@ typedef struct __ecat_slave__ {
 	uint8_t index;			/* used by etherlab debug api */
 	struct semaphore device_sem;	/* used by etherlab */
 	struct ecat_regs registers;
+	struct __sii_categories__ categories;
+	int16_t last_word_offset;
+	void (*sii_command)(struct __ecat_slave__*, int16_t offset, int16_t datalen, uint8_t * data);
 } ecat_slave;
 
 typedef struct __ecat_slave__ ecat_node_t;

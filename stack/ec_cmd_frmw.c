@@ -22,7 +22,7 @@ void ec_cmd_frmw(ecat_slave *ecs,uint8_t *dgram_ec)
 		ec_station_address(ecs));
 	if (adp != ec_station_address(ecs)) {
 		if (ado == ECT_REG_EEPSTAT)
-			ec_sii_rw(data, datalen);
+			ec_sii_rw(ecs, data, datalen);
 		else
 			ec_set_ado(ecs, ado, data, datalen);
 	} else{
