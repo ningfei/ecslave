@@ -12,6 +12,9 @@
 #include <linux/sockios.h>
 #include <linux/ethtool.h>
 
+extern int slaves_nr;
+extern ecat_slave slaves[];
+
 /* use the ethtool way to determine whether link is up*/
 int ec_is_nic_link_up(ecat_slave *esv,struct ec_device *intr)
 {
@@ -129,34 +132,4 @@ int ecs_sock(struct ec_device * intr)
 	return 0;
 }
 
-int ecs_net_init(int argc, char *argv[], ecat_slave * esv)
-{
-	int i;
-	int k;
-	struct ec_device *intr;
 
-	esv->interfaces_nr = 0;
-	for (i = 0, k = 1; k < argc; k++, i++) {
-		intr = esv->intr[i] = malloc(sizeof(struct ec_device));
-		strncpy(intr->name,
-			argv[k], sizeof(intr->name));
-		if (ecs_sock(intr))
-			return -1;
-		if (ecs_get_intr_conf(intr))
-			return -1;
-		printf("LINK %d %s  %s\n", i, intr->name,
-			  ec_is_nic_link_up(esv, intr) ? "UP" : "DOWN");
-		/*if (!ec_is_nic_link_up(esv, esv->intr[i])) {
-			free(intr);
-			esv->intr[i] = 0;
-			return -1;
-		}*/
-		ec_init_device(intr);
-		esv->interfaces_nr++;	
-	}
-	if (esv->interfaces_nr == 1) {
-		/* closed loop */
-		esv->intr[TX_INT_INDEX] = esv->intr[RX_INT_INDEX];
-	}
-	return 0;
-}

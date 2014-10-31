@@ -3,6 +3,8 @@
 
 #include "ecat_timer.h"
 
+#define MAX_SLAVES	64
+
 struct ec_device {
 	pthread_mutex_t events_sync;
         LIST_HEAD(porteve, ecat_event) events;
@@ -15,8 +17,11 @@ struct ec_device {
 	int sock;
 	int subnet_mask;
 	int link_up;
+	void *ecslave;
 };
 
+int ecs_sock(struct ec_device * intr);
+int ecs_get_intr_conf(struct ec_device * intr);
 void ec_init_device(struct ec_device *ec);
 void ecat_add_event_to_device(struct ec_device *ec, 
 		struct ecat_event* ev,
