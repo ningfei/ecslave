@@ -17,24 +17,23 @@
 int ec_init_regs(ecat_slave* esv)
 {
 	int i = 0;
-	uint16_t dl = 0;
+	//uint16_t dl = 0;
 
 	esv->registers.alstat = EC_STATE_PRE_OP;
 
 	for (i = 0 ; i < EC_MAX_PORTS ; i++){
 		if ( i < esv->interfaces_nr ){
-			if (ec_is_nic_link_up(esv, esv->intr[i]))
-				dl |= (1 << (4 + i));
-			if (ec_is_nic_loop_closed(esv))
-				dl |=	(1 << (8 + i * 2));
-			if (ec_is_nic_signal_detected(esv, esv->intr[i]))
-				dl |= (1 << (9 + i * 2));
 			esv->registers.portdes |= 0b00000011 << (2 * i);
 			continue;
 		}
-		dl |= (1 << (8 + i * 2));
 	}
-	esv->registers.dlstat = dl;
+	// port 0 ,1 : signal and link are on
+	if ( esv->interfaces_nr == 2 ){
+		esv->registers.dlstat =   0b0000101000110000;
+	}
+	if ( esv->interfaces_nr == 1 ){
+		esv->registers.dlstat =   0b0000001000010000;
+	}
 	return 0;
 }
 
@@ -350,7 +349,8 @@ void ecat_process_read_ados(ecat_slave *esv, int reg,uint8_t *data, int len)
 			break;		
 			
     		case ECT_REG_DLSTAT://      = 0x0110,
-				data[i] = esv->registers.dlstat;
+				memcpy(&data[i], &esv->registers.dlstat,sizeof(esv->registers.dlstat));
+				reg_size = sizeof(esv->registers.dlstat);
 			break;		
 
     		case ECT_REG_ALCTL://       = 0x0120,

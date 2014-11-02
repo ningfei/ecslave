@@ -15,6 +15,11 @@
 extern int slaves_nr;
 extern ecat_slave slaves[];
 
+static inline int ec_is_local_slave(ecat_slave *esv) {
+       return (esv->intr[0]->sock == 0);
+}
+
+
 /* use the ethtool way to determine whether link is up*/
 int ec_is_nic_link_up(ecat_slave *esv,struct ec_device *intr)
 {
@@ -22,6 +27,10 @@ int ec_is_nic_link_up(ecat_slave *esv,struct ec_device *intr)
     struct ifreq ifr;
     struct ethtool_value edata;
     int rc;
+	
+    if (ec_is_local_slave(esv)) {
+	return 1;
+    }
 
     sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
     if (sock < 0) {
