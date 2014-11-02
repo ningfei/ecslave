@@ -3,7 +3,7 @@
 
 #include "ecat_timer.h"
 
-#define MAX_SLAVES	64
+#define MAX_SLAVES	128
 
 struct ec_device {
 	pthread_mutex_t events_sync;
