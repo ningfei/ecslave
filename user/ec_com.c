@@ -21,14 +21,7 @@ static void ec_pkt_filter(u_char *user, const struct pcap_pkthdr *h,
                                    const u_char *bytes);
 ecat_slave slaves[MAX_SLAVES];
 int slaves_nr = 0;
-static mqd_t ecq;
 static pcap_t *rx_handle = 0;
-
-struct ecat_queue_msg {
-	char buf[2000];
-	int size;
-	int slave_index;
-};
 
 int dbg_index(ecat_slave *ecs)
 {
@@ -133,29 +126,6 @@ static void ec_pkt_filter(u_char *user, const struct pcap_pkthdr *h,
 	}
 	pthread_mutex_unlock(&intr->events_sync);
 	ec_process_datagrams(ecs, h->len, d);
-}
-
-int get_pkt(struct ecat_queue_msg* m)
-{
-	if (mq_receive(ecq, (char *)m, sizeof(*m) ,0)  < 0){
-		perror("mq_read error:");
-		return -1;
-	}	
-	return 0;
-}
-
-void *ec_local_slave(void *ecslaves)
-{
-	ecat_slave* ecs;
-	struct ecat_queue_msg m;
-	struct pcap_pkthdr h;
-
-	while(1) {
-		get_pkt(&m);
-		ecs = &slaves[m.slave_index];
-		h.len = m.size;
-		ec_pkt_filter((u_char *)ecs, &h, (u_char *)&m.buf[0]);
-	}
 }
 
 int ec_capture(void)
