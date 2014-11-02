@@ -65,11 +65,11 @@ void init_syncm(ecat_slave *esv, category_syncm *syncm,int index,category_header
 {
 	hdr->size = ( sizeof(category_syncm)) / 2;
 	if (sizeof(*syncm) %2){
-		ec_printf("ilegal size\n");
+		printf("ilegal size\n");
 		return;
 	}
-	hdr->type = CAT_TYPE_SYNCM;
 
+	hdr->type = CAT_TYPE_SYNCM;
 	syncm->length = SYNCM_SIZE;
 	syncm->ctrl_reg = 0b00110010;
 	syncm->status_reg = 0b00001000; /*b1000 - 1-buf written,b0000 1-buf read */
@@ -108,7 +108,7 @@ void ec_sii_syncm(ecat_slave* esv,int reg, uint8_t* data, int datalen)
 			syncm = &esv->categories.syncm1;
 			break;
 		default:
-			ec_printf("no sync managet %d exists\n",reg);
+			printf("no sync managet %d exists\n",reg);
 			return;
 		}
 		toggle_rw_bit(syncm);
@@ -285,7 +285,7 @@ int ec_sii_start_read(ecat_slave* esv,uint8_t * data, int datalen)
 			__FUNCTION__, datalen);
 
 	if (data[0] != 0x80 && data[0] != 0x81) {
-		ec_printf("%s no two addressed octets %x %x\n",
+		printf("%s no two addressed octets %x %x\n",
 		       __FUNCTION__	, data[0], data[1]);
 		return 1;
 	}
@@ -306,7 +306,7 @@ int ec_sii_start_read(ecat_slave* esv,uint8_t * data, int datalen)
 		break;
 
 	default: // unknown
-		ec_printf("%s default\n",__FUNCTION__);
+		printf("%s default\n",__FUNCTION__);
 		break;
 	}
 

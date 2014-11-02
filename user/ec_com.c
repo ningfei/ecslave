@@ -9,6 +9,7 @@
 #include "ec_process_data.h"
 #include "ec_com.h"
 #include "ec_cmd.h"
+#include <sys/prctl.h>
 #include <pcap/pcap.h>
 
 #include <fcntl.h>           /* For O_* constants */
@@ -16,6 +17,8 @@
 #include <mqueue.h>
 
 
+static void ec_pkt_filter(u_char *user, const struct pcap_pkthdr *h,
+                                   const u_char *bytes);
 ecat_slave slaves[MAX_SLAVES];
 int slaves_nr = 0;
 static mqd_t ecq;
@@ -39,44 +42,6 @@ uint16_t ec_dbg_wkc(ecat_slave *ecs)
 	return __ec_wkc(p);
 }
 
-static int ec_queue_init(void)
-{
-
-        struct mq_attr attr={0};
-
-        attr.mq_msgsize = sizeof(struct ecat_queue_msg);
-        attr.mq_maxmsg = MAX_SLAVES;
-
-        ecq = mq_open("/ecq", O_RDWR | O_CREAT,0700, &attr);
-        if (ecq < 0) {
-		perror("mq_open:");
-		return -1;
-        }
-	return 0;
-}
-
-static int ec_queue_pkt(int slave_index, void *data,int sz)
-{
-	struct 	ecat_queue_msg  m;
-	
-	memcpy(m.buf, data, sz);
-	m.slave_index = slave_index;
-	m.size = sz;
-	if ( mq_send(ecq, (char *)&m, sizeof(m), 0) < 0){
-		perror("Failed to send message\n");
-		return -1;
-	}
-	return 0;
-}
-
-//
-//  we have the following flows:
-//
-// forward: slave 0 sends to first virtual slave : QUEUE
-// backward: slave 0 sends to master	:ETHERNET
-// forward: virt slave to virt slave   	:QUEUE
-// backward: virt slave to virt slave 	:QUEUE
-// backward: virt slave to slave 0	:QUEUE
 void ec_tx_pkt(uint8_t* buf, int size, struct ec_device *intr)
 {
 	int i;
@@ -118,10 +83,12 @@ void ec_tx_pkt(uint8_t* buf, int size, struct ec_device *intr)
 		}
 		return;
 	}
-	// any other slave would queue the packet to the next slave
-	if ( ec_queue_pkt(ecs->index + 1, buf ,size ) <  0){
-		perror("failed to q packet:");
-		exit(0);
+
+	{
+		struct pcap_pkthdr h;
+		ecs = &slaves[ecs->index + 1];
+		h.len = size;
+		ec_pkt_filter((u_char *)ecs, &h, buf);
 	}
 }
 
@@ -193,8 +160,8 @@ void *ec_local_slave(void *ecslaves)
 
 int ec_capture(void)
 {
+	struct sched_param sp ={0};
 	ecat_slave *ecs;
-	pthread_t t;
  	char errbuf[PCAP_ERRBUF_SIZE];          /* error buffer */
 	int snap_len = 1492;	
 	int promisc = 1;
@@ -209,14 +176,9 @@ int ec_capture(void)
 		return -1;
 	}
 
-
-	if (ec_queue_init() < 0){
-		printf("failed to initialize queue\n");
-		return -1;
-	}
-
-	// works only with virtslaves. 
-	pthread_create(&t, NULL, ec_local_slave, ecs);
+	prctl(PR_SET_NAME,"ecslave",0,0,0);
+	sp.sched_priority = 90;
+	pthread_setschedparam(pthread_self(), SCHED_FIFO, &sp);
 
 	while (1) {
 		// works only with the master, recv and transmit
