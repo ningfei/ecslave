@@ -14,8 +14,8 @@ void ec_cmd_lrw(ecat_slave * ecs,uint8_t *dgram_ec)
 	uint8_t temp[datalen];
 
 	normalize_sizes(ecs, &offset, &datalen);
-	if (!get_process_data(temp, offset, datalen)) {
-		if (!set_process_data(data + offset, offset, datalen) )
+	if (!get_process_data(ecs, temp, offset, datalen)) {
+		if (!set_process_data(ecs, data + offset, offset, datalen) )
 			memcpy(data + offset, temp, datalen);
 	}
        // If LRW is used, output FMMUs increment the working counter by 2,

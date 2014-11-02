@@ -2,6 +2,7 @@
 #define __ECS_SLAVE_H__
 
 #include "ecat_timer.h"
+#include "ec_categories.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,6 +27,64 @@ typedef struct {
 
 struct ec_device;
 
+typedef struct __dlstatus__ {
+	uint16_t pdi_operational:1,
+		 dlsuserwatchdog_status:1,
+		 extended_link_detection:1,
+		 reserved:1,
+		 link_status_port0:1,
+		 link_status_port1:1,
+		 link_status_port2:1,
+		 link_status_port3:1,
+		 loop_status_port0:1,
+		 signal_detection_port0:1,
+		 loop_status_port1:1,
+		 signal_detection_port1:1,
+		 loop_status_port2:1,
+		 signal_detection_port2:1,
+		 loop_status_port3:1,
+		 signal_detection_port3:1;
+} dlstatus;
+
+struct ecat_regs {
+	uint8_t base;
+	uint8_t revision;
+	uint8_t portdes;
+	uint16_t alstat;
+	uint16_t dlstat;
+	uint8_t station_address;
+	uint8_t alias;
+	uint8_t dlctl;
+	uint8_t dlport;
+	uint8_t dlalias;
+	uint8_t alctl;
+	uint8_t alstacode;
+	uint8_t pdictl;
+	uint8_t itqmask;
+	uint8_t rxerr;
+	uint8_t eepcfg;
+	uint8_t eepctl;
+	uint8_t eepaddr;
+	uint8_t eepdat;
+	uint8_t cycle_unit_ctrl;
+	uint8_t assign_active;
+	uint32_t propagation_delay;
+	uint32_t offset_from_systemtime;
+	uint32_t drift;
+	uint32_t sync0_start;
+	uint32_t sync1_start;
+	uint32_t cycle_ns;
+	uint32_t dcoffset;
+	uint32_t rxtime_port[4];
+};
+
+typedef struct {
+	uint8_t* data;
+	int size;
+}process_data;
+
+struct __sii_categories__;
+
 typedef struct __ecat_slave__ {
 	uint8_t *pkt_head;
 	uint8_t *dgram_processed; /* current ethercat dgram processed */
@@ -33,6 +92,7 @@ typedef struct __ecat_slave__ {
 	int pkt_size;
 	int debug_level;
 	int interfaces_nr;
+	process_data pd;
 	struct ec_device* intr[EC_MAX_PORTS];
 	int pdoe_sizes[TOT_PDOS]; /* description array of pdos sizes */
 	struct fsm_slave *fsm;	/* finite state machine */
@@ -40,6 +100,10 @@ typedef struct __ecat_slave__ {
 	fsm_mbox mbox;
 	uint8_t index;			/* used by etherlab debug api */
 	struct semaphore device_sem;	/* used by etherlab */
+	struct ecat_regs registers;
+	struct __sii_categories__ categories;
+	int16_t last_word_offset;
+	void (*sii_command)(struct __ecat_slave__*, int16_t offset, int16_t datalen, uint8_t * data);
 } ecat_slave;
 
 typedef struct __ecat_slave__ ecat_node_t;

@@ -12,20 +12,22 @@
 extern "C" {
 #endif
 
-int  	 ec_init_regs(ecat_slave *);
-void 	 ec_set_ado(ecat_slave *,int reg, uint8_t * data, int datalen);
-void 	 ec_get_ado(ecat_slave*,int reg, uint8_t * data, int datalen);
+struct __ecat_slave__;
+
+int  	 ec_init_regs(struct __ecat_slave__ *);
+void 	 ec_set_ado(struct  __ecat_slave__ *,int reg, uint8_t * data, int datalen);
+void 	 ec_get_ado(struct  __ecat_slave__*,int reg, uint8_t * data, int datalen);
 uint32_t ecat_cyclic_interval_ns(void);
-uint32_t ecat_cyclic_activation(void);
+uint32_t ecat_cyclic_activation(struct  __ecat_slave__*);
 uint32_t ecat_cylic_activation_sync0(void);
 uint32_t ecat_systime_offset(void);
 uint32_t ecat_system_time(void);
 uint32_t ecat_cyclic_interval_ns(void);
-uint32_t ecat_get_dcstart(int port);
+uint32_t ecat_get_dcstart(int port,struct  __ecat_slave__*);
 void 	 ecat_set_dcstart(int port, uint8_t* data, int datalen);
 uint32_t ecat_recieve_time(int port);
-uint16_t  ec_station_address(void);
-uint32_t ecat_propagation_delay(void);
+uint16_t  ec_station_address(struct  __ecat_slave__*);
+uint32_t ecat_propagation_delay(struct  __ecat_slave__*);
 
 #ifdef __cplusplus
 }

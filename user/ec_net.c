@@ -12,6 +12,14 @@
 #include <linux/sockios.h>
 #include <linux/ethtool.h>
 
+extern int slaves_nr;
+extern ecat_slave slaves[];
+
+static inline int ec_is_local_slave(ecat_slave *esv) {
+       return (esv->intr[0]->sock == 0);
+}
+
+
 /* use the ethtool way to determine whether link is up*/
 int ec_is_nic_link_up(ecat_slave *esv,struct ec_device *intr)
 {
@@ -19,6 +27,10 @@ int ec_is_nic_link_up(ecat_slave *esv,struct ec_device *intr)
     struct ifreq ifr;
     struct ethtool_value edata;
     int rc;
+	
+    if (ec_is_local_slave(esv)) {
+	return 1;
+    }
 
     sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
     if (sock < 0) {
@@ -122,40 +134,11 @@ int ecs_sock(struct ec_device * intr)
 	strcpy(ifr.ifr_name, intr->name);
 	if (setsockopt(intr->sock, SOL_SOCKET, 
 			SO_BINDTODEVICE, &ifr, sizeof(ifr)) < 0){
-		perror("failed to bind socket to interface\n");
+		fprintf(stderr, "failed to bind socket to interface %s (%s)\n",
+				ifr.ifr_name,strerror(errno));		
 		return -1;
 	}
 	return 0;
 }
 
-int ecs_net_init(int argc, char *argv[], ecat_slave * esv)
-{
-	int i;
-	int k;
-	struct ec_device *intr;
 
-	esv->interfaces_nr = 0;
-	for (i = 0, k = 1; k < argc; k++, i++) {
-		intr = esv->intr[i] = malloc(sizeof(struct ec_device));
-		strncpy(intr->name,
-			argv[k], sizeof(intr->name));
-		if (ecs_sock(intr))
-			return -1;
-		if (ecs_get_intr_conf(intr))
-			return -1;
-		printf("LINK %d %s  %s\n", i, intr->name,
-			  ec_is_nic_link_up(esv, intr) ? "UP" : "DOWN");
-		/*if (!ec_is_nic_link_up(esv, esv->intr[i])) {
-			free(intr);
-			esv->intr[i] = 0;
-			return -1;
-		}*/
-		ec_init_device(intr);
-		esv->interfaces_nr++;	
-	}
-	if (esv->interfaces_nr == 1) {
-		/* closed loop */
-		esv->intr[TX_INT_INDEX] = esv->intr[RX_INT_INDEX];
-	}
-	return 0;
-}

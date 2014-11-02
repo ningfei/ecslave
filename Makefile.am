@@ -28,7 +28,7 @@ user/ec_com.c \
 user/ec_device.c \
 user/ec_debug.c
 
-ec_slave_CFLAGS  = -Wall -Werror -O0 -Iinclude/ -Iuser/ -Istack/ -pthread
+ec_slave_CFLAGS  = -Wall -Werror -g3 -O0 -Iinclude/ -Iuser/ -Istack/ -pthread
 if HAVE_DEBUG
 ec_slave_CFLAGS += -D__MAKE_DEBUG__
 endif

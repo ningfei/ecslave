@@ -14,7 +14,7 @@ void ec_cmd_fprd(ecat_slave *ecs,uint8_t *dgram_ec)
 
 	ado = __ec_dgram_ado(dgram_ec);
 	adp = __ec_dgram_adp(dgram_ec);
-	if (adp != ec_station_address()) {
+	if (adp != ec_station_address(ecs)) {
 		goto FPRD_OUT;
 	}
 	if (datalen == 0) {
@@ -23,7 +23,7 @@ void ec_cmd_fprd(ecat_slave *ecs,uint8_t *dgram_ec)
 	__ec_inc_wkc__(dgram_ec);
 	ec_get_ado(ecs, ado, data, datalen);
 	if (ado == ECT_REG_EEPSTAT){
-		ec_sii_rw(data, datalen);
+		ec_sii_rw(ecs, data, datalen);
 	}
 FPRD_OUT:
         __set_fsm_state(ecs, ecs_process_next_dgram);

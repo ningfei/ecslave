@@ -14,12 +14,12 @@ void ec_cmd_fprw(ecat_slave *ecs,uint8_t *dgram_ec)
 
 	ado = __ec_dgram_ado(dgram_ec);
 	adp = __ec_dgram_adp(dgram_ec);
-	if (adp != ec_station_address()) {
+	if (adp != ec_station_address(ecs)) {
 		ec_printf("%s Index=%x not me adp=%x,%x \n",
 			__FUNCTION__,
 			__ec_dgram_pkt_index(dgram_ec),
 			adp,
-			ec_station_address());
+			ec_station_address(ecs));
 		goto FPRD_OUT;
 	}
 	ec_printf("%s ado=0x%x data len=%d\n",
@@ -36,7 +36,7 @@ void ec_cmd_fprw(ecat_slave *ecs,uint8_t *dgram_ec)
 	uint8_t val[datalen];
 	ec_get_ado(ecs, ado, (uint8_t *)&val, datalen);
 	if (ado == ECT_REG_EEPSTAT)
-		ec_sii_rw(data, datalen);
+		ec_sii_rw(ecs, data, datalen);
 	 else
 		ec_set_ado(ecs, ado, data, datalen);
 	memcpy(data, val, datalen);

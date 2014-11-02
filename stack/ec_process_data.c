@@ -5,58 +5,53 @@
 #include "ec_sii.h"
 #include "ec_regs.h"
 
-typedef struct {
-	uint8_t* data;
-	int size;
-}process_data;
-
-static process_data pd;
-
-int init_process_data(ecat_slave *ecs)
+int init_process_data(ecat_slave *esv)
 {
-	pd.size = ec_sii_pdoes_sizes(ecs);
-	if (pd.size <= 0 ){
+	esv->pd.size = ec_sii_pdoes_sizes(esv);
+	if (esv->pd.size <= 0 ){
 		return -1;
-	}	
-	pd.data = xmalloc(pd.size);
-	if (pd.data == 0)
+	}
+	esv->pd.data = xmalloc(esv->pd.size);
+	if (esv->pd.data == 0)
 		return -1;
-	memset(pd.data, 'x', pd.size);
+	memset(esv->pd.data, 'x', esv->pd.size);
+	esv->last_word_offset = -1;
+	esv->sii_command = NULL;
 	return 0;
 }
 
 /*
  * process data 
 */
-int set_process_data(uint8_t *data, uint16_t offset, uint16_t datalen)
+int set_process_data(ecat_slave *esv,uint8_t *data, uint16_t offset, uint16_t datalen)
 {
-	memcpy(&pd.data[offset % pd.size], data, datalen);
+	memcpy(&esv->pd.data[offset % esv->pd.size], data, datalen);
 	return 0;
 }
 
-int get_process_data(uint8_t *data, uint16_t offset, uint16_t datalen)
+int get_process_data(ecat_slave* esv,uint8_t *data, uint16_t offset, uint16_t datalen)
 {
-	memcpy(data, &pd.data[offset % pd.size], datalen);
+	memcpy(data, &esv->pd.data[offset % esv->pd.size], datalen);
 	return 0;
 }
 
-void normalize_sizes(ecat_slave *ecs, uint32_t *offset,uint16_t *datalen)
+void normalize_sizes(ecat_slave *esv, uint32_t *offset,uint16_t *datalen)
 {
-	int off  = (ec_station_address() -1) * pd.size + *offset;
+	int off  = (ec_station_address(esv) -1) * esv->pd.size + *offset;
 	if (off < 0) {
 		ec_printf("%s off=%d  offset=%d  stafr=%hu\n",
-			__func__, off, *offset, ec_station_address());
+			__func__, off, *offset, ec_station_address(esv));
 		return;
 	}
 	ec_printf("%s off=%d offset=%d statr=%d datalen=%hu\n",
 			__func__, 
 			off, 
 			*offset, 
-			ec_station_address(),
+			ec_station_address(esv),
 			*datalen);
 	*offset = (uint32_t)off;
-	*datalen = *datalen % pd.size;
+	*datalen = *datalen % esv->pd.size;
 	if (*datalen == 0){
-		*datalen = pd.size;
+		*datalen = esv->pd.size;
 	}
 }

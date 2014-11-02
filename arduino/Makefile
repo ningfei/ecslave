@@ -79,7 +79,7 @@
 # (There is no need to define TARGET).  You can also specify the BOARD here, if
 # the project has a specific one.  Here is an example Makefile:
 #
-#SOURCES :=  ec_cmd_brw.c  ec_cmd_frmw.c ec_process_data.c ec_cmd_aprd.c ec_cmd_bwr.c   ec_cmd_lrd.c   ../stack/ec_regs.c ../stack/ec_cmd_aprw.c        ../stack/ec_cmd.c       ../stack/ec_cmd_lrw.c   ../stack/ec_sii.c ../stack/ec_cmd_apwr.c ../stack/ec_cmd_fprd.c  ../stack/ec_cmd_lwr.c ec_util.c ec_ethernet.cpp ec_net.c
+SOURCES :=  ec_cmd_brw.c  ec_cmd_frmw.c ec_process_data.c ec_cmd_aprd.c ec_cmd_bwr.c   ec_cmd_lrd.c   ../stack/ec_regs.c ../stack/ec_cmd_aprw.c        ../stack/ec_cmd.c       ../stack/ec_cmd_lrw.c   ../stack/ec_sii.c ../stack/ec_cmd_apwr.c ../stack/ec_cmd_fprd.c  ../stack/ec_cmd_lwr.c ec_util.c ec_ethernet.cpp ec_net.c
 
 
 #   LIBRARIES := EEPROM
