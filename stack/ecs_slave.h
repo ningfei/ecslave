@@ -27,12 +27,31 @@ typedef struct {
 
 struct ec_device;
 
+typedef struct __dlstatus__ {
+	uint16_t pdi_operational:1,
+		 dlsuserwatchdog_status:1,
+		 extended_link_detection:1,
+		 reserved:1,
+		 link_status_port0:1,
+		 link_status_port1:1,
+		 link_status_port2:1,
+		 link_status_port3:1,
+		 loop_status_port0:1,
+		 signal_detection_port0:1,
+		 loop_status_port1:1,
+		 signal_detection_port1:1,
+		 loop_status_port2:1,
+		 signal_detection_port2:1,
+		 loop_status_port3:1,
+		 signal_detection_port3:1;
+} dlstatus;
+
 struct ecat_regs {
 	uint8_t base;
 	uint8_t revision;
 	uint8_t portdes;
 	uint16_t alstat;
-	uint8_t dlstat;
+	uint16_t dlstat;
 	uint8_t station_address;
 	uint8_t alias;
 	uint8_t dlctl;
