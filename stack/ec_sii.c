@@ -204,7 +204,7 @@ void init_si_info(ec_sii_t *sii)
 	memset(sii,0x00,sizeof(*sii));
 
 	sii->alias = 0x00;
-	sii->vendor_id = 0x1ee;
+	sii->vendor_id = 0x017;
 	sii->product_code = 0x0e;
 	sii->revision_number = 0x12;
 	sii->serial_number = 0x45;
