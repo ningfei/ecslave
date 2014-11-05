@@ -58,7 +58,7 @@ void init_general(ecat_slave *esv, category_general * general,category_header * 
 	general->flags = 0;
 	general->current_on_bus = 100;
 	general->pad_byte1 = 0;
-	general->physical_port = (PORT_MII << PORT0_SHIFT);
+	general->physical_port = (EC_PORT_MII << PORT0_SHIFT);
 }
 // table 23
 void init_syncm(ecat_slave *esv, category_syncm *syncm,int index,category_header * hdr)

@@ -88,7 +88,7 @@ typedef struct {
 
 #define __SIZEOF__(a) ( sizeof(a) + 1)
 
-#define PORT_MII	0x01
+#define EC_PORT_MII	0x01
 #define PORT0_SHIFT	0
 #define NR_PDOS		2
 
