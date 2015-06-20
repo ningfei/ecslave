@@ -28,8 +28,9 @@ user/ec_com.c \
 user/ec_device.c \
 user/ec_debug.c
 
-ec_slave_CFLAGS  = -Wall -Werror -g3 -O0 -Iinclude/ -Iuser/ -Istack/ -pthread
+ec_slave_CFLAGS  = -Wall -Werror -g3 -O0 -Iinclude/ -Iuser/ -Istack/
 if HAVE_DEBUG
 ec_slave_CFLAGS += -D__MAKE_DEBUG__
 endif
-ec_slave_LDADD = -lrt -lpcap
+ec_slave_LDFLAGS= -pthread
+ec_slave_LDADD = -lrt -lpcap 
