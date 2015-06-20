@@ -3,10 +3,10 @@ AC_INIT([ec_slave], [0.1], [raziebe@gmail.com])
 AC_CONFIG_SRCDIR([stack/])
 AC_CONFIG_SRCDIR([user/])
 AC_CONFIG_FILES([Makefile])
-AM_INIT_AUTOMAKE(ec_slave, 2.0)
+AM_INIT_AUTOMAKE(ec_slave, 0.1)
 # Checks for programs.
 AC_PROG_CC
-
+AM_INIT_AUTOMAKE([subdir-objects])
 # Checks for debug
      AC_ARG_ENABLE([debug],
      [  --enable-debug    Turn on debugging],
