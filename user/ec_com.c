@@ -135,7 +135,7 @@ int ec_capture(void)
  	char errbuf[PCAP_ERRBUF_SIZE];          /* error buffer */
 	int snap_len = 1492;	
 	int promisc = 1;
-	int timeout_ms = 1000;
+	int timeout_ms = 0;
 
 	ecs = &slaves[0];
 	rx_handle = pcap_open_live(ecs->intr[RX_INT_INDEX]->name,
