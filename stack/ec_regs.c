@@ -29,10 +29,10 @@ int ec_init_regs(ecat_slave* esv)
 	}
 	// port 0 ,1 : signal and link are on
 	if ( esv->interfaces_nr == 2 ){
-		esv->registers.dlstat =   0b0000101000110000;
+		esv->registers.dlstat =   0b0101101000110000;
 	}
 	if ( esv->interfaces_nr == 1 ){
-		esv->registers.dlstat =   0b0000001000010000;
+		esv->registers.dlstat =   0b0101011000010000;
 	}
 	return 0;
 }
