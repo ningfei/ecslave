@@ -1,0 +1,11 @@
+--- Makefile	2015-05-10 20:09:28.250799074 +0200
++++ Makefile	2015-05-10 20:10:24.650299352 +0200
+@@ -120,7 +120,7 @@
+ INSTALL_STRIP_PROGRAM = ${SHELL} $(install_sh) -c -s
+ LDFLAGS = 
+ LIBOBJS = 
+-LIBS = 
++LIBS = -lpthread
+ LTLIBOBJS = 
+ MAKEINFO = ${SHELL} /home/pi/ecslave/missing --run makeinfo
+ OBJEXT = o
